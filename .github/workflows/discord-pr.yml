@@ -2,7 +2,8 @@ name: Notify Discord on PR
 
 on:
   pull_request:
-    types: [opened]
+    branches: [ "main" ]
+    types: [ opened ]
 
 jobs:
   discord:
@@ -12,5 +13,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{"content":"📌 새 PR이 올라왔습니다: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"}' \
+               -d "{
+                 \"content\": \"📌 새 PR이 올라왔습니다!\n🔗 https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}\n📄 제목: ${{ github.event.pull_request.title }}\n🙋 작성자: ${{ github.event.pull_request.user.login }}\"
+               }" \
                ${{ secrets.DISCORD_WEBHOOK }}
