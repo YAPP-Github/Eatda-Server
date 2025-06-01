@@ -9,5 +9,4 @@ class SundaeApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
