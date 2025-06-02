@@ -1,0 +1,30 @@
+name: Notify Discord on PR or Review
+
+on:
+  pull_request:
+    types: [ opened ]
+  pull_request_review:
+    types: [ submitted ]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Webhook
+        run: |
+          PR_URL="https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}"
+          AUTHOR="${{ github.event.pull_request.user.login || github.event.review.user.login }}"
+          TITLE="${{ github.event.pull_request.title || github.event.pull_request_review.pull_request.title }}"
+          REVIEW_STATE="${{ github.event.review.state || '' }}"
+
+          CONTENT=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CONTENT="📌 새 PR이 생성되었습니다!\n🔗 ${PR_URL}\n📄 제목: ${TITLE}\n🙋 작성자: ${AUTHOR}"
+          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            CONTENT="🔍 PR에 리뷰가 생성되었습니다! (${REVIEW_STATE})\n🔗 ${PR_URL}\n🙋 리뷰어: ${AUTHOR}"
+          fi
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"${CONTENT}\"}" \
+               ${{ secrets.DISCORD_WEBHOOK }}
