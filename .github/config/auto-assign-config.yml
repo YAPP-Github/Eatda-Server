@@ -1,0 +1,12 @@
+addReviewers: true
+addAssignees: author
+numberOfReviewers: 1
+reviewers:
+  - lvalentine6
+  - leegwichan
+
+filterLabels:
+  exclude:
+    - wip
+
+runOnDraft: false

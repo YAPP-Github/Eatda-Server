@@ -1,0 +1,27 @@
+name: Notify Discord on `/noti` Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify-on-noti-comment:
+    if: github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for `/noti` keyword and send Discord notification
+        run: |
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          PR_URL="https://github.com/${{ github.repository }}/pull/${{ github.event.issue.number }}"
+          AUTHOR="${{ github.event.comment.user.login }}"
+
+          if echo "$COMMENT_BODY" | grep -q "/noti"; then
+            CONTENT="📣 알림 요청이 감지되었습니다!\n🔗 ${PR_URL}\n🙋 작성자: ${AUTHOR}\n💬 댓글: ${COMMENT_BODY}"
+
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d "{\"content\": \"${CONTENT}\"}" \
+                 ${{ secrets.DISCORD_WEBHOOK }}
+          else
+            echo "No /noti found. Skipping notification."
+          fi
