@@ -88,32 +88,6 @@ tasks.named('test', Test) {
     finalizedBy tasks.jacocoTestReport
 }
 
-generateSwaggerUI {
-    dependsOn("openapi3")
-
-    delete(fileTree("src/main/resources/static/docs/") {
-        exclude(".gitkeep")
-    })
-    copy {
-        from("build/resources/main/static/docs/")
-        into("src/main/resources/static/docs/")
-    }
-}
-
-openapi3 {
-    servers = [ // 서버 상황에 맞춰 추가 예정
-            {
-                url = "http://localhost:8080"
-                description = "Local Server"
-            }
-    ]
-    title = "백암 순대 API" // 수정 예정
-    description = "백암 순대 API" // 수정 예정
-    version = "0.0.1"
-    format = "yaml"
-    outputDirectory = "build/resources/main/static/docs"
-}
-
 tasks.named('jacocoTestReport', JacocoReport) {
     dependsOn test
     reports {
@@ -128,3 +102,28 @@ tasks.named('jacocoTestReport', JacocoReport) {
     )
 }
 
+generateSwaggerUI {
+    dependsOn("openapi3")
+
+    delete(fileTree("src/main/resources/static/docs/") {
+        exclude(".gitkeep")
+    })
+    copy {
+        from("build/resources/main/static/docs/")
+        into("src/main/resources/static/docs/")
+    }
+}
+
+openapi3 {
+    servers = [ // 서버 상황에 맞춰 추가 예정
+                {
+                    url = "http://localhost:8080"
+                    description = "Local Server"
+                }
+    ]
+    title = "백암 순대 API" // 수정 예정
+    description = "백암 순대 API" // 수정 예정
+    version = "0.0.1"
+    format = "yaml"
+    outputDirectory = "build/resources/main/static/docs"
+}
