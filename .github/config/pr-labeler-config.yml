@@ -1,0 +1,29 @@
+fix:
+  - head-branch: ['^fix/', '^bugfix/', '^hotfix/']
+
+feat:
+  - head-branch: ['^feat/', '^feature/']
+
+docs:
+  - head-branch: ['^docs/']
+
+refactor:
+  - head-branch: ['^refactor/']
+
+test:
+  - head-branch: ['^test/']
+
+chore:
+  - head-branch: ['^chore/']
+
+ci:
+  - head-branch: ['^ci/']
+
+build:
+  - head-branch: ['^build/']
+
+perf:
+  - head-branch: ['^perf/']
+
+revert:
+  - head-branch: ['^revert/']
