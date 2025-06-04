@@ -77,11 +77,11 @@ tasks.named('asciidoctor') {
     dependsOn test
 }
 
-tasks.register('jacocoTestReport', JacocoReport) {
+tasks.named('jacocoTestReport', JacocoReport) {
     dependsOn test
     reports {
-        xml.required = true
-        html.required = true
+        xml.required.set(true)
+        html.required.set(true)
     }
     sourceDirectories.setFrom(files(sourceSets.main.allSource.srcDirs))
     classDirectories.setFrom(files(sourceSets.main.output))
