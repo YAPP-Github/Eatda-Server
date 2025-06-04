@@ -3,6 +3,12 @@ plugins {
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+
+    // Rest Docs & Swagger UI
+    id 'com.epages.restdocs-api-spec' version '0.18.2'
+    id 'org.hidetake.swagger.generator' version '2.18.2'
+
+    // Jacoco, sonarcloud
     id 'jacoco'
     id("org.sonarqube") version "6.2.0.5505"
 }
@@ -61,9 +67,19 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
+    testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
+}
+
+bootJar {
+    dependsOn("openapi3")
 }
 
 tasks.named('test', Test) {
@@ -72,9 +88,30 @@ tasks.named('test', Test) {
     finalizedBy tasks.jacocoTestReport
 }
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
+generateSwaggerUI {
+    dependsOn("openapi3")
+
+    delete(fileTree("src/main/resources/static/docs/") {
+        exclude(".gitkeep")
+    })
+    copy {
+        from("build/resources/main/static/docs/")
+        into("src/main/resources/static/docs/")
+    }
+}
+
+openapi3 {
+    servers = [ // 서버 상황에 맞춰 추가 예정
+            {
+                url = "http://localhost:8080"
+                description = "Local Server"
+            }
+    ]
+    title = "백암 순대 API" // 수정 예정
+    description = "백암 순대 API" // 수정 예정
+    version = "0.0.1"
+    format = "yaml"
+    outputDirectory = "build/resources/main/static/docs"
 }
 
 tasks.named('jacocoTestReport', JacocoReport) {
