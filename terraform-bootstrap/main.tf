@@ -69,7 +69,7 @@ resource "aws_dynamodb_table" "terraform_lock" {
 }
 
 module "ecr" {
-  source = "../terraform/common-modules/ecr"
+  source = "../terraform/common/ecr"
 
   for_each = var.ecr_repositories
 
