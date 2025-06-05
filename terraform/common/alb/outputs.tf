@@ -1,3 +1,3 @@
 output "alb_arn" {
-  value = aws_alb.issuefy_alb.arn
+  value = aws_alb.timeeat_alb.arn
 }

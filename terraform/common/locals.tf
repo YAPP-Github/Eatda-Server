@@ -75,7 +75,7 @@ locals {
           from_port                = 8080
           to_port                  = 8080
           protocol                 = "tcp"
-          source_security_group_id = module.security_group["alb"].alb_sg_id
+          source_security_group_id = module.security_group["alb"].security_group_ids
         }
       ]
     }
