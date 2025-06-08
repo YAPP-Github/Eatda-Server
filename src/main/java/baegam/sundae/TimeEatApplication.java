@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SundaeApplication {
+public class TimeEatApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SundaeApplication.class, args);
+		SpringApplication.run(TimeEatApplication.class, args);
 	}
 }
