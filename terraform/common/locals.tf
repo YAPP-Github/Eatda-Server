@@ -18,7 +18,8 @@ locals {
       policy_arns = [
         "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
         "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
-        "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+        "arn:aws:iam::aws:policy/AmazonECS_FullAccess",
+        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
       ]
       tags = {
         Purpose = "ECS EC2 Registration"
@@ -28,7 +29,9 @@ locals {
     "ecsTaskExecutionRole" = {
       assume_role_services = ["ecs-tasks.amazonaws.com"]
       policy_arns = [
-        "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerServiceFullAccess"
       ]
       tags = {
         Purpose = "ECS Task Execution"
