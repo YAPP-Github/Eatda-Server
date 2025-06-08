@@ -1,4 +1,4 @@
-package baegam.sundae.document;
+package timeeat.document;
 
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;

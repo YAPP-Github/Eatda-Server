@@ -1,6 +1,6 @@
-package baegam.sundae.controller;
+package timeeat.controller;
 
-import baegam.sundae.DatabaseCleaner;
+import timeeat.DatabaseCleaner;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;

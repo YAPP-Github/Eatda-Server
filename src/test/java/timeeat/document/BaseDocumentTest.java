@@ -1,4 +1,4 @@
-package baegam.sundae.document;
+package timeeat.document;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;

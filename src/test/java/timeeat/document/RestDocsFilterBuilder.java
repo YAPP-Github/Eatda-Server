@@ -1,4 +1,4 @@
-package baegam.sundae.document;
+package timeeat.document;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 

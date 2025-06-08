@@ -1,6 +1,6 @@
-package baegam.sundae.service;
+package timeeat.service;
 
-import baegam.sundae.DatabaseCleaner;
+import timeeat.DatabaseCleaner;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 

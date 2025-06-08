@@ -1,4 +1,4 @@
-package baegam.sundae.document;
+package timeeat.document;
 
 public enum Tag {
 
