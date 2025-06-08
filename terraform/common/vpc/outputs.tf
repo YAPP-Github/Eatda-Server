@@ -9,9 +9,13 @@ output "vpc_cidr_block" {
 }
 
 output "public_subnet_ids" {
-  description = "List of IDs of public subnets"
-  value       = aws_subnet.timeeat_public_subnet[*].id
+  description = "Map of public subnet IDs for environments"
+  value = {
+    dev  = aws_subnet.timeeat_public_subnet[0].id
+    prod = aws_subnet.timeeat_public_subnet[1].id
+  }
 }
+
 
 output "private_subnet_ids" {
   description = "List of IDs of private subnets"
