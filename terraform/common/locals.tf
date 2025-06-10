@@ -1,5 +1,6 @@
 locals {
   group_name = "power"
+  project_name = var.project_name
 
   policy_arns = [
     "arn:aws:iam::aws:policy/AdministratorAccess",

@@ -1,3 +1,8 @@
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+}
+
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
@@ -44,10 +49,4 @@ variable "tags" {
   description = "Tags to apply to resources"
   type = map(string)
   default = {}
-}
-
-variable "name_prefix" {
-  description = "Prefix to use for resource names"
-  type        = string
-  default     = "issuefy"
 }

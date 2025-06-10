@@ -1,5 +1,6 @@
 module "timeeat_vpc" {
   source = "./vpc"
+  project_name = local.project_name
 }
 
 module "timeeat_iam" {
