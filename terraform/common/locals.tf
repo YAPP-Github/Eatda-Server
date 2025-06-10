@@ -8,7 +8,7 @@ locals {
     "arn:aws:iam::aws:policy/ElasticLoadBalancingReadOnly"
   ]
 
-  user = ["roy-test"]
+  user = ["roy-test", "leegwichan"]
 }
 
 locals {
