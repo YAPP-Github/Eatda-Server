@@ -16,10 +16,12 @@ output "public_subnet_ids" {
   }
 }
 
-
 output "private_subnet_ids" {
   description = "List of IDs of private subnets"
-  value       = aws_subnet.timeeat_private_subnet[*].id
+  value = {
+    dev  = aws_subnet.timeeat_private_subnet[0].id
+    prod = aws_subnet.timeeat_private_subnet[1].id
+  }
 }
 
 output "internet_gateway_id" {
