@@ -1,4 +1,4 @@
-resource "aws_ecs_cluster" "ecs_dev_cluster" {
+resource "aws_ecs_cluster" "dev" {
   name = var.cluster_name
 
   setting {
@@ -6,7 +6,7 @@ resource "aws_ecs_cluster" "ecs_dev_cluster" {
     value = var.cluster_settings.value
   }
 
-  tags = {
-    Name = var.cluster_name
-  }
+  tags = merge(var.tags, {
+    Cluster = var.cluster_name
+  })
 }

@@ -19,3 +19,8 @@ variable "cluster_settings" {
     error_message = "Only 'containerInsights' is supported for ECS cluster setting.name."
   }
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

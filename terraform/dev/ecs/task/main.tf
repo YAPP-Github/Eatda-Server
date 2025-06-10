@@ -1,4 +1,4 @@
-resource "aws_ecs_task_definition" "ecs_dev_tasks" {
+resource "aws_ecs_task_definition" "dev" {
   for_each = var.task_definitions
 
   family                   = each.key
@@ -18,4 +18,8 @@ resource "aws_ecs_task_definition" "ecs_dev_tasks" {
       host_path = volume.value.host_path
     }
   }
+
+  tags = merge(var.tags, {
+    Task = each.key
+  })
 }

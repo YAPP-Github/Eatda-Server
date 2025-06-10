@@ -23,3 +23,8 @@ variable "container_definitions_map" {
   description = "Map of ECS service names to their container definitions"
   type        = map(any)
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

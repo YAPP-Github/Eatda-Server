@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 locals {
-  cluster_name = "time-eat-dev-ct"
+  cluster_name = "${var.project_name}-${var.environment}-cluster"
 
   settings = {
     name  = "containerInsights"
@@ -28,7 +28,7 @@ locals {
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
       name            = name
-      task_definition = module.time_eat_ecs_task.task_definition_arns[def.task_definition_name]
+      task_definition = module.task.task_definition_arns[def.task_definition_name]
       desired_count   = def.desired_count
       iam_role_arn    = local.unified_role_arn
       load_balancer = {

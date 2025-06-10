@@ -19,3 +19,8 @@ variable "ns_failure_threshold" {
 variable "service_discovery_service_name" {
   type = string
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

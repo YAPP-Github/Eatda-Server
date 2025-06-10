@@ -1,4 +1,4 @@
-resource "aws_instance" "time_eat_ec2" {
+resource "aws_instance" "dev" {
   ami                         = var.instance_definitions.ami
   instance_type               = var.instance_definitions.instance_type
   subnet_id                   = lookup(var.instance_subnet_map, var.instance_definitions.role)

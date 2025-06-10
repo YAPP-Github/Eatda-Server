@@ -14,11 +14,6 @@ variable "instance_subnet_map" {
   type = map(string)
 }
 
-variable "tags" {
-  type = map(string)
-  default = {}
-}
-
 variable "name_prefix" {
   description = "Name prefix for instance naming"
   type        = string
@@ -27,4 +22,9 @@ variable "name_prefix" {
 variable "ec2_sg_id" {
   description = "Security Group ID for EC2 instances"
   type        = string
+}
+
+variable "tags" {
+  type = map(string)
+  default = {}
 }

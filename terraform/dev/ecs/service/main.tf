@@ -1,4 +1,4 @@
-resource "aws_ecs_service" "ecs_dev_services" {
+resource "aws_ecs_service" "dev" {
   for_each = var.dev_ecs_services
 
   name                = each.key
@@ -12,7 +12,7 @@ resource "aws_ecs_service" "ecs_dev_services" {
     type = var.deployment_controller_type
   }
 
-  tags = {
-    Name = each.key
-  }
+  tags = merge(var.tags, {
+    Service = each.key
+  })
 }

@@ -15,3 +15,8 @@ variable "cluster_id" {
 variable "deployment_controller_type" {
   type = string
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

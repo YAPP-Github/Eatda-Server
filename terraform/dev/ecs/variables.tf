@@ -1,3 +1,12 @@
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+}
+
+variable "environment" {
+  type = string
+}
+
 variable "ecr_repo_names" {
   type = map(string)
 }
@@ -60,10 +69,14 @@ variable "volume_mount_paths" {
 }
 
 variable "ecs_unified_role_arn" {
-  type        = string
+  type = string
 }
 
 variable "alb_target_group_arns" {
   type = map(string)
 }
 
+variable "tags" {
+  type = map(string)
+  default = {}
+}
