@@ -1,4 +1,4 @@
-resource "aws_alb_listener" "https_listener" {
+resource "aws_alb_listener" "https" {
   load_balancer_arn = var.alb_arn
   port              = var.https_listener.port
   protocol          = var.https_listener.protocol
@@ -9,9 +9,9 @@ resource "aws_alb_listener" "https_listener" {
   }
 }
 
-resource "aws_alb_listener_rule" "listener_rules" {
+resource "aws_alb_listener_rule" "common" {
   for_each     = var.listener_rules
-  listener_arn = aws_alb_listener.https_listener.arn
+  listener_arn = aws_alb_listener.https.arn
   priority     = each.value.priority
 
   condition {

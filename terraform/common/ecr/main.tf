@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "timeeat_ecr" {
+resource "aws_ecr_repository" "common" {
   name                 = var.repository_name
   image_tag_mutability = var.image_tag_mutability
 

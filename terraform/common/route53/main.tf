@@ -1,4 +1,4 @@
-resource "aws_route53_zone" "this" {
+resource "aws_route53_zone" "common" {
   name = var.domain_name
 }
 
@@ -9,7 +9,7 @@ resource "aws_acm_certificate" "wildcard" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  zone_id = aws_route53_zone.this.zone_id
+  zone_id = aws_route53_zone.common.zone_id
   name    = aws_acm_certificate.wildcard.domain_validation_options[0].resource_record_name
   type    = aws_acm_certificate.wildcard.domain_validation_options[0].resource_record_type
   records = [aws_acm_certificate.wildcard.domain_validation_options[0].resource_record_value]
@@ -25,7 +25,7 @@ resource "aws_acm_certificate_validation" "wildcard" {
 resource "aws_route53_record" "subdomains" {
   for_each = var.subdomains
 
-  zone_id = aws_route53_zone.this.zone_id
+  zone_id = aws_route53_zone.common.zone_id
   name    = "${each.key}.${var.domain_name}"
   type    = var.recode_type
 

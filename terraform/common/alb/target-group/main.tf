@@ -1,4 +1,4 @@
-resource "aws_lb_target_group" "timeeat_target_group" {
+resource "aws_lb_target_group" "common" {
   for_each = var.target_groups
 
   name        = each.key

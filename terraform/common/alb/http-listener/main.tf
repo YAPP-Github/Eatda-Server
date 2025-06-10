@@ -1,4 +1,4 @@
-resource "aws_alb_listener" "http_listener" {
+resource "aws_alb_listener" "http" {
   load_balancer_arn = var.alb_arn
   port              = var.http_listener.port
   protocol          = var.http_listener.protocol

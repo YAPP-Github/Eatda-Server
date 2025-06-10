@@ -60,7 +60,7 @@ locals {
     port             = 443
     protocol         = "HTTPS"
     type             = "forward"
-    target_group_arn = module.timeeat_target_group.target_group_arns["dev-timeeat"]
+    target_group_arn = module.target_groups.target_group_arns["dev-timeeat"]
   }
 }
 
@@ -70,13 +70,13 @@ locals {
       priority = 1
       host_header       = "timeeat.site"
       action_type       = "forward"
-      target_group_arn  = module.timeeat_target_group.target_group_arns["prod-timeeat"]
+      target_group_arn  = module.target_groups.target_group_arns["prod-timeeat"]
     }
     "dev-path-rule" = {
       priority = 2
       host_header       = "dev.timeeat.site"
       action_type       = "forward"
-      target_group_arn  = module.timeeat_target_group.target_group_arns["dev-timeeat"]
+      target_group_arn  = module.target_groups.target_group_arns["dev-timeeat"]
     }
   }
 }

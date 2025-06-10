@@ -1,4 +1,4 @@
-resource "aws_alb" "timeeat_alb" {
+resource "aws_alb" "common" {
   name               = local.alb_name
   internal           = local.internal
   load_balancer_type = local.loadbalancer_type
@@ -12,20 +12,20 @@ resource "aws_alb" "timeeat_alb" {
   }
 }
 
-module "timeeat_http_listener" {
+module "http" {
   source        = "./http-listener"
-  alb_arn       = aws_alb.timeeat_alb.arn
+  alb_arn       = aws_alb.common.arn
   http_listener = local.http_listener
 }
 
-module "timeeat_https_listener" {
+module "https" {
   source         = "./https-listener"
-  alb_arn        = aws_alb.timeeat_alb.arn
+  alb_arn        = aws_alb.common.arn
   https_listener = local.https_listener
   listener_rules = local.listener_rules
 }
 
-module "timeeat_target_group" {
+module "target_groups" {
   source        = "./target-group"
   target_groups = local.target_groups
   vpc_id        = var.vpc_id

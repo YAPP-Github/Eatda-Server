@@ -93,7 +93,7 @@ locals {
           from_port   = 3306
           to_port     = 3306
           protocol    = "tcp"
-          cidr_blocks = module.timeeat_vpc.vpc_cidr_block
+          cidr_blocks = module.vpc.vpc_cidr_block
         }
       ]
     }
