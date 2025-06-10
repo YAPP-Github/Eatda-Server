@@ -11,29 +11,29 @@ provider "aws" {
   region = "ap-northeast-2"
 }
 
-resource "aws_s3_bucket" "timeeat_bucket" {
-  bucket        = "timeeat-prod-terraform-state-ap-northeast-2"
+resource "aws_s3_bucket" "terraform_bootstrap_bucket" {
+  bucket        = "terraform-timeeat-bootstrap-state-ap-northeast-2"
   force_destroy = false
 
   tags = {
-    Name        = "timeeat-prod-terraform-state-ap-northeast-2"
-    Environment = "prod"
+    Name        = "terraform-timeeat-bootstrap-state-ap-northeast-2"
+    Environment = "state"
     Owner       = "baegam"
-    Project     = "timeeat"
+    Project     = "time-eat"
     Service     = "infrastructure"
   }
 }
 
-resource "aws_s3_bucket_versioning" "timeeat_bucket_versioning" {
-  bucket = aws_s3_bucket.timeeat_bucket.id
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.terraform_bootstrap_bucket.id
 
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "timeeat_bucket_lifecycle" {
-  bucket = aws_s3_bucket.timeeat_bucket.id
+resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
+  bucket = aws_s3_bucket.terraform_bootstrap_bucket.id
 
   rule {
     id     = "state-file-lifecycle"
@@ -50,7 +50,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "timeeat_bucket_lifecycle" {
 }
 
 resource "aws_dynamodb_table" "terraform_lock" {
-  name         = "timeeat-terraform-lock"
+  name         = "terraform-timeeat-lock"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -60,10 +60,10 @@ resource "aws_dynamodb_table" "terraform_lock" {
   }
 
   tags = {
-    Name        = "timeeat-terraform-lock"
-    Environment = "prod"
+    Name        = "terraform-timeeat-lock"
+    Environment = "state"
     Owner       = "baegam"
-    Project     = "timeeat"
+    Project     = "time-eat"
     Service     = "infrastructure"
   }
 }

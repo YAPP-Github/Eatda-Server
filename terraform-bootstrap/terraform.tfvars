@@ -1,16 +1,18 @@
 ecr_repositories = {
-  timeeat_prod = {
+  prod = {
     scan_on_push         = false
     image_tag_mutability = "MUTABLE"
     tags = {
+      Name    = "time-eat-prod"
       Service = "prod"
     }
   }
 
-  timeeat_dev = {
+  dev = {
     scan_on_push         = false
     image_tag_mutability = "MUTABLE"
     tags = {
+      Name    = "time-eat-dev"
       Service = "dev"
     }
   }
