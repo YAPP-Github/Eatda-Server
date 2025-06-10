@@ -9,10 +9,12 @@ data "terraform_remote_state" "bootstrap" {
 
 module "common" {
   source = "./common"
+  project_name = local.project_name
 }
 
 module "dev" {
   source                = "./dev"
+  project_name          = local.project_name
   alb_target_group_arns = module.common.target_group_arns
   ec2_sg_id             = module.common.security_group_ids["ec2"]
   ecr_repo_names        = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names
@@ -21,6 +23,7 @@ module "dev" {
   instance_subnet_map   = module.common.public_subnet_ids.dev
   unified_role_arn      = module.common.role_arn["ecsTaskExecutionRole"]
   vpc_id                = module.common.vpc_id
+  tags = local.common_tags
 }
 
 module "prod_module" {
@@ -36,4 +39,5 @@ module "prod_module" {
   ecs_task_definitions  = local.ecs_task_definitions
   instance_subnet_map   = module.common.public_subnet_ids.prod
   unified_role_arn      = module.common.role_arn["ecsTaskExecutionRole"]
+  tags = local.common_tags
 }

@@ -1,8 +1,5 @@
 locals {
   environment = "prod"
-}
-
-locals {
   ns_name                        = "time-eat.com"
   ns_type                        = "A"
   service_discovery_service_name = "api"
@@ -19,7 +16,7 @@ locals {
     ami                  = "ami-012ea6058806ff688"
     instance_type        = "t3.micro"
     iam_instance_profile = "ec2-to-ecs"
-    key_name             = "time-eat-prod-key"
+    key_name             = "ec2-prod-key"
     user_data            = <<-EOF
 #!/bin/bash
 echo ECS_CLUSTER=time-eat-prod-cluster >> /etc/ecs/ecs.config

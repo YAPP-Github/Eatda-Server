@@ -1,7 +1,7 @@
 resource "aws_service_discovery_private_dns_namespace" "prod" {
   name = var.ns_name
   vpc  = var.vpc_id
-
+  tags = var.tags
 }
 
 resource "aws_service_discovery_service" "api" {
@@ -17,4 +17,6 @@ resource "aws_service_discovery_service" "api" {
   health_check_custom_config {
     failure_threshold = var.ns_failure_threshold
   }
+
+  tags = var.tags
 }
