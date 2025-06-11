@@ -2,6 +2,7 @@ resource "aws_alb_listener" "https" {
   load_balancer_arn = var.alb_arn
   port              = var.https_listener.port
   protocol          = var.https_listener.protocol
+  certificate_arn   = var.https_listener.certificate_arn
 
   default_action {
     type             = var.https_listener.type
@@ -23,5 +24,9 @@ resource "aws_alb_listener_rule" "common" {
   action {
     type             = each.value.action_type
     target_group_arn = each.value.target_group_arn
+  }
+
+  tags = {
+    Name = each.key
   }
 }
