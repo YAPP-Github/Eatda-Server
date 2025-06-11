@@ -25,8 +25,8 @@ module "ecs" {
   ecs_services = var.ecs_services
   ecs_task_definitions = var.ecs_task_definitions
   name_space_id          = module.cloud_map.namespace_id
-  ecs_unified_role_arn   = var.unified_role_arn
   environment            = local.environment
   project_name           = var.project_name
   tags = local.tags
+  region                 = var.region
 }

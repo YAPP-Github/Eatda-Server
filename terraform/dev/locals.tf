@@ -1,3 +1,13 @@
+data "terraform_remote_state" "bootstrap" {
+  backend = "s3"
+
+  config = {
+    bucket = "timeeat-tf-state"
+    key    = "bootstrap/terraform.tfstate"
+    region = "ap-northeast-2"
+  }
+}
+
 locals {
   environment                    = "dev"
   ns_name                        = "time-eat.com"
@@ -16,6 +26,7 @@ locals {
   dev_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
     instance_type        = "t2.micro"
+    role                 = "dev"
     iam_instance_profile = "ec2-to-ecs"
     key_name             = "ec2-dev-key"
     user_data            = <<-EOF
@@ -26,13 +37,13 @@ EOF
 }
 
 locals {
-  ecs_services = {
-    task_definition_name = "a"
-    desired_count        = 1
-    load_balancer = {
-      target_group_key = string
-      container_name   = string
-      container_port   = number
-    }
+  ecs_services         = var.ecs_services
+}
+
+locals {
+  ecs_task_definitions = {
+    for k, v in var.ecs_task_definitions : k => merge(v, {
+      container_image          = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names[k]
+    })
   }
 }
