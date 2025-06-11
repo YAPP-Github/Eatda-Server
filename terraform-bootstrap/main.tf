@@ -12,11 +12,11 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_bootstrap_bucket" {
-  bucket        = "terraform-timeeat-bootstrap-state-ap-northeast-2"
+  bucket        = "timeeat-tf-state"
   force_destroy = false
 
   tags = {
-    Name        = "terraform-timeeat-bootstrap-state-ap-northeast-2"
+    Name        = "timeeat-tf-state"
     Environment = "state"
     Owner       = "baegam"
     Project     = "time-eat"
@@ -50,7 +50,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
 }
 
 resource "aws_dynamodb_table" "terraform_lock" {
-  name         = "terraform-timeeat-lock"
+  name         = "timeeat-tf-lock"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -60,7 +60,7 @@ resource "aws_dynamodb_table" "terraform_lock" {
   }
 
   tags = {
-    Name        = "terraform-timeeat-lock"
+    Name        = "timeeat-tf-lock"
     Environment = "state"
     Owner       = "baegam"
     Project     = "time-eat"
