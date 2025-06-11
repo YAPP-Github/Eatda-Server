@@ -11,7 +11,7 @@ provider "aws" {
   region = "ap-northeast-2"
 }
 
-resource "aws_s3_bucket" "terraform_bootstrap_bucket" {
+resource "aws_s3_bucket" "bootstrap" {
   bucket        = "timeeat-tf-state"
   force_destroy = false
 
@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "terraform_bootstrap_bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
-  bucket = aws_s3_bucket.terraform_bootstrap_bucket.id
+  bucket = aws_s3_bucket.bootstrap.id
 
   versioning_configuration {
     status = "Enabled"
@@ -33,7 +33,7 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
-  bucket = aws_s3_bucket.terraform_bootstrap_bucket.id
+  bucket = aws_s3_bucket.bootstrap.id
 
   rule {
     id     = "state-file-lifecycle"
@@ -49,7 +49,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
   }
 }
 
-resource "aws_dynamodb_table" "terraform_lock" {
+resource "aws_dynamodb_table" "lock" {
   name         = "timeeat-tf-lock"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
