@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 
     // Rest Docs & Swagger UI
     id 'com.epages.restdocs-api-spec' version '0.18.2'
@@ -13,7 +12,7 @@ plugins {
     id("org.sonarqube") version "6.2.0.5505"
 }
 
-group = 'baegam'
+group = 'time-eat'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -121,8 +120,8 @@ openapi3 {
                     description = "Local Server"
                 }
     ]
-    title = "백암 순대 API" // 수정 예정
-    description = "백암 순대 API" // 수정 예정
+    title = "Time Eat API"
+    description = "Time Eat API 명세서"
     version = "0.0.1"
     format = "yaml"
     outputDirectory = "build/resources/main/static/docs"

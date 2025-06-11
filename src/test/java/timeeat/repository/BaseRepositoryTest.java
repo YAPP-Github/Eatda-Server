@@ -1,4 +1,4 @@
-package baegam.sundae.repository;
+package timeeat.repository;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
