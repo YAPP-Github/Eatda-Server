@@ -7,6 +7,10 @@ variable "environment" {
   type = string
 }
 
+variable "region" {
+  type = string
+}
+
 variable "ecr_repo_names" {
   type = map(string)
 }
@@ -17,13 +21,17 @@ variable "name_space_id" {
 
 variable "ecs_task_definitions" {
   type = map(object({
-    cpu          = number
-    memory       = number
-    network_mode = string
+    cpu                = number
+    memory             = number
+    network_mode       = string
     container_port = list(number)
     host_port = list(number)
-    log_group    = string
+    log_group          = string
     environment = map(string)
+    container_image    = string
+    execution_role_arn = string
+    task_role_arn      = string
+    requires_compatibilities = list(string)
     volumes = list(object({
       name      = string
       host_path = string
@@ -31,10 +39,10 @@ variable "ecs_task_definitions" {
   }))
 }
 
+
 variable "ecs_services" {
   type = map(object({
-    task_definition_name = string
-    desired_count        = number
+    desired_count = number
     load_balancer = object({
       target_group_key = string
       container_name   = string
@@ -66,10 +74,6 @@ variable "log_stream_prefix" {
 variable "volume_mount_paths" {
   type = map(string)
   default = {}
-}
-
-variable "ecs_unified_role_arn" {
-  type = string
 }
 
 variable "alb_target_group_arns" {

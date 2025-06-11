@@ -2,6 +2,8 @@ data "aws_caller_identity" "current" {}
 
 locals {
   cluster_name = "${var.project_name}-${var.environment}-cluster"
+  launch_type  = "EC2"
+  scheduling_strategy = "REPLICA"
 
   settings = {
     name  = "containerInsights"
@@ -15,22 +17,20 @@ locals {
     name => "${data.aws_caller_identity.current.account_id}.dkr.ecr.ap-northeast-2.amazonaws.com/${repo}"
   }
 
-  unified_role_arn = var.ecs_unified_role_arn
-
   resolved_task_definitions = {
     for name, def in var.ecs_task_definitions : name => merge(def, {
-      container_image    = "${local.ecr_repo_urls[name]}:latest"
-      task_role_arn      = local.unified_role_arn
-      execution_role_arn = local.unified_role_arn
+      task_definition_name = "time-eat-dev-api"
+      container_image      = "${local.ecr_repo_urls[name]}:latest"
+      task_role_arn        = def.task_role_arn
+      execution_role_arn   = def.execution_role_arn
     })
   }
 
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
-      name            = name
-      task_definition = module.task.task_definition_arns[def.task_definition_name]
-      desired_count   = def.desired_count
-      iam_role_arn    = local.unified_role_arn
+      name          = name
+      desired_count = def.desired_count
+      iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
       load_balancer = {
         target_group_arn = var.alb_target_group_arns[def.load_balancer.target_group_key]
         container_name   = def.load_balancer.container_name
