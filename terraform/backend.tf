@@ -4,6 +4,6 @@ terraform {
     key            = "bootstrap/terraform.tfstate"
     region         = "ap-northeast-2"
     encrypt        = true
-    dynamodb_table = "timeeat-terraform-lock"
+    dynamodb_table = "timeeat-tf-lock"
   }
 }
