@@ -68,10 +68,6 @@ variable "volume_mount_paths" {
   default = {}
 }
 
-variable "ecs_unified_role_arn" {
-  type = string
-}
-
 variable "alb_target_group_arns" {
   type = map(string)
 }

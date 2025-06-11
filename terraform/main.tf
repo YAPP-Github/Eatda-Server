@@ -8,7 +8,7 @@ data "terraform_remote_state" "bootstrap" {
 }
 
 module "common" {
-  source = "./common"
+  source       = "./common"
   project_name = local.project_name
 }
 
@@ -20,10 +20,10 @@ module "dev" {
   ecr_repo_names        = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names
   ecs_services          = local.ecs_services
   ecs_task_definitions  = local.ecs_task_definitions
-  instance_subnet_map   = module.common.public_subnet_ids.dev
-  unified_role_arn      = module.common.role_arn["ecsTaskExecutionRole"]
+  instance_subnet_map   = module.common.public_subnet_ids
   vpc_id                = module.common.vpc_id
-  tags = local.common_tags
+  tags                  = local.common_tags
+  region                = local.region
 }
 
 module "prod_module" {
@@ -38,6 +38,5 @@ module "prod_module" {
   ecs_services          = local.ecs_services
   ecs_task_definitions  = local.ecs_task_definitions
   instance_subnet_map   = module.common.public_subnet_ids.prod
-  unified_role_arn      = module.common.role_arn["ecsTaskExecutionRole"]
-  tags = local.common_tags
+  tags                  = local.common_tags
 }

@@ -1,7 +1,7 @@
 locals {
   backend = "s3"
   bootstrap_remote_state = {
-    bucket = "timeeat-prod-terraform-state-ap-northeast-2"
+    bucket = "timeeat-tf-state"
     key    = "bootstrap/terraform.tfstate"
     region = "ap-northeast-2"
   }
@@ -10,7 +10,11 @@ locals {
 
 locals {
   project_name = "time-eat"
-
+  region       = "ap-northeast-2"
+  ecr_repo_names = {
+    dev = "dev"
+    prod = "prod"
+  }
   common_tags = {
     Project   = local.project_name
     ManagedBy = "terraform"
@@ -19,5 +23,14 @@ locals {
 
 locals {
   ecs_services         = var.ecs_services
-  ecs_task_definitions = var.ecs_task_definitions
 }
+
+locals {
+  ecs_task_definitions = {
+    for k, v in var.ecs_task_definitions : k => merge(v, {
+      execution_role_arn = module.common.role_arn["ecsTaskExecutionRole"]
+      task_role_arn      = module.common.role_arn["ec2-to-ecs"]
+    })
+  }
+}
+

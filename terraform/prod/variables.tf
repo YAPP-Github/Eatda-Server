@@ -19,10 +19,6 @@ variable "alb_target_group_arns" {
   type = string
 }
 
-variable "unified_role_arn" {
-  type = string
-}
-
 variable "ecr_repo_names" {
   type = map(string)
 }
