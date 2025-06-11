@@ -11,8 +11,8 @@ resource "aws_iam_user" "user" {
 
 resource "aws_iam_group_membership" "membership" {
   name  = "${var.group_name}-membership"
-  users = [aws_iam_user.user.name]
   group = aws_iam_group.admin.name
+  users = [for user in aws_iam_user.user : user.name]
 }
 
 resource "aws_iam_group_policy_attachment" "admin_policy" {
