@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "./vpc"
+  source       = "./vpc"
   project_name = local.project_name
 }
 
@@ -31,6 +31,18 @@ module "security_group" {
   egress_rules  = local.all_egress
 }
 
+resource "aws_security_group_rule" "cross_references" {
+  for_each = local.security_group_cross_refs
+
+  type                     = "ingress"
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  source_security_group_id = each.value.source_security_group_id
+  security_group_id        = each.value.target_security_group_id
+  description              = each.value.description
+}
+
 module "route53" {
   source            = "./route53"
   domain_name       = local.domain_name
@@ -40,8 +52,13 @@ module "route53" {
 }
 
 module "alb" {
-  source  = "./alb"
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnet_ids
-  alb_security_group_id = [module.security_group.security_group_ids["alb"]]
+  source = "./alb"
+  vpc_id = module.vpc.vpc_id
+  subnets = flatten([
+    module.vpc.public_subnet_ids.dev,
+    module.vpc.public_subnet_ids.prod
+  ])
+  alb_security_group_id = [module.security_group["alb"].security_group_id]
+  certificate_arn                 = module.route53.certificate_arn
+  certificate_validation_complete = module.route53.certificate_validation_complete
 }
