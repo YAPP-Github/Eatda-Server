@@ -10,7 +10,7 @@ locals {
 
 locals {
   target_groups = {
-    "dev-timeeat" = {
+    "dev" = {
       env         = "dev"
       port        = 8080
       protocol    = "HTTP"
@@ -24,7 +24,7 @@ locals {
         unhealthy_threshold = 5
       }
     }
-    "prod-timeeat" = {
+    "prod" = {
       env         = "prod"
       port        = 8080
       protocol    = "HTTP"
@@ -60,7 +60,10 @@ locals {
     port             = 443
     protocol         = "HTTPS"
     type             = "forward"
-    target_group_arn = module.target_groups.target_group_arns["dev-timeeat"]
+    certificate_arn           = var.certificate_arn
+    ssl_policy                = "ELBSecurityPolicy-TLS-1-2-2017-01"
+    target_group_arn = module.target_groups.target_group_arns["dev"]
+    default_target_group_arn  = module.target_groups.target_group_arns["dev"]
   }
 }
 
@@ -68,15 +71,15 @@ locals {
   listener_rules = {
     "prod-path-rule" = {
       priority = 1
-      host_header       = "timeeat.site"
+      host_header       = "api.time-eat.com"
       action_type       = "forward"
-      target_group_arn  = module.target_groups.target_group_arns["prod-timeeat"]
+      target_group_arn  = module.target_groups.target_group_arns["prod"]
     }
     "dev-path-rule" = {
       priority = 2
-      host_header       = "dev.timeeat.site"
+      host_header       = "dev.time-eat.com"
       action_type       = "forward"
-      target_group_arn  = module.target_groups.target_group_arns["dev-timeeat"]
+      target_group_arn  = module.target_groups.target_group_arns["dev"]
     }
   }
 }

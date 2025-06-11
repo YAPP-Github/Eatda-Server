@@ -2,14 +2,12 @@ resource "aws_alb" "common" {
   name               = local.alb_name
   internal           = local.internal
   load_balancer_type = local.loadbalancer_type
-  security_groups = [var.alb_security_group_id]
+  security_groups    = var.alb_security_group_id
   subnets            = var.subnets
 
   enable_deletion_protection = local.deletion_protection
 
-  tags = {
-    Environment = local.alb_tags
-  }
+  tags = local.alb_tags
 }
 
 module "http" {
@@ -23,6 +21,7 @@ module "https" {
   alb_arn        = aws_alb.common.arn
   https_listener = local.https_listener
   listener_rules = local.listener_rules
+  depends_on = [var.certificate_validation_complete]
 }
 
 module "target_groups" {
