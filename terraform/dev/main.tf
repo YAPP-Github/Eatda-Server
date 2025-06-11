@@ -1,5 +1,5 @@
 module "cloud_map" {
-  source                         = "cloud-map"
+  source                         = "./cloud-map"
   ns_name                        = local.ns_name
   service_discovery_service_name = local.service_discovery_service_name
   ns_failure_threshold           = local.ns_failure_threshold
