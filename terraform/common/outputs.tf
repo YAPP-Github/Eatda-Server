@@ -20,7 +20,10 @@ output "private_subnet_ids" {
 }
 
 output "security_group_ids" {
-  value = module.security_group.security_group_ids
+  value = {
+    for k, sg in module.security_group :
+    k => sg.security_group_id
+  }
 }
 
 output "target_group_arns" {
@@ -36,18 +39,28 @@ output "user_name" {
 }
 
 output "group_name" {
-  value = module.iam.group_name
+  value = module.iam.group_names
 }
 
 output "role_name" {
-  value = module.iam_role.role_name
+  value = {
+    for k, mod in module.iam_role :
+    k => mod.role_name
+  }
 }
 
 output "role_arn" {
-  value = module.iam_role.role_arn
+  value = {
+    for k, mod in module.iam_role :
+    k => mod.role_arn
+  }
 }
 
 output "instance_profile_name" {
-  value = module.iam_role.instance_profile_name
+  value = {
+    for k, mod in module.iam_role :
+    k => mod.instance_profile_name
+  }
 }
+
 
