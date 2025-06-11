@@ -1,5 +1,5 @@
 locals {
-  group_name = "power"
+  group_name   = "power"
   project_name = var.project_name
 
   policy_arns = [
@@ -32,7 +32,9 @@ locals {
       policy_arns = [
         "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
         "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-        "arn:aws:iam::aws:policy/AmazonEC2ContainerServiceFullAccess"
+        "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+        "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
       ]
       tags = {
         Purpose = "ECS Task Execution"
@@ -42,13 +44,18 @@ locals {
 }
 
 locals {
-  domain_name       = "timeeat.site"
+  domain_name       = "time-eat.com"
   validation_method = "DNS"
   recode_type       = "A"
-  subdomains = [
-    "prod.timeeat.site",
-    "dev.timeeat.site"
-  ]
+  alb_alias = {
+    alb_dns_name = module.alb.alb_dns_name
+    alb_zone_id  = module.alb.alb_zone_id
+  }
+
+  subdomains = {
+    prod = local.alb_alias
+    dev  = local.alb_alias
+  }
 }
 
 locals {
@@ -73,13 +80,6 @@ locals {
           to_port     = 22
           protocol    = "tcp"
           cidr_blocks = ["0.0.0.0/0"]
-        },
-        {
-          description              = "HTTP"
-          from_port                = 8080
-          to_port                  = 8080
-          protocol                 = "tcp"
-          source_security_group_id = module.security_group["alb"].security_group_ids
         }
       ]
     }
@@ -89,11 +89,11 @@ locals {
       description = "RDS SG"
       ingress = [
         {
-          description = "MySQL"
+          description = "MySQL from VPC"
           from_port   = 3306
           to_port     = 3306
           protocol    = "tcp"
-          cidr_blocks = module.vpc.vpc_cidr_block
+          cidr_blocks = [module.vpc.vpc_cidr_block]
         }
       ]
     }
@@ -119,7 +119,28 @@ locals {
       ]
     }
   }
+
+  security_group_cross_refs = {
+    "ec2_from_alb" = {
+      from_port                = 8080
+      to_port                  = 8080
+      protocol                 = "tcp"
+      source_security_group_id = module.security_group["alb"].security_group_id
+      target_security_group_id = module.security_group["ec2"].security_group_id
+      description              = "HTTP from ALB"
+    }
+
+    "rds_from_ec2" = {
+      from_port                = 3306
+      to_port                  = 3306
+      protocol                 = "tcp"
+      source_security_group_id = module.security_group["ec2"].security_group_id
+      target_security_group_id = module.security_group["rds"].security_group_id
+      description              = "MySQL from EC2"
+    }
+  }
 }
+
 
 
 
