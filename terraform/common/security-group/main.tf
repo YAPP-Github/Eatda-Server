@@ -4,14 +4,16 @@ resource "aws_security_group" "common" {
   vpc_id      = var.vpc_id
 
   dynamic "ingress" {
-    for_each = var.ingress_rules
+    for_each = {
+      for k, v in var.ingress_rules : k => v
+      if !contains(keys(v), "source_security_group_id") # source SG 없는 경우만
+    }
     content {
       description = ingress.value.description
       from_port   = ingress.value.from_port
       to_port     = ingress.value.to_port
       protocol    = ingress.value.protocol
-      cidr_blocks = try(ingress.value.cidr_blocks, null)
-      source_security_group_id = try(ingress.value.source_security_group_id, null)
+      cidr_blocks = ingress.value.cidr_blocks
     }
   }
 
