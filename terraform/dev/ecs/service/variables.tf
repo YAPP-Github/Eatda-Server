@@ -27,7 +27,7 @@ variable "scheduling_strategy" {
 }
 
 variable "task_definition_arn" {
-  type = string
+  type = map(string)
 }
 
 variable "alb_target_group_arns" {

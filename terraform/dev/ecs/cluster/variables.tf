@@ -1,6 +1,6 @@
 variable "cluster_name" {
   description = "dev cluster name"
-  default     = "time-eat-dev-cluster"
+  default     = "dev-cluster"
 }
 
 variable "namespace_id" {

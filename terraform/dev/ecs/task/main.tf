@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "dev" {
-  for_each = var.task_definitions
+  for_each = var.ecs_task_definitions
 
   family                   = each.key
   network_mode             = each.value.network_mode
