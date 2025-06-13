@@ -12,3 +12,12 @@ resource "aws_instance" "dev" {
     Name = "${var.name_prefix}-${var.instance_definitions.role}"
   }
 }
+
+resource "aws_eip" "dev" {
+  instance = aws_instance.dev.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "${var.name_prefix}-${var.instance_definitions.role}-eip"
+  }
+}
