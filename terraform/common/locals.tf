@@ -65,7 +65,7 @@ locals {
   }
 
   subdomains = {
-    prod = local.alb_alias
+    api = local.alb_alias
     dev  = local.alb_alias
   }
 }
