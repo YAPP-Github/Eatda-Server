@@ -3,6 +3,16 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
+output "vpc_cidr_block" {
+  description = "The CIDR block of the VPC"
+  value       = module.vpc.vpc_cidr_block
+}
+
+output "availability_zones" {
+  description = "List of availability zones"
+  value       = module.vpc.availability_zones
+}
+
 output "public_subnet_ids" {
   description = "Map of public subnet IDs for environments"
   value = {

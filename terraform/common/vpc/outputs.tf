@@ -8,6 +8,11 @@ output "vpc_cidr_block" {
   value       = aws_vpc.vpc.cidr_block
 }
 
+output "availability_zones" {
+  description = "List of availability zones"
+  value       = var.availability_zones
+}
+
 output "public_subnet_ids" {
   description = "Map of public subnet IDs for environments"
   value = {
