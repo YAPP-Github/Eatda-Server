@@ -27,13 +27,13 @@ locals {
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {
-        DD_SITE = "datadoghq.com"
-        DD_PROCESS_AGENT_ENABLED = "true"
-        DD_APM_ENABLED = "true"
-        DD_LOGS_ENABLED = "true"
+        DD_SITE                              = "datadoghq.com"
+        DD_PROCESS_AGENT_ENABLED             = "true"
+        DD_APM_ENABLED                       = "true"
+        DD_LOGS_ENABLED                      = "true"
         DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
-        DD_APM_RECEIVER_PORT = "8126"
-        DD_APM_NON_LOCAL_TRAFFIC = "true"
+        DD_APM_RECEIVER_PORT                 = "8126"
+        DD_APM_NON_LOCAL_TRAFFIC             = "true"
       }
       secrets = [
         {
@@ -64,7 +64,7 @@ locals {
       desired_count       = def.desired_count
       scheduling_strategy = def.scheduling_strategy
       iam_role_arn        = var.ecs_task_definitions[name].task_role_arn
-      load_balancer       = try(def.load_balancer, null)
+      load_balancer = try(def.load_balancer, null)
     }
   }
 

@@ -5,7 +5,7 @@ variable "group_name" {
 
 variable "user_names" {
   description = "IAM user name"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "policy_arns" {

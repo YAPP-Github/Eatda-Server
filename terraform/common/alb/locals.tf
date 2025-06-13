@@ -1,8 +1,8 @@
 locals {
   alb_name            = "timeeat-alb"
   deletion_protection = false
-  loadbalancer_type = "application"
-  internal          = false
+  loadbalancer_type   = "application"
+  internal            = false
   alb_tags = {
     Environment = local.alb_name
   }
@@ -57,29 +57,29 @@ locals {
 
 locals {
   https_listener = {
-    port             = 443
-    protocol         = "HTTPS"
-    type             = "forward"
-    certificate_arn           = var.certificate_arn
-    ssl_policy                = "ELBSecurityPolicy-TLS-1-2-2017-01"
-    target_group_arn = module.target_groups.target_group_arns["dev"]
-    default_target_group_arn  = module.target_groups.target_group_arns["dev"]
+    port                     = 443
+    protocol                 = "HTTPS"
+    type                     = "forward"
+    certificate_arn          = var.certificate_arn
+    ssl_policy               = "ELBSecurityPolicy-TLS-1-2-2017-01"
+    target_group_arn         = module.target_groups.target_group_arns["dev"]
+    default_target_group_arn = module.target_groups.target_group_arns["dev"]
   }
 }
 
 locals {
   listener_rules = {
     "prod-path-rule" = {
-      priority = 1
-      host_header       = "api.time-eat.com"
-      action_type       = "forward"
-      target_group_arn  = module.target_groups.target_group_arns["prod"]
+      priority         = 1
+      host_header      = "api.time-eat.com"
+      action_type      = "forward"
+      target_group_arn = module.target_groups.target_group_arns["prod"]
     }
     "dev-path-rule" = {
-      priority = 2
-      host_header       = "dev.time-eat.com"
-      action_type       = "forward"
-      target_group_arn  = module.target_groups.target_group_arns["dev"]
+      priority         = 2
+      host_header      = "dev.time-eat.com"
+      action_type      = "forward"
+      target_group_arn = module.target_groups.target_group_arns["dev"]
     }
   }
 }

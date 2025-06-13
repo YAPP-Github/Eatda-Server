@@ -49,9 +49,9 @@ variable "ecs_services" {
 
 variable "ecs_task_definitions" {
   type = map(object({
-    cpu                = number
-    memory             = number
-    network_mode       = string
+    cpu          = number
+    memory       = number
+    network_mode = string
     container_port = list(number)
     host_port = list(number)
     environment = map(string)

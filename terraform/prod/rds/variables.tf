@@ -10,7 +10,7 @@ variable "vpc_cidr" {
 
 variable "availability_zones" {
   description = "List of availability zones"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "identifier" {
@@ -51,7 +51,7 @@ variable "password" {
 
 variable "vpc_security_group_ids" {
   description = "List of VPC security group IDs"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "multi_az" {
@@ -74,6 +74,6 @@ variable "storage_encrypted" {
 
 variable "tags" {
   description = "Tags to apply to resources"
-  type        = map(string)
-  default     = {}
+  type = map(string)
+  default = {}
 }

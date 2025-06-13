@@ -12,7 +12,7 @@ locals {
   project_name = "time-eat"
   region       = "ap-northeast-2"
   ecr_repo_names = {
-    dev = "dev"
+    dev  = "dev"
     prod = "prod"
   }
   common_tags = {
@@ -22,7 +22,7 @@ locals {
 }
 
 locals {
-  ecs_services         = var.ecs_services
+  ecs_services = var.ecs_services
 }
 
 locals {

@@ -8,9 +8,9 @@ variable "ecs_task_definitions" {
     task_role_arn      = string
     execution_role_arn = string
     requires_compatibilities = list(string)
-    container_port     = list(number)
-    host_port          = list(number)
-    volumes            = optional(list(object({
+    container_port = list(number)
+    host_port = list(number)
+    volumes = optional(list(object({
       name      = string
       host_path = string
     })), [])
@@ -20,7 +20,7 @@ variable "ecs_task_definitions" {
 
 variable "container_definitions_map" {
   description = "Map of ECS service names to their container definitions"
-  type        = map(any)
+  type = map(any)
 }
 
 variable "tags" {

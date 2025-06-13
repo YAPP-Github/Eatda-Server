@@ -29,19 +29,19 @@ module "ecs" {
 }
 
 module "rds" {
-  source                = "./rds"
-  vpc_id                = var.vpc_id
-  vpc_cidr              = var.vpc_cidr
-  availability_zones    = var.availability_zones
-  identifier            = local.identifier
-  instance_class        = local.instance_class
-  engine                = local.engine
-  engine_version        = local.engine_version
-  allocated_storage     = local.allocated_storage
-  username              = data.aws_ssm_parameter.rds_user_name.value
-  password              = data.aws_ssm_parameter.rds_password.value
+  source                 = "./rds"
+  vpc_id                 = var.vpc_id
+  vpc_cidr               = var.vpc_cidr
+  availability_zones     = var.availability_zones
+  identifier             = local.identifier
+  instance_class         = local.instance_class
+  engine                 = local.engine
+  engine_version         = local.engine_version
+  allocated_storage      = local.allocated_storage
+  username               = data.aws_ssm_parameter.rds_user_name.value
+  password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = var.vpc_security_group_ids
-  multi_az              = false
-  storage_encrypted     = true
-  tags                  = var.tags
+  multi_az               = false
+  storage_encrypted      = true
+  tags                   = var.tags
 }

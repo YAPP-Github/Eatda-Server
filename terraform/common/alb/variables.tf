@@ -4,7 +4,7 @@ variable "subnets" {
 }
 
 variable "alb_security_group_id" {
-  type        = list(string)
+  type = list(string)
   description = "Security group ID for the ALB"
 }
 

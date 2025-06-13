@@ -25,7 +25,6 @@ variable "ecs_task_definitions" {
   }))
 }
 
-
 variable "ecs_services" {
   type = map(object({
     desired_count = number

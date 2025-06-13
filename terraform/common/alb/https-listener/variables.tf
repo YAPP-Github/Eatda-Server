@@ -2,12 +2,12 @@ variable "alb_arn" {}
 
 variable "https_listener" {
   type = object({
-    port               = number
-    protocol           = string
-    type               = string
-    certificate_arn    = string
-    target_group_arn   = string
-    ssl_policy         = string
+    port                     = number
+    protocol                 = string
+    type                     = string
+    certificate_arn          = string
+    target_group_arn         = string
+    ssl_policy               = string
     default_target_group_arn = string
   })
 }

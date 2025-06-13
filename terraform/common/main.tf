@@ -22,12 +22,12 @@ module "iam_role" {
 module "security_group" {
   source = "./security-group"
 
-  vpc_id              = module.vpc.vpc_id
-  security_groups     = local.security_groups
-  ingress_rules       = local.ingress_rules
-  egress_rules        = local.egress_rules
+  vpc_id                = module.vpc.vpc_id
+  security_groups       = local.security_groups
+  ingress_rules         = local.ingress_rules
+  egress_rules          = local.egress_rules
   cross_reference_rules = local.cross_reference_rules
-  tags                = var.tags
+  tags                  = var.tags
 }
 
 module "route53" {

@@ -76,27 +76,27 @@ locals {
       name        = "timeeat-alb-sg"
       description = "ALB SG"
       tags = {
-        Name = "timeeat-alb-sg"
+        Name        = "timeeat-alb-sg"
         Environment = "common"
-        Service = "alb"
+        Service     = "alb"
       }
     }
     ec2 = {
       name        = "timeeat-ec2-sg"
       description = "EC2 SG"
       tags = {
-        Name = "timeeat-ec2-sg"
+        Name        = "timeeat-ec2-sg"
         Environment = "common"
-        Service = "ec2"
+        Service     = "ec2"
       }
     }
     rds = {
       name        = "timeeat-rds-sg"
       description = "RDS SG"
       tags = {
-        Name = "timeeat-rds-sg"
+        Name        = "timeeat-rds-sg"
         Environment = "common"
-        Service = "rds"
+        Service     = "rds"
       }
     }
   }
@@ -104,54 +104,54 @@ locals {
   ingress_rules = {
     alb_http = {
       security_group_key = "alb"
-      from_port         = 80
-      to_port           = 80
-      protocol          = "tcp"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "HTTP"
+      from_port          = 80
+      to_port            = 80
+      protocol           = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "HTTP"
     }
     alb_https = {
       security_group_key = "alb"
-      from_port         = 443
-      to_port           = 443
-      protocol          = "tcp"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "HTTPS"
+      from_port          = 443
+      to_port            = 443
+      protocol           = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "HTTPS"
     }
     ec2_ssh = {
       security_group_key = "ec2"
-      from_port         = 22
-      to_port           = 22
-      protocol          = "tcp"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "SSH"
+      from_port          = 22
+      to_port            = 22
+      protocol           = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "SSH"
     }
   }
 
   egress_rules = {
     alb_egress = {
       security_group_key = "alb"
-      from_port         = 0
-      to_port           = 0
-      protocol          = "-1"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "Allow all"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "Allow all"
     }
     ec2_egress = {
       security_group_key = "ec2"
-      from_port         = 0
-      to_port           = 0
-      protocol          = "-1"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "Allow all"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "Allow all"
     }
     rds_egress = {
       security_group_key = "rds"
-      from_port         = 0
-      to_port           = 0
-      protocol          = "-1"
-      cidr_blocks       = ["0.0.0.0/0"]
-      description       = "Allow all"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      description        = "Allow all"
     }
   }
 
@@ -159,26 +159,26 @@ locals {
     ec2_from_alb_http = {
       source_security_group_key = "alb"
       target_security_group_key = "ec2"
-      from_port                = 8080
-      to_port                  = 8080
-      protocol                 = "tcp"
-      description              = "HTTP from ALB"
+      from_port                 = 8080
+      to_port                   = 8080
+      protocol                  = "tcp"
+      description               = "HTTP from ALB"
     }
     ec2_from_alb_dynamic = {
       source_security_group_key = "alb"
       target_security_group_key = "ec2"
-      from_port                = 32768
-      to_port                  = 60999
-      protocol                 = "tcp"
-      description              = "Dynamic ports from ALB"
+      from_port                 = 32768
+      to_port                   = 60999
+      protocol                  = "tcp"
+      description               = "Dynamic ports from ALB"
     }
     rds_from_ec2 = {
       source_security_group_key = "ec2"
       target_security_group_key = "rds"
-      from_port                = 3306
-      to_port                  = 3306
-      protocol                 = "tcp"
-      description              = "MySQL from EC2"
+      from_port                 = 3306
+      to_port                   = 3306
+      protocol                  = "tcp"
+      description               = "MySQL from EC2"
     }
   }
 }

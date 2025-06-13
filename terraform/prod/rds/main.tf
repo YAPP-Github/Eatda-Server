@@ -1,7 +1,7 @@
 resource "aws_subnet" "rds_private" {
-  count = 2
+  count             = 2
   vpc_id            = var.vpc_id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
   availability_zone = var.availability_zones[count.index]
 
   tags = merge(var.tags, {

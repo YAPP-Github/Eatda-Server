@@ -4,6 +4,6 @@ variable "project_name" {
 }
 
 variable "tags" {
-  type    = map(string)
+  type = map(string)
   default = {}
 }

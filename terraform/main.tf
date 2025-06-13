@@ -33,7 +33,7 @@ module "prod_module" {
   vpc_id                = module.common.vpc_id
   vpc_cidr              = module.common.vpc_cidr_block
   availability_zones    = module.common.availability_zones
-  private_subnet_ids    = [module.common.private_subnet_ids.prod]
+  private_subnet_ids = [module.common.private_subnet_ids.prod]
   vpc_security_group_ids = [module.common.security_group_ids["rds"]]
   alb_target_group_arns = module.common.target_group_arns
   ec2_sg_id             = module.common.security_group_ids["ec2"]

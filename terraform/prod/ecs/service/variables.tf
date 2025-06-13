@@ -17,12 +17,12 @@ variable "deployment_controller_type" {
 }
 
 variable "launch_type" {
-  type = string
+  type    = string
   default = "EC2"
 }
 
 variable "scheduling_strategy" {
-  type = string
+  type    = string
   default = "REPLICA"
 }
 

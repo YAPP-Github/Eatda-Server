@@ -16,7 +16,7 @@ module "service" {
   source                     = "./service"
   cluster_id                 = module.cluster.cluster_id
   deployment_controller_type = local.deployment_controller_type
-  ecs_services              = var.ecs_services
-  task_definition_arn       = module.task.task_definition_arns
-  tags                      = var.tags
+  ecs_services               = var.ecs_services
+  task_definition_arn        = module.task.task_definition_arns
+  tags                       = var.tags
 }

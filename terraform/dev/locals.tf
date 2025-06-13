@@ -9,8 +9,8 @@ data "terraform_remote_state" "bootstrap" {
 }
 
 locals {
-  environment                    = "dev"
-  name_prefix                    = "time-eat"
+  environment = "dev"
+  name_prefix = "time-eat"
 
   tags = merge(var.tags, {
     Environment = local.environment

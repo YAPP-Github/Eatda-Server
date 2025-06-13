@@ -1,7 +1,7 @@
 variable "instance_definitions" {
   description = "EC2 instance definitions for different roles including AMI and instance type"
   type = object({
-    role = string
+    role          = string
     ami           = string
     instance_type = string
     iam_instance_profile = optional(string)
