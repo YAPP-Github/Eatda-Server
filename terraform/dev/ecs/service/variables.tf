@@ -9,7 +9,6 @@ variable "ecs_services" {
   }))
 }
 
-
 variable "cluster_id" {
   type = string
 }

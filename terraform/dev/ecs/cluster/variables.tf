@@ -3,11 +3,6 @@ variable "cluster_name" {
   default     = "dev-cluster"
 }
 
-variable "namespace_id" {
-  description = "dev namespace id"
-  type        = string
-}
-
 variable "cluster_settings" {
   type = object({
     name  = string

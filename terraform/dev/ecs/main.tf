@@ -2,7 +2,6 @@ module "cluster" {
   source = "./cluster"
   cluster_name = local.cluster_name
   cluster_settings = local.settings
-  namespace_id = var.name_space_id
   tags = var.tags
 }
 

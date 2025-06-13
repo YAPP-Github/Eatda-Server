@@ -1,22 +1,9 @@
-variable "project_name" {
-  description = "Name of the project"
-  type        = string
-}
-
 variable "environment" {
-  type = string
-}
-
-variable "region" {
   type = string
 }
 
 variable "ecr_repo_names" {
   type = map(string)
-}
-
-variable "name_space_id" {
-  type = string
 }
 
 variable "ecs_task_definitions" {
@@ -58,11 +45,6 @@ variable "default_stop_timeout" {
 variable "default_protocol" {
   type    = string
   default = "tcp"
-}
-
-variable "log_stream_prefix" {
-  type    = string
-  default = "ecs"
 }
 
 variable "volume_mount_paths" {
