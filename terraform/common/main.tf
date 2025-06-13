@@ -20,27 +20,14 @@ module "iam_role" {
 }
 
 module "security_group" {
-  source   = "./security-group"
-  for_each = local.security_group_defs
+  source = "./security-group"
 
-  name        = each.value.name
-  description = each.value.description
-  vpc_id      = module.vpc.vpc_id
-
-  ingress_rules = each.value.ingress
-  egress_rules  = local.all_egress
-}
-
-resource "aws_security_group_rule" "cross_references" {
-  for_each = local.security_group_cross_refs
-
-  type                     = "ingress"
-  from_port                = each.value.from_port
-  to_port                  = each.value.to_port
-  protocol                 = each.value.protocol
-  source_security_group_id = each.value.source_security_group_id
-  security_group_id        = each.value.target_security_group_id
-  description              = each.value.description
+  vpc_id              = module.vpc.vpc_id
+  security_groups     = local.security_groups
+  ingress_rules       = local.ingress_rules
+  egress_rules        = local.egress_rules
+  cross_reference_rules = local.cross_reference_rules
+  tags                = var.tags
 }
 
 module "route53" {
@@ -58,7 +45,7 @@ module "alb" {
     module.vpc.public_subnet_ids.dev,
     module.vpc.public_subnet_ids.prod
   ])
-  alb_security_group_id = [module.security_group["alb"].security_group_id]
+  alb_security_group_id = [module.security_group.security_group_ids["alb"]]
   certificate_arn                 = module.route53.certificate_arn
   certificate_validation_complete = module.route53.certificate_validation_complete
 }

@@ -20,10 +20,7 @@ output "private_subnet_ids" {
 }
 
 output "security_group_ids" {
-  value = {
-    for k, sg in module.security_group :
-    k => sg.security_group_id
-  }
+  value = module.security_group.security_group_ids
 }
 
 output "target_group_arns" {
@@ -62,5 +59,3 @@ output "instance_profile_name" {
     k => mod.instance_profile_name
   }
 }
-
-
