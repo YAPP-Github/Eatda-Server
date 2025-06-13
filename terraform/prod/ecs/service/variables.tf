@@ -1,4 +1,4 @@
-variable "service" {
+variable "ecs_services" {
   type = map(object({
     name                = string
     launch_type         = string
@@ -14,6 +14,20 @@ variable "cluster_id" {
 
 variable "deployment_controller_type" {
   type = string
+}
+
+variable "launch_type" {
+  type = string
+  default = "EC2"
+}
+
+variable "scheduling_strategy" {
+  type = string
+  default = "REPLICA"
+}
+
+variable "task_definition_arn" {
+  type = map(string)
 }
 
 variable "tags" {
