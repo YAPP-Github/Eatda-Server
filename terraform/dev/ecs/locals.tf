@@ -1,8 +1,8 @@
 data "aws_caller_identity" "current" {}
 
 locals {
-  cluster_name = "${var.project_name}-${var.environment}-cluster"
-  launch_type  = "EC2"
+  cluster_name        = "${var.environment}-cluster"
+  launch_type         = "EC2"
   scheduling_strategy = "REPLICA"
 
   settings = {
@@ -12,17 +12,59 @@ locals {
 
   deployment_controller_type = "ECS"
 
-  ecr_repo_urls = {
-    for name, repo in var.ecr_repo_names :
-    name => "${data.aws_caller_identity.current.account_id}.dkr.ecr.ap-northeast-2.amazonaws.com/${repo}"
-  }
-
   resolved_task_definitions = {
-    for name, def in var.ecs_task_definitions : name => merge(def, {
-      task_definition_name = "time-eat-dev-api"
-      container_image      = "${local.ecr_repo_urls[name]}:latest"
+    for name, def in var.ecs_task_definitions :
+    name => name == "api" ? merge(def, {
+      task_definition_name = "time-eat-dev"
+      container_image      = "${var.ecr_repo_names["dev"]}:latest"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
+      environment = {}
+      secrets = []
+    }) : name == "mysql" ? merge(def, {
+      task_definition_name = "time-eat-mysql"
+      container_image      = "mysql:8"
+      task_role_arn        = def.task_role_arn
+      execution_role_arn   = def.execution_role_arn
+      environment = {
+        MYSQL_DATABASE = "time-eat"
+      }
+      secrets = [
+        {
+          name      = "MYSQL_USER"
+          valueFrom = "/dev/mysql-name"
+        },
+        {
+          name      = "MYSQL_ROOT_PASSWORD"
+          valueFrom = "/dev/mysql-root-pw"
+        },
+        {
+          name      = "MYSQL_PASSWORD"
+          valueFrom = "/dev/mysql-pw"
+        }
+      ]
+    }) : merge(def, {
+      task_definition_name = "dummy"
+      container_image      = "dummy"
+      task_role_arn        = def.task_role_arn
+      execution_role_arn   = def.execution_role_arn
+      environment = {
+        MYSQL_DATABASE = "dummy"
+      }
+      secrets = [
+        {
+          name      = "DUMMY"
+          valueFrom = "/dummy"
+        },
+        {
+          name      = "DUMMY"
+          valueFrom = "/dummy"
+        },
+        {
+          name      = "DUMMY"
+          valueFrom = "/dummy"
+        }
+      ]
     })
   }
 
@@ -31,18 +73,14 @@ locals {
       name          = name
       desired_count = def.desired_count
       iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
-      load_balancer = {
-        target_group_arn = var.alb_target_group_arns[def.load_balancer.target_group_key]
-        container_name   = def.load_balancer.container_name
-        container_port   = def.load_balancer.container_port
-      }
+      load_balancer = try(def.load_balancer, null)
     }
   }
 
   container_definitions_map = {
     for svc, def in local.resolved_task_definitions : svc => [
       {
-        name      = "${var.name_prefix}-${svc}"
+        name      = def.task_definition_name
         image     = def.container_image
         cpu       = def.cpu
         memory    = def.memory
@@ -65,20 +103,17 @@ locals {
           }
         ]
 
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = def.log_group
-            awslogs-create-group  = "true"
-            awslogs-region        = var.region
-            awslogs-stream-prefix = var.log_stream_prefix
+        secrets = [
+          for s in def.secrets : {
+            name      = s.name
+            valueFrom = s.valueFrom
           }
-        }
+        ]
 
         mountPoints = [
           for vol in (def.volumes != null ? def.volumes : []) : {
             sourceVolume = vol.name
-            containerPath = lookup(var.volume_mount_paths, vol.name, "/logs")
+            containerPath = lookup(var.volume_mount_paths, vol.name, "/time-eat")
             readOnly     = false
           }
         ]
