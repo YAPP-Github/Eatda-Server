@@ -20,11 +20,10 @@ variable "ecs_task_definitions" {
 
 variable "ecs_services" {
   type = map(object({
-    name                = string
-    launch_type         = string
-    task_definition     = string
-    desired_count       = number
-    scheduling_strategy = string
+    desired_count   = number
+    task_definition = string
+    launch_type     = optional(string)
+    scheduling_strategy = optional(string)
     load_balancer = optional(object({
       target_group_key = string
       container_name   = string
