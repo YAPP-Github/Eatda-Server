@@ -10,11 +10,6 @@ data "terraform_remote_state" "bootstrap" {
 
 locals {
   environment                    = "dev"
-  ns_name                        = "time-eat.com"
-  ns_type                        = "A"
-  service_discovery_service_name = "api"
-  ns_failure_threshold           = 1
-  ns_ttl                         = 10
   name_prefix                    = "time-eat"
 
   tags = merge(var.tags, {
