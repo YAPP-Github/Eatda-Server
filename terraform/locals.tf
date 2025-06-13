@@ -29,8 +29,7 @@ locals {
   ecs_task_definitions = {
     for k, v in var.ecs_task_definitions : k => merge(v, {
       execution_role_arn = module.common.role_arn["ecsTaskExecutionRole"]
-      task_role_arn      = module.common.role_arn["ec2-to-ecs"]
+      task_role_arn      = module.common.role_arn["ecsAppTaskRole"]
     })
   }
 }
-
