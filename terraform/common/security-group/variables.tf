@@ -1,11 +1,3 @@
-variable "name" {
-  type = string
-}
-
-variable "description" {
-  type = string
-}
-
 variable "vpc_id" {
   type = string
 }
@@ -15,24 +7,43 @@ variable "tags" {
   default = {}
 }
 
-variable "ingress_rules" {
-  type = list(object({
+variable "security_groups" {
+  type = map(object({
+    name        = string
     description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+    tags        = map(string)
   }))
-  default = []
+}
+
+variable "ingress_rules" {
+  type = map(object({
+    security_group_key = string
+    from_port         = number
+    to_port           = number
+    protocol          = string
+    cidr_blocks       = list(string)
+    description       = string
+  }))
 }
 
 variable "egress_rules" {
-  type = list(object({
-    description = string
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+  type = map(object({
+    security_group_key = string
+    from_port         = number
+    to_port           = number
+    protocol          = string
+    cidr_blocks       = list(string)
+    description       = string
   }))
-  default = []
+}
+
+variable "cross_reference_rules" {
+  type = map(object({
+    source_security_group_key = string
+    target_security_group_key = string
+    from_port                = number
+    to_port                  = number
+    protocol                 = string
+    description              = string
+  }))
 }
