@@ -1,5 +1,25 @@
+variable "vpc_id" {
+  description = "VPC ID where RDS will be created"
+  type        = string
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block of the VPC"
+  type        = string
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+}
+
 variable "identifier" {
-  description = "RDS instance identifier"
+  description = "Identifier for the RDS instance"
+  type        = string
+}
+
+variable "instance_class" {
+  description = "Instance class for the RDS instance"
   type        = string
 }
 
@@ -13,13 +33,8 @@ variable "engine_version" {
   type        = string
 }
 
-variable "instance_class" {
-  description = "Instance type"
-  type        = string
-}
-
 variable "allocated_storage" {
-  description = "Storage size (GB)"
+  description = "Allocated storage in GB"
   type        = number
 }
 
@@ -36,31 +51,29 @@ variable "password" {
 
 variable "vpc_security_group_ids" {
   description = "List of VPC security group IDs"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "multi_az" {
-  description = "Multi-AZ deployment"
+  description = "Whether to enable Multi-AZ deployment"
   type        = bool
+  default     = false
 }
 
 variable "backup_retention_period" {
-  description = "Backup retention (in days)"
+  description = "Backup retention period in days"
   type        = number
-  default     = 0
+  default     = 7
 }
 
 variable "storage_encrypted" {
-  description = "Whether to encrypt storage"
+  description = "Whether to enable storage encryption"
   type        = bool
-}
-
-variable "private_subnet_ids" {
-  description = "Private subnet IDs to associate with DB subnet group"
-  type = list(string)
+  default     = true
 }
 
 variable "tags" {
-  type = map(string)
-  default = {}
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
 }

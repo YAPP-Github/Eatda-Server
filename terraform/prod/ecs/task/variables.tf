@@ -7,7 +7,7 @@ variable "task_definitions" {
     container_image    = string
     task_role_arn      = string
     execution_role_arn = string
-    log_group          = string
+    log_group          = optional(string)
     requires_compatibilities = list(string)
     container_port = list(number)
     host_port = list(number)

@@ -1,6 +1,17 @@
+resource "aws_subnet" "rds_private" {
+  count = 2
+  vpc_id            = var.vpc_id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  availability_zone = var.availability_zones[count.index]
+
+  tags = merge(var.tags, {
+    Name = "${var.identifier}-rds-private-${count.index + 1}"
+  })
+}
+
 resource "aws_db_subnet_group" "private" {
   name       = "${var.identifier}-subnet-group"
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = aws_subnet.rds_private[*].id
 
   tags = merge(var.tags, {
     Name = "${var.identifier}-subnet-group"
