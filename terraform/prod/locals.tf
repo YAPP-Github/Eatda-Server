@@ -26,7 +26,14 @@ locals {
     key_name             = "time-eat-ec2-prod-key"
     user_data            = <<-EOF
 #!/bin/bash
-echo ECS_CLUSTER=time-eat-prod-cluster >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=prod-cluster >> /etc/ecs/ecs.config
+
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
 EOF
   }
 }
