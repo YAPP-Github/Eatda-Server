@@ -26,7 +26,6 @@ variable "ecs_task_definitions" {
     network_mode       = string
     container_port = list(number)
     host_port = list(number)
-    log_group          = string
     environment = map(string)
     container_image    = string
     execution_role_arn = string
@@ -43,17 +42,12 @@ variable "ecs_task_definitions" {
 variable "ecs_services" {
   type = map(object({
     desired_count = number
-    load_balancer = object({
+    load_balancer = optional(object({
       target_group_key = string
       container_name   = string
       container_port   = number
-    })
+    }))
   }))
-}
-
-variable "name_prefix" {
-  type    = string
-  default = "time-eat"
 }
 
 variable "default_stop_timeout" {

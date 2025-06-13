@@ -13,9 +13,9 @@ locals {
   ns_name                        = "time-eat.com"
   ns_type                        = "A"
   service_discovery_service_name = "api"
-  ns_failure_threshold           = 2
+  ns_failure_threshold           = 1
   ns_ttl                         = 10
-  name_prefix                    = "time_eat"
+  name_prefix                    = "time-eat"
 
   tags = merge(var.tags, {
     Environment = local.environment
@@ -28,22 +28,30 @@ locals {
     instance_type        = "t2.micro"
     role                 = "dev"
     iam_instance_profile = "ec2-to-ecs"
-    key_name             = "ec2-dev-key"
+    key_name             = "time-eat-ec2-dev-key"
     user_data            = <<-EOF
 #!/bin/bash
-echo ECS_CLUSTER=time-eat-prod-cluster >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=dev-cluster >> /etc/ecs/ecs.config
+
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
 EOF
   }
 }
 
 locals {
-  ecs_services         = var.ecs_services
+  ecs_services = var.ecs_services
 }
 
 locals {
   ecs_task_definitions = {
-    for k, v in var.ecs_task_definitions : k => merge(v, {
-      container_image          = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names[k]
-    })
+    for k, v in var.ecs_task_definitions :
+    k => k == "api" ?
+      merge(v, { container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["dev"]}:latest" }) :
+      v
   }
 }
