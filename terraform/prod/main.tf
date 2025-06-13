@@ -13,7 +13,7 @@ module "ec2" {
   ec2_sg_id            = var.ec2_sg_id
   instance_definitions = local.dev_instance_definitions
   instance_subnet_map  = var.instance_subnet_map
-  name_prefix          = local.environment
+  name_prefix          = local.name_prefix
   tags                 = var.tags
 }
 
