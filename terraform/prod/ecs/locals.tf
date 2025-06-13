@@ -27,7 +27,7 @@ locals {
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {
-        DD_SITE                              = "datadoghq.com"
+        DD_SITE                              = "us5.datadoghq.com"
         DD_PROCESS_AGENT_ENABLED             = "true"
         DD_APM_ENABLED                       = "true"
         DD_LOGS_ENABLED                      = "true"
@@ -49,7 +49,7 @@ locals {
       environment = {}
       secrets = [
         {
-          name      = "DUMMY"
+          name      = "DUMMY_${name}"
           valueFrom = "/dummy"
         }
       ]
@@ -59,10 +59,7 @@ locals {
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
       name                = name
-      launch_type         = def.launch_type
-      task_definition     = def.task_definition
       desired_count       = def.desired_count
-      scheduling_strategy = def.scheduling_strategy
       iam_role_arn        = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }
@@ -104,7 +101,7 @@ locals {
         mountPoints = [
           for vol in (def.volumes != null ? def.volumes : []) : {
             sourceVolume = vol.name
-            containerPath = lookup(var.volume_mount_paths, vol.name, "/time-eat")
+            containerPath = vol.host_path
             readOnly     = false
           }
         ]

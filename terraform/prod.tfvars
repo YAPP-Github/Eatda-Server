@@ -1,19 +1,15 @@
 ecs_services = {
   api = {
-    name                = "api"
-    task_definition     = "api"
     desired_count       = 1
-    launch_type         = "EC2"
-    scheduling_strategy = "REPLICA"
+    task_definition     = "api"
     load_balancer = {
       target_group_key = "prod"
-      container_name   = "time-eat-api"
+      container_name   = "time-eat-prod"
       container_port   = 8080
     }
   }
 
   datadog = {
-    name                = "datadog"
     task_definition     = "datadog"
     desired_count       = 1
     launch_type         = "EC2"
@@ -26,8 +22,8 @@ ecs_task_definitions = {
     cpu          = 256
     memory       = 256
     network_mode = "bridge"
-    container_port = [8080, 8126]
-    host_port = [0, 8126]
+    container_port = [8080]
+    host_port = [0]
     log_group    = "/ecs/time-eat-api"
     environment = {}
     volumes = [
@@ -39,9 +35,8 @@ ecs_task_definitions = {
   }
 
   datadog = {
-    name              = "datadog-agent"
     container_image   = "public.ecr.aws/datadog/agent:latest"
-    cpu               = 100
+    cpu               = 256
     memoryReservation = 128
     memory            = 512
     network_mode      = "bridge"
@@ -64,11 +59,11 @@ ecs_task_definitions = {
       },
       {
         name      = "proc"
-        host_path = "/proc/"
+        host_path = "/proc"
       },
       {
         name      = "cgroup"
-        host_path = "/cgroup/"
+        host_path = "/sys/fs/cgroup"
       }
     ]
     family = "datadog-agent-task"

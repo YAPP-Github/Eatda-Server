@@ -1,10 +1,11 @@
 variable "ecs_services" {
   type = map(object({
-    name                = string
-    launch_type         = string
-    task_definition     = string
-    desired_count       = number
-    scheduling_strategy = string
+    desired_count = number
+    load_balancer = object({
+      target_group_key = string
+      container_name   = string
+      container_port   = number
+    })
   }))
 }
 
@@ -18,15 +19,17 @@ variable "deployment_controller_type" {
 
 variable "launch_type" {
   type    = string
-  default = "EC2"
 }
 
 variable "scheduling_strategy" {
   type    = string
-  default = "REPLICA"
 }
 
 variable "task_definition_arn" {
+  type = map(string)
+}
+
+variable "alb_target_group_arns" {
   type = map(string)
 }
 

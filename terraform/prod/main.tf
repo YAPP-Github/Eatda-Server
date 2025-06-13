@@ -1,10 +1,10 @@
 data "aws_ssm_parameter" "rds_user_name" {
-  name            = "/prod/mysql-pw"
+  name            = "/prod/mysql-name"
   with_decryption = true
 }
 
 data "aws_ssm_parameter" "rds_password" {
-  name            = "/prod/mysql-name"
+  name            = "/prod/mysql-pw"
   with_decryption = true
 }
 
@@ -42,6 +42,7 @@ module "rds" {
   password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = var.vpc_security_group_ids
   multi_az               = false
+  backup_retention_period = 0
   storage_encrypted      = true
   tags                   = var.tags
 }

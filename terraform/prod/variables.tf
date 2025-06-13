@@ -34,11 +34,8 @@ variable "ecr_repo_names" {
 
 variable "ecs_services" {
   type = map(object({
-    name                = string
-    launch_type         = string
-    task_definition     = string
     desired_count       = number
-    scheduling_strategy = string
+    task_definition     = string
     load_balancer = optional(object({
       target_group_key = string
       container_name   = string
