@@ -29,14 +29,17 @@ module "dev" {
 module "prod_module" {
   source                = "./prod"
   project_name          = local.project_name
+  environment           = "prod"
   vpc_id                = module.common.vpc_id
-  private_subnet_ids = [module.common.private_subnet_ids.prod]
+  vpc_cidr              = module.common.vpc_cidr_block
+  availability_zones    = module.common.availability_zones
+  private_subnet_ids    = [module.common.private_subnet_ids.prod]
   vpc_security_group_ids = [module.common.security_group_ids["rds"]]
   alb_target_group_arns = module.common.target_group_arns
   ec2_sg_id             = module.common.security_group_ids["ec2"]
   ecr_repo_names        = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names
   ecs_services          = local.ecs_services
   ecs_task_definitions  = local.ecs_task_definitions
-  instance_subnet_map   = module.common.public_subnet_ids.prod
+  instance_subnet_map   = module.common.public_subnet_ids
   tags                  = local.common_tags
 }
