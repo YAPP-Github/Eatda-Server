@@ -40,9 +40,10 @@ jobs:
         working-directory: ./terraform/common
         run: |
           set +e
-          terraform plan -no-color -detailed-exitcode > >(tee plan_full.txt) 2> >(tee plan_full.txt >&2)
+          terraform plan -no-color -detailed-exitcode > plan_full.txt 2>&1
           exit_code=$?
           set -e
+          cat plan_full.txt
 
           resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
           plan_summary=$(grep -E '^Plan:' plan_full.txt)
@@ -106,9 +107,10 @@ jobs:
         working-directory: ./terraform/dev
         run: |
           set +e
-          terraform plan -no-color -detailed-exitcode > >(tee plan_full.txt) 2> >(tee plan_full.txt >&2)
+          terraform plan -no-color -detailed-exitcode > plan_full.txt 2>&1
           exit_code=$?
           set -e
+          cat plan_full.txt
 
           resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
           plan_summary=$(grep -E '^Plan:' plan_full.txt)
