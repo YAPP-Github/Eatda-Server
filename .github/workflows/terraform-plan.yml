@@ -39,33 +39,39 @@ jobs:
         id: plan
         working-directory: ./terraform/common
         run: |
+          #!/bin/bash
           set +e
+          
           terraform plan -no-color -detailed-exitcode > plan_full.txt 2>&1
-          exit_code=$?
-          set -e
+          TERRAFORM_EXIT_CODE=$?
+          
           cat plan_full.txt
-
-          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
-          plan_summary=$(grep -E '^Plan:' plan_full.txt)
-
+          
+          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50 || echo "No resource changes")
+          plan_summary=$(grep -E '^Plan:' plan_full.txt || echo "No plan summary")
+          
           {
             echo "summary_output<<EOF"
             echo "$resource_summary"
             echo "$plan_summary"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-
-          if [ "$exit_code" -eq 0 ]; then
-            echo "✅ Terraform plan completed with no changes."
-            echo "plan_status=success" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 2 ]; then
-            echo "✅ Terraform plan completed with changes."
-            echo "plan_status=changes" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 1 ]; then
-            echo "❌ Terraform plan failed with errors."
-            echo "plan_status=error" >> $GITHUB_OUTPUT
-          fi
-
+          
+          case $TERRAFORM_EXIT_CODE in
+            0)
+              echo "✅ Terraform plan completed with no changes."
+              echo "plan_status=success" >> $GITHUB_OUTPUT
+              ;;
+            2)
+              echo "✅ Terraform plan completed with changes."
+              echo "plan_status=changes" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "❌ Terraform plan failed with errors."
+              echo "plan_status=error" >> $GITHUB_OUTPUT
+              ;;
+          esac
+          
           exit 0
 
       - name: Upload full plan as artifact
@@ -106,33 +112,39 @@ jobs:
         id: plan
         working-directory: ./terraform/dev
         run: |
+          #!/bin/bash
           set +e
+          
           terraform plan -no-color -detailed-exitcode > plan_full.txt 2>&1
-          exit_code=$?
-          set -e
+          TERRAFORM_EXIT_CODE=$?
+          
           cat plan_full.txt
-
-          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
-          plan_summary=$(grep -E '^Plan:' plan_full.txt)
-
+          
+          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50 || echo "No resource changes")
+          plan_summary=$(grep -E '^Plan:' plan_full.txt || echo "No plan summary")
+          
           {
             echo "summary_output<<EOF"
             echo "$resource_summary"
             echo "$plan_summary"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-
-          if [ "$exit_code" -eq 0 ]; then
-            echo "✅ Terraform plan completed with no changes."
-            echo "plan_status=success" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 2 ]; then
-            echo "✅ Terraform plan completed with changes."
-            echo "plan_status=changes" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 1 ]; then
-            echo "❌ Terraform plan failed with errors."
-            echo "plan_status=error" >> $GITHUB_OUTPUT
-          fi
-
+          
+          case $TERRAFORM_EXIT_CODE in
+            0)
+              echo "✅ Terraform plan completed with no changes."
+              echo "plan_status=success" >> $GITHUB_OUTPUT
+              ;;
+            2)
+              echo "✅ Terraform plan completed with changes."
+              echo "plan_status=changes" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "❌ Terraform plan failed with errors."
+              echo "plan_status=error" >> $GITHUB_OUTPUT
+              ;;
+          esac
+          
           exit 0
 
       - name: Upload full plan as artifact
@@ -173,33 +185,39 @@ jobs:
         id: plan
         working-directory: ./terraform/prod
         run: |
+          #!/bin/bash
           set +e
+          
           terraform plan -no-color -detailed-exitcode > plan_full.txt 2>&1
-          exit_code=$?
-          set -e
+          TERRAFORM_EXIT_CODE=$?
+          
           cat plan_full.txt
-
-          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
-          plan_summary=$(grep -E '^Plan:' plan_full.txt)
-
+          
+          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50 || echo "No resource changes")
+          plan_summary=$(grep -E '^Plan:' plan_full.txt || echo "No plan summary")
+          
           {
             echo "summary_output<<EOF"
             echo "$resource_summary"
             echo "$plan_summary"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-
-          if [ "$exit_code" -eq 0 ]; then
-            echo "✅ Terraform plan completed with no changes."
-            echo "plan_status=success" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 2 ]; then
-            echo "✅ Terraform plan completed with changes."
-            echo "plan_status=changes" >> $GITHUB_OUTPUT
-          elif [ "$exit_code" -eq 1 ]; then
-            echo "❌ Terraform plan failed with errors."
-            echo "plan_status=error" >> $GITHUB_OUTPUT
-          fi
-
+          
+          case $TERRAFORM_EXIT_CODE in
+            0)
+              echo "✅ Terraform plan completed with no changes."
+              echo "plan_status=success" >> $GITHUB_OUTPUT
+              ;;
+            2)
+              echo "✅ Terraform plan completed with changes."
+              echo "plan_status=changes" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "❌ Terraform plan failed with errors."
+              echo "plan_status=error" >> $GITHUB_OUTPUT
+              ;;
+          esac
+          
           exit 0
 
       - name: Upload full plan as artifact
