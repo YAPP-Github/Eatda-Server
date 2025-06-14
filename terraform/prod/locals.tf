@@ -1,6 +1,5 @@
 data "terraform_remote_state" "bootstrap" {
   backend = "s3"
-
   config = {
     bucket = "timeeat-tf-state"
     key    = "bootstrap/terraform.tfstate"
@@ -8,13 +7,38 @@ data "terraform_remote_state" "bootstrap" {
   }
 }
 
-locals {
-  environment = "prod"
-  name_prefix = "time-eat"
+data "terraform_remote_state" "common" {
+  backend = "s3"
+  config = {
+    bucket = "timeeat-tf-state"
+    key    = "common/terraform.tfstate"
+    region = "ap-northeast-2"
+  }
+}
 
-  tags = merge(var.tags, {
-    Environment = local.environment
-  })
+
+locals {
+  project_name = "time-eat"
+  region       = "ap-northeast-2"
+  environment  = "prod"
+  name_prefix  = "time-eat"
+
+  ec2_sg_id                 = data.terraform_remote_state.common.outputs.security_group_ids["ec2"]
+  instance_definitions      = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
+  instance_subnet_map       = data.terraform_remote_state.common.outputs.public_subnet_ids
+  ecr_repo_names            = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names
+  ecs_services              = var.ecs_services
+  ecs_task_definitions_base = var.ecs_task_definitions_base
+  alb_target_group_arns     = data.terraform_remote_state.common.outputs.target_group_arns
+  vpc_id                    = data.terraform_remote_state.common.outputs.vpc_id
+  vpc_cidr                  = data.terraform_remote_state.common.outputs.vpc_cidr_block
+  availability_zones        = data.terraform_remote_state.common.outputs.availability_zones
+  vpc_security_group_ids = [data.terraform_remote_state.common.outputs.security_group_ids["rds"]]
+
+  common_tags = {
+    Project   = local.project_name
+    ManagedBy = "terraform"
+  }
 }
 
 locals {
@@ -39,21 +63,24 @@ EOF
 }
 
 locals {
-  ecs_services = var.ecs_services
-}
-
-locals {
   ecs_task_definitions = {
-    for k, v in var.ecs_task_definitions :
-    k => k == "api" ?
-      merge(v, { container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["dev"]}:latest" }) :
-      v
+    for k, v in var.ecs_task_definitions_base :
+    k => merge(
+      v,
+      {
+        execution_role_arn = data.terraform_remote_state.common.outputs.role_arn["ecsTaskExecutionRole"],
+        task_role_arn      = data.terraform_remote_state.common.outputs.role_arn["ecsAppTaskRole"]
+      },
+        k == "api-prod" ? {
+        container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["dev"]}:latest"
+      } : {},
+    )
   }
 }
 
 locals {
   allocated_storage = 20
-  identifier        = "${var.project_name}-${local.environment}-db"
+  identifier        = "${local.project_name}-${local.environment}-db"
   instance_class    = "db.t3.micro"
   engine_version    = "8.0.42"
   engine            = "MySQL"

@@ -1,10 +1,10 @@
 ecs_services = {
   api-prod = {
     desired_count       = 1
-    task_definition     = "api"
+    task_definition     = "api-prod"
     load_balancer = {
-      target_group_key = "prod"
-      container_name   = "time-eat-prod"
+      target_group_key = "api-prod"
+      container_name   = "api-prod"
       container_port   = 8080
     }
   }
@@ -17,7 +17,7 @@ ecs_services = {
   }
 }
 
-ecs_task_definitions = {
+ecs_task_definitions_base = {
   api-prod = {
     cpu          = 256
     memory       = 256

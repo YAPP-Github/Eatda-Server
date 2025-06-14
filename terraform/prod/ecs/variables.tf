@@ -1,8 +1,3 @@
-variable "project_name" {
-  description = "Name of the project"
-  type        = string
-}
-
 variable "environment" {
   type = string
 }
@@ -41,11 +36,6 @@ variable "ecs_services" {
   }))
 }
 
-variable "name_prefix" {
-  type    = string
-  default = "time-eat"
-}
-
 variable "default_stop_timeout" {
   type    = number
   default = 30
@@ -54,11 +44,6 @@ variable "default_stop_timeout" {
 variable "default_protocol" {
   type    = string
   default = "tcp"
-}
-
-variable "volume_mount_paths" {
-  type = map(string)
-  default = {}
 }
 
 variable "alb_target_group_arns" {

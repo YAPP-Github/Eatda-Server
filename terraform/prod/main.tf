@@ -10,39 +10,38 @@ data "aws_ssm_parameter" "rds_password" {
 
 module "ec2" {
   source               = "./ec2"
-  ec2_sg_id            = var.ec2_sg_id
+  ec2_sg_id            = local.ec2_sg_id
   instance_definitions = local.dev_instance_definitions
-  instance_subnet_map  = var.instance_subnet_map
+  instance_subnet_map  = local.instance_subnet_map
   name_prefix          = local.name_prefix
-  tags                 = var.tags
+  tags                 = local.common_tags
 }
 
 module "ecs" {
   source                = "./ecs"
-  alb_target_group_arns = var.alb_target_group_arns
-  ecr_repo_names        = var.ecr_repo_names
+  alb_target_group_arns = local.alb_target_group_arns
+  ecr_repo_names        = local.ecr_repo_names
   ecs_services          = var.ecs_services
-  ecs_task_definitions  = var.ecs_task_definitions
-  project_name          = var.project_name
+  ecs_task_definitions  = local.ecs_task_definitions
   environment           = local.environment
-  tags                  = var.tags
+  tags                  = local.common_tags
 }
 
 module "rds" {
-  source                 = "./rds"
-  vpc_id                 = var.vpc_id
-  vpc_cidr               = var.vpc_cidr
-  availability_zones     = var.availability_zones
-  identifier             = local.identifier
-  instance_class         = local.instance_class
-  engine                 = local.engine
-  engine_version         = local.engine_version
-  allocated_storage      = local.allocated_storage
-  username               = data.aws_ssm_parameter.rds_user_name.value
-  password               = data.aws_ssm_parameter.rds_password.value
-  vpc_security_group_ids = var.vpc_security_group_ids
-  multi_az               = false
+  source                  = "./rds"
+  vpc_id                  = local.vpc_id
+  vpc_cidr                = local.vpc_cidr
+  availability_zones      = local.availability_zones
+  identifier              = local.identifier
+  instance_class          = local.instance_class
+  engine                  = local.engine
+  engine_version          = local.engine_version
+  allocated_storage       = local.allocated_storage
+  username                = data.aws_ssm_parameter.rds_user_name.value
+  password                = data.aws_ssm_parameter.rds_password.value
+  vpc_security_group_ids  = local.vpc_security_group_ids
+  multi_az                = false
   backup_retention_period = 0
-  storage_encrypted      = true
-  tags                   = var.tags
+  storage_encrypted       = true
+  tags                    = local.common_tags
 }
