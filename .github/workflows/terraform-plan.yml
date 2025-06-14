@@ -236,47 +236,88 @@ jobs:
     needs: [ plan-common, plan-dev, plan-prod ]
     if: always()
     steps:
+      - name: Generate Comment Body
+        id: comment
+        run: |
+          cat > comment.md << 'EOF'
+          ## 📄 Terraform Plan Summary
+
+          ### 🛡️ Common Infrastructure
+          ```
+          EOF
+          echo "${{ needs.plan-common.outputs.summary_output || 'No output available' }}" >> comment.md
+          cat >> comment.md << 'EOF'
+          ```
+          EOF
+
+          if [ "${{ needs.plan-common.outputs.plan_status }}" = "error" ]; then
+            echo "**Status:** ❌ Failed" >> comment.md
+          elif [ "${{ needs.plan-common.outputs.plan_status }}" = "changes" ]; then
+            echo "**Status:** 🔄 Changes Detected" >> comment.md
+          else
+            echo "**Status:** ✅ No Changes" >> comment.md
+          fi
+
+          if [ "${{ needs.plan-dev.result }}" != "skipped" ]; then
+            cat >> comment.md << 'EOF'
+
+          ---
+          ### 🛠️ Development Environment
+          ```
+          EOF
+            echo "${{ needs.plan-dev.outputs.summary_output || 'No output available' }}" >> comment.md
+            cat >> comment.md << 'EOF'
+          ```
+          EOF
+
+            if [ "${{ needs.plan-dev.outputs.plan_status }}" = "error" ]; then
+              echo "**Status:** ❌ Failed" >> comment.md
+            elif [ "${{ needs.plan-dev.outputs.plan_status }}" = "changes" ]; then
+              echo "**Status:** 🔄 Changes Detected" >> comment.md
+            else
+              echo "**Status:** ✅ No Changes" >> comment.md
+            fi
+          fi
+
+          if [ "${{ needs.plan-prod.result }}" != "skipped" ]; then
+            cat >> comment.md << 'EOF'
+
+          ---
+          ### 🚀 Production Environment
+          ```
+          EOF
+            echo "${{ needs.plan-prod.outputs.summary_output || 'No output available' }}" >> comment.md
+            cat >> comment.md << 'EOF'
+          ```
+          EOF
+
+            if [ "${{ needs.plan-prod.outputs.plan_status }}" = "error" ]; then
+              echo "**Status:** ❌ Failed" >> comment.md
+            elif [ "${{ needs.plan-prod.outputs.plan_status }}" = "changes" ]; then
+              echo "**Status:** 🔄 Changes Detected" >> comment.md
+            else
+              echo "**Status:** ✅ No Changes" >> comment.md
+            fi
+          fi
+
+          cat >> comment.md << 'EOF'
+
+          ---
+          📋 **Full Results:** [View in Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+
+          {
+            echo "body<<EOF"
+            cat comment.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Comment PR with Plan Summary
         uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## 📄 Terraform Plan Summary
-
-            ### 🛡️ Common Infrastructure
-            ```
-            ${{ needs.plan-common.outputs.summary_output || 'No output available' }}
-            ```
-            **Status:** ${{ needs.plan-common.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-common.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes' }}
-
-            ${{ needs.plan-dev.result != 'skipped' && '---' || '' }}
-            ${{ needs.plan-dev.result != 'skipped' && '### 🛠️ Development Environment' || '' }}
-            ${{ needs.plan-dev.result != 'skipped' && '```
-            ${{ needs.plan-dev.result != 'skipped' && (needs.plan-dev.outputs.summary_output || 'No output available') || '' }}
-            ${{ needs.plan-dev.result != 'skipped' && '```' || '' }}
-            ${{ needs.plan-dev.result != 'skipped' && format('**Status:** {0}', needs.plan-dev.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-dev.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes') || '' }}
-
-            ${{ needs.plan-prod.result != 'skipped' && '---' || '' }}
-            ${{ needs.plan-prod.result != 'skipped' && '### 🚀 Production Environment' || '' }}
-            ${{ needs.plan-prod.result != 'skipped' && '```
-            ${{ needs.plan-prod.result != 'skipped' && (needs.plan-prod.outputs.summary_output || 'No output available') || '' }}
-            ${{ needs.plan-prod.result != 'skipped' && '```' || '' }}
-            ${{ needs.plan-prod.result != 'skipped' && format('**Status:** {0}', needs.plan-prod.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-prod.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes') || '' }}
-
-            ---
-
-            📋 **Full Terraform Plan Results:** [View in Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-            <details>
-            <summary>📊 Execution Summary</summary>
-
-            - **Common:** ${{ needs.plan-common.result }}
-            - **Dev:** ${{ needs.plan-dev.result }}  
-            - **Prod:** ${{ needs.plan-prod.result }}
-
-            </details>
-      
+          body: ${{ steps.comment.outputs.body }}
 
       - name: Fail job if any plan failed
         if: |
