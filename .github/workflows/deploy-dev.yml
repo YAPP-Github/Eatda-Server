@@ -130,6 +130,16 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Prepare semantic-release config (no github release)
+        run: |
+          echo "module.exports = {
+            branches: ['develop'],
+            plugins: [
+              '@semantic-release/commit-analyzer',
+              '@semantic-release/release-notes-generator'
+            ]
+          };" > release.config.js
+
       - name: Semantic Release
         run: |
           OUTPUT=$(npx semantic-release --no-ci)
@@ -201,7 +211,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d "{\"content\": \"✅ 새로운 버전이 배포 되었어요!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
+            -d "{\"content\": \"✅ (개발 서버) 새로운 버전이 배포 되었어요!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Discord Notify (Failure)
@@ -209,6 +219,6 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d "{\"content\": \"❌ 배포 실패!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
+            -d "{\"content\": \"❌ (개발 서버) 배포 실패!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
 
