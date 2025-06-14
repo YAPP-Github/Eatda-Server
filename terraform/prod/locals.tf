@@ -72,7 +72,7 @@ locals {
         task_role_arn      = data.terraform_remote_state.common.outputs.role_arn["ecsAppTaskRole"]
       },
         k == "api-prod" ? {
-        container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["dev"]}:latest"
+        container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["prod"]}:latest"
       } : {},
     )
   }
