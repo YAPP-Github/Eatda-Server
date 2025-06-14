@@ -1,18 +1,18 @@
 module "ec2" {
   source               = "./ec2"
-  ec2_sg_id            = var.ec2_sg_id
+  ec2_sg_id            = local.ec2_sg_id
   instance_definitions = local.dev_instance_definitions
-  instance_subnet_map  = var.instance_subnet_map
+  instance_subnet_map  = local.instance_subnet_map
   name_prefix          = local.name_prefix
-  tags                 = local.tags
+  tags                 = local.common_tags
 }
 
 module "ecs" {
   source                = "./ecs"
-  alb_target_group_arns = var.alb_target_group_arns
-  ecr_repo_names        = var.ecr_repo_names
+  alb_target_group_arns = local.alb_target_group_arns
+  ecr_repo_names        = local.ecr_repo_names
   ecs_services          = var.ecs_services
-  ecs_task_definitions  = var.ecs_task_definitions
+  ecs_task_definitions  = local.ecs_task_definitions
   environment           = local.environment
-  tags                  = local.tags
+  tags                  = local.common_tags
 }

@@ -1,31 +1,3 @@
-variable "project_name" {
-  type = string
-}
-
-variable "region" {
-  type = string
-}
-
-variable "vpc_id" {
-  type = string
-}
-
-variable "ec2_sg_id" {
-  type = string
-}
-
-variable "instance_subnet_map" {
-  type = map(string)
-}
-
-variable "alb_target_group_arns" {
-  type = map(string)
-}
-
-variable "ecr_repo_names" {
-  type = map(string)
-}
-
 variable "ecs_services" {
   type = map(object({
     desired_count = number
@@ -37,7 +9,7 @@ variable "ecs_services" {
   }))
 }
 
-variable "ecs_task_definitions" {
+variable "ecs_task_definitions_base" {
   type = map(object({
     cpu          = number
     memory       = number
@@ -54,9 +26,4 @@ variable "ecs_task_definitions" {
       host_path = string
     }))
   }))
-}
-
-variable "tags" {
-  type = map(string)
-  default = {}
 }

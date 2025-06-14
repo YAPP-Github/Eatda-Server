@@ -1,5 +1,14 @@
 data "aws_caller_identity" "current" {}
 
+data "terraform_remote_state" "common" {
+  backend = "s3"
+  config = {
+    bucket = "timeeat-tf-state"
+    key    = "common/terraform.tfstate"
+    region = "ap-northeast-2"
+  }
+}
+
 locals {
   cluster_name        = "${var.environment}-cluster"
   launch_type         = "EC2"
@@ -15,14 +24,14 @@ locals {
   resolved_task_definitions = {
     for name, def in var.ecs_task_definitions :
     name => name == "api-dev" ? merge(def, {
-      task_definition_name = "time-eat-dev"
+      task_definition_name = "api-dev"
       container_image      = "${var.ecr_repo_names["dev"]}:latest"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {}
       secrets = []
-    }) : name == "mysql" ? merge(def, {
-      task_definition_name = "time-eat-mysql"
+    }) : name == "mysql-dev" ? merge(def, {
+      task_definition_name = "mysql-dev"
       container_image      = "mysql:8"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
