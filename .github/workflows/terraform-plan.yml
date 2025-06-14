@@ -47,10 +47,12 @@ jobs:
           resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
           plan_summary=$(grep -E '^Plan:' plan_full.txt)
 
-          echo "summary_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$resource_summary" >> $GITHUB_OUTPUT
-          echo "$plan_summary" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "summary_output<<EOF"
+            echo "$resource_summary"
+            echo "$plan_summary"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
           if [ "$exit_code" -eq 0 ]; then
             echo "✅ Terraform plan completed with no changes."
@@ -111,10 +113,12 @@ jobs:
           resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
           plan_summary=$(grep -E '^Plan:' plan_full.txt)
 
-          echo "summary_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$resource_summary" >> $GITHUB_OUTPUT
-          echo "$plan_summary" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "summary_output<<EOF"
+            echo "$resource_summary"
+            echo "$plan_summary"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
           if [ "$exit_code" -eq 0 ]; then
             echo "✅ Terraform plan completed with no changes."
@@ -175,10 +179,12 @@ jobs:
           resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
           plan_summary=$(grep -E '^Plan:' plan_full.txt)
 
-          echo "summary_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$resource_summary" >> $GITHUB_OUTPUT
-          echo "$plan_summary" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "summary_output<<EOF"
+            echo "$resource_summary"
+            echo "$plan_summary"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
           if [ "$exit_code" -eq 0 ]; then
             echo "✅ Terraform plan completed with no changes."
@@ -206,7 +212,7 @@ jobs:
   comment-summary:
     name: "Comment PR with Plan Summary"
     runs-on: ubuntu-latest
-    needs: [plan-common, plan-dev, plan-prod]
+    needs: [ plan-common, plan-dev, plan-prod ]
     if: always()
     steps:
       - name: Comment PR with Plan Summary
