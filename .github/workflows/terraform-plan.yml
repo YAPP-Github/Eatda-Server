@@ -1,0 +1,98 @@
+name: Terraform Plan on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Plan and Capture Output
+        id: plan
+        working-directory: ./terraform
+        run: |
+          set +e
+          terraform plan -no-color -detailed-exitcode > >(tee plan_full.txt) 2> >(tee plan_full.txt >&2)
+          exit_code=$?
+          set -e
+          
+          resource_summary=$(grep -E '^(# |  [~+\-])' plan_full.txt | head -n 50)
+          
+          plan_summary=$(grep -E '^Plan:' plan_full.txt)
+          
+          echo "summary_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$resource_summary" >> $GITHUB_OUTPUT
+          echo "$plan_summary" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if [ "$exit_code" -eq 0 ]; then
+            echo "✅ Terraform plan completed with no changes."
+            echo "plan_status=success" >> $GITHUB_OUTPUT
+          elif [ "$exit_code" -eq 2 ]; then
+            echo "✅ Terraform plan completed with changes."
+            echo "plan_status=changes" >> $GITHUB_OUTPUT
+          elif [ "$exit_code" -eq 1 ]; then
+            echo "❌ Terraform plan failed with errors."
+            echo "plan_status=error" >> $GITHUB_OUTPUT
+          fi
+
+          exit 0
+
+      - name: Upload full plan as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: ./terraform/plan_full.txt
+
+      - name: Comment PR with Plan Summary
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## 📄 Terraform Plan Summary
+
+            ### 💬 변경 요약
+            ```terraform
+            ${{ steps.plan.outputs.summary_output }}
+            ```
+
+            ### 📌 상태
+            ${{ steps.plan.outputs.plan_status == 'error' && '❌ **실패**: Terraform Plan 도중 오류가 발생했습니다.' || '' }}
+            ${{ steps.plan.outputs.plan_status == 'changes' && '🔄 **변경사항 있음**: 적용 시 리소스 변경이 발생합니다.' || '' }}
+            ${{ steps.plan.outputs.plan_status == 'success' && '✅ **변경 없음**: 현재 인프라 상태는 최신입니다.' || '' }}
+
+            ### 📎 참고  
+            전체 Terraform Plan 결과는 [GitHub Actions Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})에서 확인하실 수 있습니다.
+
+      - name: Fail job if plan failed
+        if: ${{ steps.plan.outputs.plan_status == 'error' }}
+        run: exit 1
