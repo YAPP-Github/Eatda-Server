@@ -27,7 +27,7 @@ module "security_group" {
   ingress_rules         = local.ingress_rules
   egress_rules          = local.egress_rules
   cross_reference_rules = local.cross_reference_rules
-  tags                  = var.tags
+  tags                  = local.common_tags
 }
 
 module "route53" {

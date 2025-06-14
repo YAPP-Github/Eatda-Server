@@ -1,6 +1,6 @@
 locals {
   group_name   = "power"
-  project_name = var.project_name
+  project_name = "time-eat"
 
   policy_arns = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
@@ -10,6 +10,11 @@ locals {
   ]
 
   user = ["roy-test", "leegwichan"]
+
+  common_tags = {
+    Project   = local.project_name
+    ManagedBy = "terraform"
+  }
 }
 
 locals {
@@ -66,7 +71,7 @@ locals {
 
   subdomains = {
     api = local.alb_alias
-    dev  = local.alb_alias
+    dev = local.alb_alias
   }
 }
 
