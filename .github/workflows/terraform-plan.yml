@@ -244,29 +244,39 @@ jobs:
           body: |
             ## 📄 Terraform Plan Summary
 
-            ### 🛡️ common
-            ```terraform
-            ${{ needs.plan-common.outputs.summary_output }}
+            ### 🛡️ Common Infrastructure
             ```
-            **상태:** ${{ needs.plan-common.outputs.plan_status == 'error' && '❌ 실패' || needs.plan-common.outputs.plan_status == 'changes' && '🔄 변경사항 있음' || '✅ 변경 없음' }}
+            ${{ needs.plan-common.outputs.summary_output || 'No output available' }}
+            ```
+            **Status:** ${{ needs.plan-common.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-common.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes' }}
 
-            ${{ needs.plan-dev.result != 'skipped' && (
-            format('\n---\n\n### 🛠️ dev\n```terraform\n{0}\n```\n**상태:** {1}',
-              needs.plan-dev.outputs.summary_output,
-              needs.plan-dev.outputs.plan_status == 'error' && '❌ 실패' || needs.plan-dev.outputs.plan_status == 'changes' && '🔄 변경사항 있음' || '✅ 변경 없음'
-            )
-            ) || '' }}
+            ${{ needs.plan-dev.result != 'skipped' && '---' || '' }}
+            ${{ needs.plan-dev.result != 'skipped' && '### 🛠️ Development Environment' || '' }}
+            ${{ needs.plan-dev.result != 'skipped' && '```
+            ${{ needs.plan-dev.result != 'skipped' && (needs.plan-dev.outputs.summary_output || 'No output available') || '' }}
+            ${{ needs.plan-dev.result != 'skipped' && '```' || '' }}
+            ${{ needs.plan-dev.result != 'skipped' && format('**Status:** {0}', needs.plan-dev.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-dev.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes') || '' }}
 
-            ${{ needs.plan-prod.result != 'skipped' && (
-            format('\n---\n\n### 🚀 prod\n```terraform\n{0}\n```\n**상태:** {1}',
-              needs.plan-prod.outputs.summary_output,
-              needs.plan-prod.outputs.plan_status == 'error' && '❌ 실패' || needs.plan-prod.outputs.plan_status == 'changes' && '🔄 변경사항 있음' || '✅ 변경 없음'
-            )
-            ) || '' }}
+            ${{ needs.plan-prod.result != 'skipped' && '---' || '' }}
+            ${{ needs.plan-prod.result != 'skipped' && '### 🚀 Production Environment' || '' }}
+            ${{ needs.plan-prod.result != 'skipped' && '```
+            ${{ needs.plan-prod.result != 'skipped' && (needs.plan-prod.outputs.summary_output || 'No output available') || '' }}
+            ${{ needs.plan-prod.result != 'skipped' && '```' || '' }}
+            ${{ needs.plan-prod.result != 'skipped' && format('**Status:** {0}', needs.plan-prod.outputs.plan_status == 'error' && '❌ Failed' || needs.plan-prod.outputs.plan_status == 'changes' && '🔄 Changes Detected' || '✅ No Changes') || '' }}
 
             ---
 
-            전체 Terraform Plan 결과는 [GitHub Actions Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})에서 확인할 수 있습니다.
+            📋 **Full Terraform Plan Results:** [View in Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            <details>
+            <summary>📊 Execution Summary</summary>
+
+            - **Common:** ${{ needs.plan-common.result }}
+            - **Dev:** ${{ needs.plan-dev.result }}  
+            - **Prod:** ${{ needs.plan-prod.result }}
+
+            </details>
+      
 
       - name: Fail job if any plan failed
         if: |
