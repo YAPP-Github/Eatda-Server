@@ -45,10 +45,6 @@ output "user_name" {
   value = module.iam.user_name
 }
 
-output "group_name" {
-  value = module.iam.group_names
-}
-
 output "role_name" {
   value = {
     for k, mod in module.iam_role :
