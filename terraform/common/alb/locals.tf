@@ -63,7 +63,7 @@ locals {
     certificate_arn          = var.certificate_arn
     ssl_policy               = "ELBSecurityPolicy-TLS-1-2-2017-01"
     target_group_arn         = module.target_groups.target_group_arns["api-dev"]
-    default_target_group_arn = module.target_groups.target_group_arns["api-dev"]
+    default_target_group_arn = module.target_groups.target_group_arns["api-prod"]
   }
 }
 
