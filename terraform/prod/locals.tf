@@ -42,7 +42,7 @@ locals {
 }
 
 locals {
-  dev_instance_definitions = {
+  prod_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
     instance_type        = "t3.micro"
     role                 = "prod"

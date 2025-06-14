@@ -11,7 +11,7 @@ data "aws_ssm_parameter" "rds_password" {
 module "ec2" {
   source               = "./ec2"
   ec2_sg_id            = local.ec2_sg_id
-  instance_definitions = local.dev_instance_definitions
+  instance_definitions = local.prod_instance_definitions
   instance_subnet_map  = local.instance_subnet_map
   name_prefix          = local.name_prefix
   tags                 = local.common_tags
