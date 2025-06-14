@@ -34,7 +34,7 @@ module "route53" {
   source            = "./route53"
   domain_name       = local.domain_name
   validation_method = local.validation_method
-  recode_type       = local.recode_type
+  record_type       = local.record_type
   subdomains        = local.subdomains
 }
 

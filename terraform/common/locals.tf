@@ -63,7 +63,7 @@ locals {
 locals {
   domain_name       = "time-eat.com"
   validation_method = "DNS"
-  recode_type       = "A"
+  record_type       = "A"
   alb_alias = {
     alb_dns_name = module.alb.alb_dns_name
     alb_zone_id  = module.alb.alb_zone_id

@@ -42,7 +42,7 @@ resource "aws_route53_record" "subdomains" {
 
   zone_id = data.aws_route53_zone.common.zone_id
   name    = "${each.key}.${var.domain_name}"
-  type    = var.recode_type
+  type    = var.record_type
 
   alias {
     name                   = each.value.alb_dns_name

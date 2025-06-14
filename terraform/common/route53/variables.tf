@@ -15,6 +15,6 @@ variable "validation_method" {
   type = string
 }
 
-variable "recode_type" {
+variable "record_type" {
   type = string
 }
