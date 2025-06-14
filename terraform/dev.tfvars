@@ -1,5 +1,5 @@
 ecs_services = {
-  api = {
+  api-dev = {
     desired_count   = 1
     task_definition = "api"
     load_balancer = {
@@ -16,7 +16,7 @@ ecs_services = {
 }
 
 ecs_task_definitions = {
-  api = {
+  api-dev = {
     cpu          = 256
     memory       = 256
     network_mode = "bridge"

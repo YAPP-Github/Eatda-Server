@@ -14,7 +14,7 @@ locals {
 
   resolved_task_definitions = {
     for name, def in var.ecs_task_definitions :
-    name => name == "api" ? merge(def, {
+    name => name == "api-prod" ? merge(def, {
       task_definition_name = "time-eat-prod"
       container_image      = "${var.ecr_repo_names["prod"]}:latest"
       task_role_arn        = def.task_role_arn
