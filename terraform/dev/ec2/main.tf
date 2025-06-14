@@ -8,6 +8,11 @@ resource "aws_instance" "dev" {
   vpc_security_group_ids = [var.ec2_sg_id]
   user_data_replace_on_change = true
 
+  metadata_options {
+    http_tokens = "required"
+    http_endpoint = "enabled"
+  }
+
   tags = {
     Name = "${var.name_prefix}-${var.instance_definitions.role}"
   }
