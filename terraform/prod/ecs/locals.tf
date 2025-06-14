@@ -56,9 +56,9 @@ locals {
 
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
-      name                = name
-      desired_count       = def.desired_count
-      iam_role_arn        = var.ecs_task_definitions[name].task_role_arn
+      name          = name
+      desired_count = def.desired_count
+      iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }
   }
@@ -98,9 +98,9 @@ locals {
 
         mountPoints = [
           for vol in (def.volumes != null ? def.volumes : []) : {
-            sourceVolume = vol.name
+            sourceVolume  = vol.name
             containerPath = vol.host_path
-            readOnly     = false
+            readOnly      = false
           }
         ]
       }

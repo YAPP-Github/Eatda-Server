@@ -1,7 +1,7 @@
 ecs_services = {
   api-prod = {
-    desired_count       = 1
-    task_definition     = "api-prod"
+    desired_count   = 1
+    task_definition = "api-prod"
     load_balancer = {
       target_group_key = "api-prod"
       container_name   = "api-prod"

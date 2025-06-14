@@ -18,11 +18,11 @@ variable "deployment_controller_type" {
 }
 
 variable "launch_type" {
-  type    = string
+  type = string
 }
 
 variable "scheduling_strategy" {
-  type    = string
+  type = string
 }
 
 variable "task_definition_arn" {

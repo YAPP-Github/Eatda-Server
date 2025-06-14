@@ -1,14 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-data "terraform_remote_state" "common" {
-  backend = "s3"
-  config = {
-    bucket = "timeeat-tf-state"
-    key    = "common/terraform.tfstate"
-    region = "ap-northeast-2"
-  }
-}
-
 locals {
   cluster_name        = "${var.environment}-cluster"
   launch_type         = "EC2"
