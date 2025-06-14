@@ -1,11 +1,11 @@
 resource "aws_alb" "common" {
-  name               = local.alb_name
-  internal           = local.internal
-  load_balancer_type = local.loadbalancer_type
-  security_groups    = var.alb_security_group_id
-  subnets            = var.subnets
-
+  name                       = local.alb_name
+  internal                   = local.internal
+  load_balancer_type         = local.loadbalancer_type
+  security_groups            = var.alb_security_group_id
+  subnets                    = var.subnets
   enable_deletion_protection = local.deletion_protection
+  drop_invalid_header_fields = true
 
   tags = local.alb_tags
 }
