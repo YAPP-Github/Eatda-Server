@@ -10,7 +10,7 @@ locals {
 
 locals {
   target_groups = {
-    "dev" = {
+    "api-dev" = {
       env         = "dev"
       port        = 8080
       protocol    = "HTTP"
@@ -24,7 +24,7 @@ locals {
         unhealthy_threshold = 5
       }
     }
-    "prod" = {
+    "api-prod" = {
       env         = "prod"
       port        = 8080
       protocol    = "HTTP"
@@ -62,8 +62,8 @@ locals {
     type                     = "forward"
     certificate_arn          = var.certificate_arn
     ssl_policy               = "ELBSecurityPolicy-TLS-1-2-2017-01"
-    target_group_arn         = module.target_groups.target_group_arns["dev"]
-    default_target_group_arn = module.target_groups.target_group_arns["dev"]
+    target_group_arn         = module.target_groups.target_group_arns["api-dev"]
+    default_target_group_arn = module.target_groups.target_group_arns["api-dev"]
   }
 }
 
@@ -73,13 +73,13 @@ locals {
       priority         = 1
       host_header      = "api.time-eat.com"
       action_type      = "forward"
-      target_group_arn = module.target_groups.target_group_arns["prod"]
+      target_group_arn = module.target_groups.target_group_arns["api-prod"]
     }
     "dev-path-rule" = {
       priority         = 2
       host_header      = "dev.time-eat.com"
       action_type      = "forward"
-      target_group_arn = module.target_groups.target_group_arns["dev"]
+      target_group_arn = module.target_groups.target_group_arns["api-dev"]
     }
   }
 }
