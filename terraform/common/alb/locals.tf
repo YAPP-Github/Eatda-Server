@@ -16,7 +16,7 @@ locals {
       protocol    = "HTTP"
       target_type = "instance"
       health_check = {
-        path                = "/health"
+        path                = "/actuator/health/"
         protocol            = "HTTP"
         interval            = 30
         matcher             = "200"
@@ -30,7 +30,7 @@ locals {
       protocol    = "HTTP"
       target_type = "instance"
       health_check = {
-        path                = "/health"
+        path                = "/actuator/health"
         protocol            = "HTTP"
         interval            = 30
         matcher             = "200"
