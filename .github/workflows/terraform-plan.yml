@@ -11,6 +11,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
 jobs:
   plan-common:
     name: "Terraform Plan (common)"

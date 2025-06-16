@@ -20,6 +20,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
 env:
   AWS_REGION: ap-northeast-2
 
