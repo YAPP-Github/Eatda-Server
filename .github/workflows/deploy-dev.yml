@@ -89,8 +89,8 @@ jobs:
           TF_OUTPUTS='${{ needs.terraform-apply-dev.outputs.tf_outputs_json }}'
           echo "ECR_REPOSITORY=$(echo "$TF_OUTPUTS" | jq -r '.ecr_repository_name.value')" >> $GITHUB_ENV
           echo "ECS_CLUSTER=$(echo "$TF_OUTPUTS" | jq -r '.ecs_cluster_name.value')" >> $GITHUB_ENV
-          echo "ECS_SERVICE=$(echo "$TF_OUTPUTS" | jq -r '.ecs_service_name.value')" >> $GITHUB_ENV
-          echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.container_name.value')" >> $GITHUB_ENV
+          echo "ECS_SERVICE=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_service_name.value')" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_container_name.value')" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
