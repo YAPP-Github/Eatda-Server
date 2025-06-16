@@ -108,10 +108,11 @@ jobs:
         run: npm install semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator conventional-changelog-conventionalcommits
 
       - name: Semantic Release
+        id: get_version
         run: |
           OUTPUT=$(./node_modules/.bin/semantic-release --no-ci)
           echo "$OUTPUT"
-          VERSION=$(echo "$OUTPUT" | grep -oP 'Published release \K[0-9.]+')
+          VERSION=$(echo "$OUTPUT" | grep -oP 'Published prerelease \K[0-9.a-z-]+')
           if [ -z "$VERSION" ]; then
             echo "릴리즈할 새로운 버전이 없습니다. 배포를 건너뜁니다."
             exit 0
@@ -146,9 +147,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION" >> $GITHUB_ENV
 
       - name: Get latest ECS task definition
@@ -182,7 +181,7 @@ jobs:
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-          embed-title: "✅ 프로덕션 배포 성공!"
+          embed-title: "✅ 개발 서버 배포 성공!"
           embed-color: 65280
           embed-description: |
             새로운 버전이 성공적으로 배포되었습니다.
@@ -197,7 +196,7 @@ jobs:
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-          embed-title: "❌ 프로덕션 배포 실패!"
+          embed-title: "❌ 개발 서버 배포 실패!"
           embed-color: 16711680
           embed-description: |
             배포 과정 중 오류가 발생했습니다. 아래 링크에서 로그를 확인하세요.
