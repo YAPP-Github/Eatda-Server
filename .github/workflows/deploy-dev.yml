@@ -104,9 +104,12 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install Semantic Release dependencies
+        run: npm install semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator conventional-changelog-conventionalcommits
+
       - name: Semantic Release
         run: |
-          OUTPUT=$(npx semantic-release --no-ci)
+          OUTPUT=$(./node_modules/.bin/semantic-release --no-ci)
           echo "$OUTPUT"
           VERSION=$(echo "$OUTPUT" | grep -oP 'Published release \K[0-9.]+')
           if [ -z "$VERSION" ]; then
