@@ -173,18 +173,36 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
+      - name: Prepare Notification Info
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Discord Notify (Success)
         if: success()
-        run: |
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\": \"✅ (개발 서버) 새로운 버전이 배포 되었어요!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
-            ${{ secrets.DISCORD_WEBHOOK }}
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "✅ 프로덕션 배포 성공!"
+          embed-color: 65280
+          embed-description: |
+            새로운 버전이 성공적으로 배포되었습니다.
+            
+            **버전**: [v${{ env.SEMANTIC_VERSION }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ env.SEMANTIC_VERSION }})
+            **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **배포자**: ${{ github.actor }}
+          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Discord Notify (Failure)
         if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\": \"❌ (개발 서버) 배포 실패!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
-            ${{ secrets.DISCORD_WEBHOOK }}
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "❌ 프로덕션 배포 실패!"
+          embed-color: 16711680
+          embed-description: |
+            배포 과정 중 오류가 발생했습니다. 아래 링크에서 로그를 확인하세요.
+            
+            **시도 버전**: ${{ env.SEMANTIC_VERSION }}
+            **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **요청자**: ${{ github.actor }}
+          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
