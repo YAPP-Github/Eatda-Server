@@ -21,7 +21,7 @@ jobs:
           ref: main
 
       - name: Issue Parser
-        uses: stefanbuck/github-issue-praser@v3
+        uses: stefanbuck/github-issue-parser@v3
         id: issue-parser
         with:
           template-path: .github/ISSUE_TEMPLATE/01-feat-template.yml
@@ -58,11 +58,6 @@ jobs:
 
       - name: Log created issue
         run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create.outputs.issue }} was created"
-
-      - name: Checkout main code
-        uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Get first label as branch prefix
         id: label
