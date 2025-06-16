@@ -3,6 +3,7 @@ variable "target_groups" {
     port        = number
     protocol    = string
     target_type = string
+    deregistration_delay = number
     health_check = object({
       path                = string
       protocol            = string

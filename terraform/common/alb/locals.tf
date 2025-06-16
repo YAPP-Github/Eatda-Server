@@ -3,6 +3,7 @@ locals {
   deletion_protection = false
   loadbalancer_type   = "application"
   internal            = false
+
   alb_tags = {
     Environment = local.alb_name
   }
@@ -11,10 +12,11 @@ locals {
 locals {
   target_groups = {
     "api-dev" = {
-      env         = "dev"
-      port        = 8080
-      protocol    = "HTTP"
-      target_type = "instance"
+      env                  = "dev"
+      port                 = 8080
+      protocol             = "HTTP"
+      target_type          = "instance"
+      deregistration_delay = 60
       health_check = {
         path                = "/actuator/health/"
         protocol            = "HTTP"
@@ -25,10 +27,11 @@ locals {
       }
     }
     "api-prod" = {
-      env         = "prod"
-      port        = 8080
-      protocol    = "HTTP"
-      target_type = "instance"
+      env                  = "prod"
+      port                 = 8080
+      protocol             = "HTTP"
+      target_type          = "instance"
+      deregistration_delay = 60
       health_check = {
         path                = "/actuator/health"
         protocol            = "HTTP"
