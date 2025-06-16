@@ -112,7 +112,7 @@ jobs:
         run: |
           OUTPUT=$(./node_modules/.bin/semantic-release --no-ci)
           echo "$OUTPUT"
-          VERSION=$(echo "$OUTPUT" | grep -oP 'Published prerelease \K[0-9.a-z-]+')
+                    VERSION=$(echo "$OUTPUT" | grep -oP 'Published (?:pre)?release \K[0-9.a-z-]+')
           if [ -z "$VERSION" ]; then
             echo "릴리즈할 새로운 버전이 없습니다. 배포를 건너뜁니다."
             exit 0
