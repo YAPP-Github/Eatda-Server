@@ -1,6 +1,5 @@
 ecs_services = {
   api-prod = {
-    desired_count   = 1
     task_definition = "api-prod"
     load_balancer = {
       target_group_key = "api-prod"
@@ -11,7 +10,6 @@ ecs_services = {
 
   datadog = {
     task_definition     = "datadog"
-    desired_count       = 1
     launch_type         = "EC2"
     scheduling_strategy = "REPLICA"
   }

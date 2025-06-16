@@ -1,7 +1,7 @@
 locals {
   cluster_name        = "${var.environment}-cluster"
   launch_type         = "EC2"
-  scheduling_strategy = "REPLICA"
+  scheduling_strategy = "DAEMON"
 
   settings = {
     name  = "containerInsights"
@@ -69,7 +69,6 @@ locals {
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
       name          = name
-      desired_count = def.desired_count
       iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }

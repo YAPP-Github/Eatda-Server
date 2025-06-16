@@ -1,7 +1,7 @@
 locals {
   cluster_name        = "${var.environment}-cluster"
   launch_type         = "EC2"
-  scheduling_strategy = "REPLICA"
+  scheduling_strategy = "DAEMON"
 
   settings = {
     name  = "containerInsights"
