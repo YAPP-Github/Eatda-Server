@@ -1,5 +1,5 @@
 output "ecr_repository_name" {
-  value = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["prod"]
+  value = data.terraform_remote_state.bootstrap.outputs.ecr_repo_urls["prod"]
 }
 
 output "ecs_cluster_name" {
