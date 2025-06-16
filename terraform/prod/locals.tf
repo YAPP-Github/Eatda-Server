@@ -26,7 +26,7 @@ locals {
   ec2_sg_id                 = data.terraform_remote_state.common.outputs.security_group_ids["ec2"]
   instance_definitions      = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
   instance_subnet_map       = data.terraform_remote_state.common.outputs.public_subnet_ids
-  ecr_repo_names            = data.terraform_remote_state.bootstrap.outputs.ecr_repo_names
+  ecr_repo_urls             = data.terraform_remote_state.bootstrap.outputs.ecr_repo_urls
   ecs_services              = var.ecs_services
   ecs_task_definitions_base = var.ecs_task_definitions_base
   alb_target_group_arns     = data.terraform_remote_state.common.outputs.target_group_arns
@@ -72,7 +72,7 @@ locals {
         task_role_arn      = data.terraform_remote_state.common.outputs.role_arn["ecsAppTaskRole"]
       },
         k == "api-prod" ? {
-        container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_names["prod"]}:latest"
+        container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_urls["prod"]}:latest"
       } : {},
     )
   }

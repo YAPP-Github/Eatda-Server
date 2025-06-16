@@ -2,7 +2,7 @@ variable "environment" {
   type = string
 }
 
-variable "ecr_repo_names" {
+variable "ecr_repo_urls" {
   type = map(string)
 }
 

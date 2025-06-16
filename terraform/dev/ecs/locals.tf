@@ -14,7 +14,7 @@ locals {
     for name, def in var.ecs_task_definitions :
     name => name == "api-dev" ? merge(def, {
       task_definition_name = "api-dev"
-      container_image      = "${var.ecr_repo_names["dev"]}:latest"
+      container_image      = "${var.ecr_repo_urls["dev"]}:latest"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {}
