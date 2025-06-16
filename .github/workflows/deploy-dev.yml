@@ -78,13 +78,16 @@ jobs:
     runs-on: ubuntu-latest
     environment: develop
     needs: terraform-apply-dev
-    env:
-      ECR_REPOSITORY: ${{ fromJSON(needs.terraform-apply-dev.outputs.tf_outputs_json).ecr_repository_name.value }}
-      ECS_CLUSTER: ${{ fromJSON(needs.terraform-apply-dev.outputs.tf_outputs_json).ecs_cluster_name.value }}
-      ECS_SERVICE: ${{ fromJSON(needs.terraform-apply-dev.outputs.tf_outputs_json).ecs_service_name.value }}
-      CONTAINER_NAME: ${{ fromJSON(needs.terraform-apply-dev.outputs.tf_outputs_json).container_name.value }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Parse Terraform Outputs and Set Environment Variables
+        run: |
+          TF_OUTPUTS='${{ needs.terraform-apply-dev.outputs.tf_outputs_json }}'
+          echo "ECR_REPOSITORY=$(echo "$TF_OUTPUTS" | jq -r '.ecr_repository_name.value')" >> $GITHUB_ENV
+          echo "ECS_CLUSTER=$(echo "$TF_OUTPUTS" | jq -r '.ecs_cluster_name.value')" >> $GITHUB_ENV
+          echo "ECS_SERVICE=$(echo "$TF_OUTPUTS" | jq -r '.ecs_service_name.value')" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.container_name.value')" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -179,4 +182,3 @@ jobs:
             -X POST \
             -d "{\"content\": \"❌ (개발 서버) 배포 실패!\n레포: ${GITHUB_REPOSITORY}\n브랜치: ${GITHUB_REF}\n버전: ${SEMANTIC_VERSION}\"}" \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
