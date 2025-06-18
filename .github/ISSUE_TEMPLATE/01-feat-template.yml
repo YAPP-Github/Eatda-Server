@@ -27,6 +27,5 @@ body:
     attributes:
       label: '📅 마감일'
       description: '마감일을 입력해주세요 (YY.MM.DD)'
-      placeholder: ''
     validations:
       required: false
