@@ -26,8 +26,19 @@ public class StoreHours {
     }
 
     private void validate(LocalTime openTime, LocalTime closeTime) {
-        if (openTime != null && closeTime != null && openTime.isAfter(closeTime)) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_TIME);
+        validateNotNull(openTime, closeTime);
+        validateOrder(openTime, closeTime);
+    }
+
+    private void validateNotNull(LocalTime openTime, LocalTime closeTime) {
+        if (openTime == null || closeTime == null) {
+            throw new BusinessException(BusinessErrorCode.INVALID_STORE_TIME_NULL);
+        }
+    }
+
+    private void validateOrder(LocalTime openTime, LocalTime closeTime) {
+        if (openTime.isAfter(closeTime)) {
+            throw new BusinessException(BusinessErrorCode.INVALID_STORE_TIME_ORDER);
         }
     }
 }
