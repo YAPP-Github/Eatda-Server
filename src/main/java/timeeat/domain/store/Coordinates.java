@@ -29,10 +29,21 @@ public class Coordinates {
     }
 
     private void validate(Double latitude, Double longitude) {
-        if (latitude != null && (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE)) {
+        validateNotNull(latitude, longitude);
+        validateRange(latitude, longitude);
+    }
+
+    private void validateNotNull(Double latitude, Double longitude) {
+        if (latitude == null || longitude == null) {
+            throw new BusinessException(BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
+        }
+    }
+
+    private void validateRange(Double latitude, Double longitude) {
+        if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORE_COORDINATES);
         }
-        if (longitude != null && (longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE)) {
+        if (longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORE_COORDINATES);
         }
     }
