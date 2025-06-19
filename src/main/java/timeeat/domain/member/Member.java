@@ -36,7 +36,6 @@ public class Member {
 
     public Member(String socialId) {
         this.socialId = socialId;
-        this.optInMarketing = false;
     }
 
     public Member(
@@ -59,5 +58,9 @@ public class Member {
         if (optInMarketing == null) {
             throw new BusinessException(BusinessErrorCode.INVALID_MARKETING_CONSENT);
         }
+    }
+
+    public boolean isOptInMarketing() {
+        return Boolean.TRUE.equals(optInMarketing);
     }
 }
