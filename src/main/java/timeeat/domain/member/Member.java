@@ -35,6 +35,7 @@ public class Member {
     private Boolean optInMarketing;
 
     public Member(String socialId) {
+        validateSocialId(socialId);
         this.socialId = socialId;
     }
 
@@ -45,13 +46,18 @@ public class Member {
             String interestArea,
             Boolean optInMarketing
     ) {
+        this(socialId);
         validateOptInMarketing(optInMarketing);
-
-        this.socialId = socialId;
         this.nickname = nickname;
         this.mobilePhoneNumber = new MobilePhoneNumber(mobilePhoneNumber);
         this.interestArea = InterestArea.from(interestArea);
         this.optInMarketing = optInMarketing;
+    }
+
+    private void validateSocialId(String socialId) {
+        if (socialId == null || socialId.trim().isEmpty()) {
+            throw new BusinessException(BusinessErrorCode.INVALID_SOCIAL_ID);
+        }
     }
 
     private void validateOptInMarketing(Boolean optInMarketing) {
