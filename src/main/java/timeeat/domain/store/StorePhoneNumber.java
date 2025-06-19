@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode
 public class StorePhoneNumber {
 
-    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^\\d{9,12}$");
+    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^\\d{8,12}$");
 
     @Column(name = "phone_number", nullable = false)
     private String value;
