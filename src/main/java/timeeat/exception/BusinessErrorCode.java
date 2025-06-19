@@ -25,20 +25,14 @@ public enum BusinessErrorCode {
 
     // Menu
     INVALID_MENU_NAME("MEN001", "메뉴명은 필수입니다."),
-
     INVALID_MENU_PRICE("MEN002", "메뉴 가격은 0보다 커야 합니다."),
-
     INVALID_MENU_DISCOUNT_PRICE("MEN003", "할인 가격은 원가보다 작아야 합니다."),
-
     INVALID_MENU_DISCOUNT_TIME("MEN004", "할인 시간이 올바르지 않습니다."),
 
     // Bookmark
     DUPLICATE_BOOKMARK("BOK001", "이미 북마크된 매장입니다."),
-
     BOOKMARK_NOT_FOUND("BOK002", "북마크를 찾을 수 없습니다."),
-
     BOOKMARK_MEMBER_REQUIRED("BOK003", "북마크 생성 시 회원 정보는 필수입니다."),
-
     BOOKMARK_STORE_REQUIRED("BOK004", "북마크 생성 시 가게 정보는 필수입니다.");
 
     private final String code;
