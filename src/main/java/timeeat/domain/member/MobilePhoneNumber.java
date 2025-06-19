@@ -29,7 +29,7 @@ public class MobilePhoneNumber {
 
     private void validate(String number) {
         if (number != null && !PHONE_NUMBER_PATTERN.matcher(number).matches()) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_PHONE_NUMBER);
+            throw new BusinessException(BusinessErrorCode.INVALID_MOBILE_PHONE_NUMBER);
         }
     }
 }
