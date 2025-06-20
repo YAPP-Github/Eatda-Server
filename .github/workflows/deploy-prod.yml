@@ -117,8 +117,7 @@ jobs:
           node-version: '22'
 
       - name: Install Semantic Release dependencies
-        run: npm install semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github @semantic-release/changelog @semantic-release/git
-
+        run: npm install semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github @semantic-release/changelog @semantic-release/git conventional-changelog-conventionalcommits
 
       - name: Semantic Release (Dry Run)
         id: get_version
