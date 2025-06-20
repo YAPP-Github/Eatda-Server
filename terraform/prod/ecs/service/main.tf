@@ -5,7 +5,6 @@ resource "aws_ecs_service" "prod" {
   cluster         = var.cluster_id
   launch_type = lookup(each.value, "launch_type", var.launch_type)
   task_definition = var.task_definition_arn[each.key]
-  desired_count   = each.value.desired_count
   scheduling_strategy = lookup(each.value, "scheduling_strategy", var.scheduling_strategy)
 
   dynamic "load_balancer" {

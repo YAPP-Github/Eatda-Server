@@ -1,6 +1,5 @@
 ecs_services = {
   api-dev = {
-    desired_count   = 1
     task_definition = "api-dev"
     load_balancer = {
       target_group_key = "api-dev"
@@ -10,7 +9,6 @@ ecs_services = {
   }
 
   mysql-dev = {
-    desired_count   = 1
     task_definition = "mysql"
   }
 }

@@ -1,10 +1,11 @@
 resource "aws_lb_target_group" "common" {
   for_each = var.target_groups
 
-  name        = each.key
-  port        = each.value.port
-  protocol    = each.value.protocol
-  target_type = each.value.target_type
+  name                 = each.key
+  port                 = each.value.port
+  protocol             = each.value.protocol
+  target_type          = each.value.target_type
+  deregistration_delay = each.value.deregistration_delay
 
   vpc_id = var.vpc_id
 
