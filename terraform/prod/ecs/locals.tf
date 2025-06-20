@@ -1,7 +1,7 @@
 locals {
   cluster_name        = "${var.environment}-cluster"
   launch_type         = "EC2"
-  scheduling_strategy = "REPLICA"
+  scheduling_strategy = "DAEMON"
 
   settings = {
     name  = "containerInsights"
@@ -14,7 +14,7 @@ locals {
     for name, def in var.ecs_task_definitions :
     name => name == "api-prod" ? merge(def, {
       task_definition_name = "api-prod"
-      container_image      = "${var.ecr_repo_names["prod"]}:latest"
+      container_image      = "${var.ecr_repo_urls["prod"]}:placeholder"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {}
@@ -57,7 +57,6 @@ locals {
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
       name          = name
-      desired_count = def.desired_count
       iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }

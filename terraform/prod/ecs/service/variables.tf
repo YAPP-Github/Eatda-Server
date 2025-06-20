@@ -1,6 +1,5 @@
 variable "ecs_services" {
   type = map(object({
-    desired_count = number
     load_balancer = object({
       target_group_key = string
       container_name   = string
