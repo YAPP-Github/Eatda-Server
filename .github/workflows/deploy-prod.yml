@@ -33,9 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: hashicorp/setup-terraform@v3
 
       - name: Configure AWS credentials
@@ -95,6 +92,8 @@ jobs:
     needs: terraform-apply-prod
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Parse Terraform Outputs and Set Environment Variables
         run: |
