@@ -196,7 +196,7 @@ jobs:
           wait-for-service-stability: true
 
       - name: Semantic Release (Final)
-        if: success() && env.SEMANTIC_VERSION != '' && github.event.inputs.rollback_version == ''
+        if: success() && env.SEMANTIC_VERSION != '' && (github.event.inputs.rollback_version == null || github.event.inputs.rollback_version == '')
         run: |
           ./node_modules/.bin/semantic-release --no-ci
         env:
