@@ -11,7 +11,7 @@ class OauthClientTest {
 
     private final String clientId = "testClientId";
     private final String redirectUri = "http://localhost:8080/oauth/callback";
-    private final OauthClient oauthClient = new OauthClient(clientId, redirectUri);
+    private final OauthClient oauthClient = new OauthClient(new OauthProperties(clientId, redirectUri));
 
     @Nested
     class GetOauthLoginUrl {
