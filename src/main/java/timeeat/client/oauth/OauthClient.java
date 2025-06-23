@@ -1,25 +1,24 @@
 package timeeat.client.oauth;
 
 import java.net.URI;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
+@EnableConfigurationProperties(OauthProperties.class)
 public class OauthClient {
 
-    private final String clientId;
-    private final String redirectUri;
+    private final OauthProperties properties;
 
-    public OauthClient(@Value("${oauth.clientId}") String clientId, @Value("${oauth.redirectUri}") String redirectUri) {
-        this.clientId = clientId;
-        this.redirectUri = redirectUri;
+    public OauthClient(OauthProperties oauthProperties) {
+        this.properties = oauthProperties;
     }
 
     public URI getOauthLoginUrl() {
         return UriComponentsBuilder.fromUriString("https://kauth.kakao.com/oauth/authorize")
-                .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", redirectUri)
+                .queryParam("client_id", properties.getClientId())
+                .queryParam("redirect_uri", properties.getRedirectUri())
                 .queryParam("response_type", "code")
                 .build()
                 .toUri();
