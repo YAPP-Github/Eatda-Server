@@ -23,3 +23,7 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
+jwt:
+  secret-key: test-secret-key-test-secret-key-test-key-test-secret-key-test
+  access-token-expiration: 1h
+  refresh-token-expiration: 1d
