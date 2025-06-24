@@ -1,5 +1,7 @@
 package timeeat.domain.store;
 
+import java.time.LocalTime;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,12 +11,10 @@ import timeeat.enums.StoreCategory;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.time.LocalTime;
-
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Table(name = "store")
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store {
 
     @Id

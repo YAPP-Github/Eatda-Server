@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Table(name = "menu")
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
 
     private static final int MAX_NAME_LENGTH = 255;

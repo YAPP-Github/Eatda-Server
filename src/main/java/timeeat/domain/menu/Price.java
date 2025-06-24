@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-@Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Price {
 
     private static final int MIN_PRICE = 1;

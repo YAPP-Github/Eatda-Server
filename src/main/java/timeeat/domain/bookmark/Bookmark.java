@@ -9,10 +9,10 @@ import timeeat.domain.store.Store;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Table(name = "bookmark")
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bookmark {
 
     @Id
@@ -46,3 +46,4 @@ public class Bookmark {
         }
     }
 }
+

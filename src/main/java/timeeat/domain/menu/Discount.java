@@ -1,5 +1,7 @@
 package timeeat.domain.menu;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -8,12 +10,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.time.LocalDateTime;
-
-@Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Discount {
     private static final int MIN_PRICE = 1;
 
@@ -43,3 +43,4 @@ public class Discount {
         }
     }
 }
+
