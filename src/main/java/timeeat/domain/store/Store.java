@@ -50,6 +50,8 @@ public class Store {
     @Column(name = "interest_area", nullable = false)
     private InterestArea interestArea;
 
+    //TODO 빌더 패턴으로 변경 합의, 다음 도메인 수정시 반영 필요
+
     public Store(
             String name,
             String category,
