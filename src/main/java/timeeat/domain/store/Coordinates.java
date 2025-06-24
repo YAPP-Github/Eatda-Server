@@ -41,10 +41,10 @@ public class Coordinates {
 
     private void validateRange(Double latitude, Double longitude) {
         if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_COORDINATES);
+            throw new BusinessException(BusinessErrorCode.OUT_OF_SEOUL_LATITUDE_RANGE);
         }
         if (longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_COORDINATES);
+            throw new BusinessException(BusinessErrorCode.OUT_OF_SEOUL_LONGITUDE_RANGE);
         }
     }
 }
