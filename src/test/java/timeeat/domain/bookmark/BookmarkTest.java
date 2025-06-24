@@ -1,24 +1,25 @@
 package timeeat.domain.bookmark;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalTime;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import timeeat.domain.member.Member;
 import timeeat.domain.store.Store;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 class BookmarkTest {
 
     @Nested
     @DisplayName("북마크 생성 시")
-    class CreateBookmarkTest {
+    class CreateBookmark {
 
         @Test
         void 정상적인_멤버와_가게로_북마크를_생성한다() {

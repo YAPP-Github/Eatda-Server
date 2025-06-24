@@ -1,21 +1,22 @@
 package timeeat.domain.store;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import timeeat.exception.BusinessErrorCode;
-import timeeat.exception.BusinessException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalTime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 class StoreHoursTest {
 
     @Nested
     @DisplayName("영업시간 생성 시")
-    class CreateStoreHoursTest {
+    class CreateStoreHours {
 
         @Test
         void 정상적인_영업시간으로_생성한다() {

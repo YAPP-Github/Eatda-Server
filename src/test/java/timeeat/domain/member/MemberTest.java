@@ -1,21 +1,22 @@
 package timeeat.domain.member;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import timeeat.enums.InterestArea;
-import timeeat.exception.BusinessErrorCode;
-import timeeat.exception.BusinessException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import timeeat.enums.InterestArea;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 class MemberTest {
 
     @Nested
     @DisplayName("Oauth 최초 가입으로 회원을 생성할 때")
-    class CreateOauthMemberTest {
+    class CreateOauthMember {
 
         @Test
         void socialId만으로_생성_시_나머지_필드는_null_상태이다() {

@@ -1,19 +1,20 @@
 package timeeat.domain.menu;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PriceTest {
 
     @Nested
     @DisplayName("가격을 생성할 때")
-    class CreatePriceTest {
+    class CreatePrice {
 
         @Test
         void 정상적인_가격으로_생성한다() {

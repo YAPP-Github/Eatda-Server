@@ -1,19 +1,20 @@
 package timeeat.domain.store;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CoordinatesTest {
 
     @Nested
     @DisplayName("좌표를 생성할 때")
-    class CreateCoordinatesTest {
+    class CreateCoordinates {
 
         @Test
         void 정상적인_위도와_경도로_생성한다() {
