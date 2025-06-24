@@ -76,9 +76,11 @@ class MemberTest {
 
             Member member = new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing);
 
-            assertThat(member.getNickname()).isNull();
-            assertThat(member.getMobilePhoneNumber().getValue()).isNull();
-            assertThat(member.isOptInMarketing()).isFalse();
+            assertAll(
+                    () -> assertThat(member.getNickname()).isNull(),
+                    () -> assertThat(member.getMobilePhoneNumber().getValue()).isNull(),
+                    () -> assertThat(member.isOptInMarketing()).isFalse()
+            );
         }
 
         @Test
