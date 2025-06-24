@@ -1,21 +1,22 @@
 package timeeat.domain.store;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StorePhoneNumberTest {
 
     @Nested
     @DisplayName("가게 번호를 생성할 때")
-    class CreateStorePhoneNumberTest {
+    class CreateStorePhoneNumber {
 
         @ParameterizedTest
         @ValueSource(strings = {"021234567", "03112345678", "15771234", "077012345678"})

@@ -17,7 +17,7 @@ class StoreTest {
 
     @Nested
     @DisplayName("가게 정보를 생성할 때")
-    class CreateStoreTest {
+    class CreateStore {
 
         @Test
         void 모든_정보가_정상적일_때_가게를_생성한다() {
