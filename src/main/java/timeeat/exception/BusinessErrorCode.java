@@ -21,14 +21,16 @@ public enum BusinessErrorCode {
     INVALID_STORE_ID("STO006", "유효하지 않은 매장 ID입니다."),
     INVALID_STORE_COORDINATES_NULL("STO007", "좌표 값은 필수입니다."),
     INVALID_STORE_TIME_NULL("STO008", "영업 시간은 필수입니다."),
-    INVALID_STORE_TIME_ORDER("STO09", "종료 시간은 시작 시간보다 늦어야 합니다."),
+    INVALID_STORE_TIME_ORDER("STO009", "종료 시간은 시작 시간보다 늦어야 합니다."),
+    OUT_OF_SEOUL_LATITUDE_RANGE("STO010", "서비스 지역(서울)을 벗어난 위도 값입니다."),
+    OUT_OF_SEOUL_LONGITUDE_RANGE("STO011", "서비스 지역(서울)을 벗어난 경도 값입니다."),
 
     // Menu
     INVALID_MENU_NAME("MEN001", "메뉴명은 필수입니다."),
     INVALID_MENU_PRICE("MEN002", "메뉴 가격은 0보다 커야 합니다."),
     INVALID_MENU_DISCOUNT_PRICE("MEN003", "할인 가격은 원가보다 작아야 합니다."),
     INVALID_MENU_DISCOUNT_TIME("MEN004", "할인 시간이 올바르지 않습니다."),
-    INVALID_MENU_LENGTH("MEN001", "메뉴명 길이가 최대를 초과했습니다."),
+    INVALID_MENU_LENGTH("MEN005", "메뉴명 길이가 최대를 초과했습니다."),
 
     // Bookmark
     DUPLICATE_BOOKMARK("BOK001", "이미 북마크된 매장입니다."),

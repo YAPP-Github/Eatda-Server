@@ -2,6 +2,7 @@ package timeeat.domain.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,6 +46,28 @@ class CoordinatesTest {
             assertThatThrownBy(() -> new Coordinates(latitude, nullLongitude))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
+        }
+
+        @Test
+        @DisplayName("위도 값이 서울 지역 범위를 벗어나면 예외를 던진다")
+        void 위도값이_최소_범위를_벗어나면_예외를_던진다() {
+            Double invalidLatitude = -91.0;
+            Double validLongitude = 126.9780;
+
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Coordinates(invalidLatitude, validLongitude));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.OUT_OF_SEOUL_LATITUDE_RANGE);
+        }
+
+        @Test
+        @DisplayName("경도 값이 서울 지역 범위를 벗어나면 예외를 던진다")
+        void 경도값이_최대_범위를_벗어나면_예외를_던진다() {
+            Double invalidLongitude = 181.0;
+            Double validLatitude = 37.5665;
+
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Coordinates(validLatitude, invalidLongitude));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.OUT_OF_SEOUL_LONGITUDE_RANGE);
         }
     }
 }
