@@ -13,7 +13,7 @@ public class MemberController {
 
     private final JwtManager jwtManager;
 
-    @PostMapping("/api/login")
+    @PostMapping("/api/member/login")
     public ResponseEntity<TokenResponse> login() {
         // TODO : memberService.login() 메서드를 호출하여 로그인 처리
 
