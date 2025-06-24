@@ -15,7 +15,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/api/login/auth")
+    @GetMapping("/api/member/login/auth")
     public ResponseEntity<Void> redirectOauthLoginPage() {
         URI oauthLoginUrl = memberService.getOauthLoginUrl();
 
@@ -25,7 +25,7 @@ public class MemberController {
                 .build();
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/api/member/login")
     public ResponseEntity<String> login(@RequestBody MemberLoginRequest request) {
         memberService.login(request);
         return ResponseEntity.ok("Oauth 로그인 성공"); // TODO 회원 생성 후 정보 반환
