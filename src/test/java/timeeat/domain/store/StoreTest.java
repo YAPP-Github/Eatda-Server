@@ -1,17 +1,18 @@
 package timeeat.domain.store;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import timeeat.enums.StoreCategory;
-import timeeat.exception.BusinessErrorCode;
-import timeeat.exception.BusinessException;
-
-import java.time.LocalTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.time.LocalTime;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import timeeat.enums.StoreCategory;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 class StoreTest {
 

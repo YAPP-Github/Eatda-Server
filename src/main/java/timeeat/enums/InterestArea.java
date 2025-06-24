@@ -1,10 +1,10 @@
 package timeeat.enums;
 
+import java.util.Arrays;
+
 import lombok.Getter;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
-
-import java.util.Arrays;
 
 @Getter
 public enum InterestArea {
