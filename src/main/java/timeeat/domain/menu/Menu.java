@@ -1,5 +1,7 @@
 package timeeat.domain.menu;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,13 +9,13 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.time.LocalDateTime;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "menu")
 public class Menu {
+
+    private static final int MAX_NAME_LENGTH = 255;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +46,7 @@ public class Menu {
             LocalDateTime discountEndTime
     ) {
         validateName(name);
+        validateNameLength(name);
 
         this.name = name;
         this.description = description;
@@ -55,6 +58,12 @@ public class Menu {
     private void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new BusinessException(BusinessErrorCode.INVALID_MENU_NAME);
+        }
+    }
+
+    private void validateNameLength(String name) {
+        if (name.length() > MAX_NAME_LENGTH) {
+            throw new BusinessException(BusinessErrorCode.INVALID_MENU_LENGTH);
         }
     }
 }
