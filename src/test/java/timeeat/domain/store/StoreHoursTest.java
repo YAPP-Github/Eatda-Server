@@ -1,7 +1,7 @@
 package timeeat.domain.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalTime;
 
@@ -33,18 +33,18 @@ class StoreHoursTest {
         void openTime이_null이면_예외를_던진다() {
             LocalTime close = LocalTime.of(18, 0);
 
-            assertThatThrownBy(() -> new StoreHours(null, close))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_TIME_NULL);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new StoreHours(null, close));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_TIME_NULL);
         }
 
         @Test
         void closeTime이_null이면_예외를_던진다() {
             LocalTime open = LocalTime.of(9, 0);
 
-            assertThatThrownBy(() -> new StoreHours(open, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_TIME_NULL);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new StoreHours(open, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_TIME_NULL);
         }
 
         @Test
@@ -52,9 +52,9 @@ class StoreHoursTest {
             LocalTime open = LocalTime.of(20, 0);
             LocalTime close = LocalTime.of(9, 0);
 
-            assertThatThrownBy(() -> new StoreHours(open, close))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_TIME_ORDER);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new StoreHours(open, close));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_TIME_ORDER);
         }
     }
 }

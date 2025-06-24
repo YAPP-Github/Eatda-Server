@@ -1,7 +1,6 @@
 package timeeat.domain.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +32,9 @@ class CoordinatesTest {
             Double nullLatitude = null;
             Double longitude = 126.9780;
 
-            assertThatThrownBy(() -> new Coordinates(nullLatitude, longitude))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Coordinates(nullLatitude, longitude));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
         }
 
         @Test
@@ -43,9 +42,9 @@ class CoordinatesTest {
             Double latitude = 37.5665;
             Double nullLongitude = null;
 
-            assertThatThrownBy(() -> new Coordinates(latitude, nullLongitude))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Coordinates(latitude, nullLongitude));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
         }
 
         @Test

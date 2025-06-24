@@ -1,7 +1,7 @@
 package timeeat.enums;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,9 +24,9 @@ class InterestAreaTest {
 
         @Test
         void 유효하지_않은_이름으로_예외를_던진다() {
-            assertThatThrownBy(() -> InterestArea.from("없는동네"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_INTEREST_AREA);
+            BusinessException exception = assertThrows(BusinessException.class, () -> InterestArea.from("없는동네"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_INTEREST_AREA);
         }
     }
 }

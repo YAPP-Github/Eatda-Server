@@ -1,8 +1,8 @@
 package timeeat.domain.menu;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 
@@ -37,9 +37,10 @@ class MenuTest {
 
         @Test
         void 이름이_null이면_예외를_던진다() {
-            assertThatThrownBy(() -> new Menu(null, "설명", 10000, "url", null, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_NAME);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Menu(null, "설명", 10000, "url", null, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_NAME);
         }
 
         @Test
@@ -47,18 +48,20 @@ class MenuTest {
             Integer price = 10000;
             Integer invalidDiscountPrice = 12000;
 
-            assertThatThrownBy(() -> new Menu("이름", "설명", price, "url", invalidDiscountPrice, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Menu("이름", "설명", price, "url", invalidDiscountPrice, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
         }
 
         @Test
         void 이름이_최대_길이를_초과하면_예외를_던진다() {
             String overflowName = "t".repeat(255 + 1);
 
-            assertThatThrownBy(() -> new Menu(overflowName, "설명", 10000, "url", null, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_LENGTH);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Menu(overflowName, "설명", 10000, "url", null, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_LENGTH);
         }
     }
 }
