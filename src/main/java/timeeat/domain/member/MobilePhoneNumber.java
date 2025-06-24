@@ -1,5 +1,7 @@
 package timeeat.domain.member;
 
+import java.util.regex.Pattern;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -9,12 +11,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.util.regex.Pattern;
-
-@Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MobilePhoneNumber {
 
     private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^\\d{11}$");

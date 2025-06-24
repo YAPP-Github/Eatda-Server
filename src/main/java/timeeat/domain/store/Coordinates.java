@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-@Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coordinates {
 
     private static final double MIN_LATITUDE = 37.413294;

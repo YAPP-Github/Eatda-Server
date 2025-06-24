@@ -1,5 +1,7 @@
 package timeeat.domain.store;
 
+import java.time.LocalTime;
+
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -8,12 +10,10 @@ import lombok.NoArgsConstructor;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-import java.time.LocalTime;
-
-@Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreHours {
 
     private LocalTime openTime;

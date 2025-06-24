@@ -8,10 +8,10 @@ import timeeat.enums.InterestArea;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Table(name = "member")
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
     @Id
@@ -70,3 +70,4 @@ public class Member {
         return Boolean.TRUE.equals(optInMarketing);
     }
 }
+
