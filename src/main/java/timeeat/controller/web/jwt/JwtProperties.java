@@ -10,7 +10,7 @@ import io.jsonwebtoken.security.Keys;
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    private static final int SECRET_KEY_MIN_BYTES = 256;
+    private static final int SECRET_KEY_MIN_BYTES = 32;
 
     private final String secretKey;
     private final Duration accessTokenExpiration;
@@ -29,7 +29,7 @@ public class JwtProperties {
     private void validate(String secretKey) {
         if (secretKey == null || secretKey.getBytes().length < SECRET_KEY_MIN_BYTES) {
             // TODO Initialize error 논의
-            throw new RuntimeException("JWT secret key must be at least 256 bits");
+            throw new RuntimeException("JWT secret key must be at least 32 bytes");
         }
     }
 
