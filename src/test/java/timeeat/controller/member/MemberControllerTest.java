@@ -24,7 +24,7 @@ class MemberControllerTest extends BaseControllerTest {
             String location = given()
                     .redirects().follow(false)
                     .when()
-                    .get("/api/login/auth")
+                    .get("/api/member/login/auth")
                     .then()
                     .statusCode(302)
                     .extract().header(HttpHeaders.LOCATION);
