@@ -1,8 +1,8 @@
 package timeeat.domain.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,9 +37,9 @@ class MemberTest {
         void socialId가_null이면_예외가_발생한다() {
             String socialId = null;
 
-            assertThatThrownBy(() -> new Member(socialId))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_SOCIAL_ID);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_SOCIAL_ID);
         }
     }
 
@@ -91,9 +91,9 @@ class MemberTest {
             String interestArea = "강남구";
             Boolean optInMarketing = null;
 
-            assertThatThrownBy(() -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MARKETING_CONSENT);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MARKETING_CONSENT);
         }
 
         @Test
@@ -104,9 +104,9 @@ class MemberTest {
             String interestArea = "부산";
             Boolean optInMarketing = true;
 
-            assertThatThrownBy(() -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_INTEREST_AREA);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_INTEREST_AREA);
         }
     }
 }

@@ -1,7 +1,7 @@
 package timeeat.domain.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,9 +38,8 @@ class StorePhoneNumberTest {
         @ParameterizedTest
         @ValueSource(strings = {"1234567", "1234567890123", "02-1234-5678", "abcdefghij"})
         void 번호_형식이_올바르지_않으면_예외를_던진다(String invalidNumber) {
-            assertThatThrownBy(() -> new StorePhoneNumber(invalidNumber))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_PHONE_NUMBER);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new StorePhoneNumber(invalidNumber));
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_PHONE_NUMBER);
         }
     }
 }

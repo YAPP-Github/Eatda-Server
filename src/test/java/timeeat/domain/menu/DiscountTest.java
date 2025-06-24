@@ -1,7 +1,7 @@
 package timeeat.domain.menu;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 
@@ -52,27 +52,27 @@ class DiscountTest {
         void 할인_가격이_원가보다_비싸면_예외를_던진다() {
             Integer invalidDiscountPrice = 12000;
 
-            assertThatThrownBy(() -> new Discount(originalPrice, invalidDiscountPrice, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Discount(originalPrice, invalidDiscountPrice, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
         }
 
         @Test
         void 할인_가격이_원가와_같으면_예외를_던진다() {
             Integer sameDiscountPrice = 10000;
 
-            assertThatThrownBy(() -> new Discount(originalPrice, sameDiscountPrice, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Discount(originalPrice, sameDiscountPrice, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
         }
 
         @Test
         void 할인_가격이_0원이면_예외를_던진다() {
             Integer zeroDiscountPrice = 0;
 
-            assertThatThrownBy(() -> new Discount(originalPrice, zeroDiscountPrice, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Discount(originalPrice, zeroDiscountPrice, null, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_DISCOUNT_PRICE);
         }
 
         @Test
@@ -80,9 +80,9 @@ class DiscountTest {
             LocalDateTime startTime = LocalDateTime.now();
             LocalDateTime endTime = startTime.minusHours(2);
 
-            assertThatThrownBy(() -> new Discount(originalPrice, 8000, startTime, endTime))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_MENU_DISCOUNT_TIME);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Discount(originalPrice, 8000, startTime, endTime));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MENU_DISCOUNT_TIME);
         }
     }
 }

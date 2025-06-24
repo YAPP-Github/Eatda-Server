@@ -1,8 +1,8 @@
 package timeeat.domain.bookmark;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalTime;
 
@@ -60,18 +60,18 @@ class BookmarkTest {
                     null,
                     "강남구");
 
-            assertThatThrownBy(() -> new Bookmark(null, store))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.BOOKMARK_MEMBER_REQUIRED);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Bookmark(null, store));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.BOOKMARK_MEMBER_REQUIRED);
         }
 
         @Test
         void 가게가_null이면_예외를_던진다() {
             Member member = new Member("socialId123");
 
-            assertThatThrownBy(() -> new Bookmark(member, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.BOOKMARK_STORE_REQUIRED);
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Bookmark(member, null));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.BOOKMARK_STORE_REQUIRED);
         }
     }
 }

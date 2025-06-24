@@ -1,8 +1,8 @@
 package timeeat.domain.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalTime;
 
@@ -46,37 +46,42 @@ class StoreTest {
 
         @Test
         void 가게_이름이_null이면_예외를_던진다() {
-            assertThatThrownBy(() -> new Store(null, "양식", "주소", 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_NAME);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store(null, "양식", "주소", 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_NAME);
         }
 
         @Test
         void 주소가_null이면_예외를_던진다() {
-            assertThatThrownBy(() -> new Store("가게", "양식", null, 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_ADDRESS);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store("가게", "양식", null, 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_ADDRESS);
         }
 
         @Test
         void 유효하지_않은_카테고리면_예외를_던진다() {
-            assertThatThrownBy(() -> new Store("가게", "없는카테고리", "주소", 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_CATEGORY);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store("가게", "없는카테고리", "주소", 37.5, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_CATEGORY);
         }
 
         @Test
         void 좌표값이_null이면_예외를_던진다() {
-            assertThatThrownBy(() -> new Store("가게", "양식", "주소", null, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store("가게", "양식", "주소", null, 127.0, "0212345678", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_COORDINATES_NULL);
         }
 
         @Test
         void 전화번호_형식이_틀리면_예외를_던진다() {
-            assertThatThrownBy(() -> new Store("가게", "양식", "주소", 37.5, 127.0, "123", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_PHONE_NUMBER);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store("가게", "양식", "주소", 37.5, 127.0, "123", null, LocalTime.now(), LocalTime.now().plusHours(1), null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_PHONE_NUMBER);
         }
 
         @Test
@@ -84,9 +89,10 @@ class StoreTest {
             LocalTime openTime = LocalTime.of(22, 0);
             LocalTime closeTime = LocalTime.of(10, 0);
 
-            assertThatThrownBy(() -> new Store("가게", "양식", "주소", 37.5, 127.0, "0212345678", null, openTime, closeTime, null, "강남구"))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", BusinessErrorCode.INVALID_STORE_TIME_ORDER);
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Store("가게", "양식", "주소", 37.5, 127.0, "0212345678", null, openTime, closeTime, null, "강남구"));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_STORE_TIME_ORDER);
         }
     }
 }
