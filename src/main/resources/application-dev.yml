@@ -7,9 +7,9 @@ spring:
     import: "aws-parameterstore:/dev/"
 
   datasource:
-    url: ${mysql-url}
-    username: ${mysql-name}
-    password: ${mysql-pw}
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER_NAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -25,7 +25,7 @@ spring:
       - classpath:db/seed/dev
 
 jwt:
-  secret-key: ${jwt-secret-key}
+  secret-key: ${JWT_SECRET_KEY}
 
 cors:
   origin:

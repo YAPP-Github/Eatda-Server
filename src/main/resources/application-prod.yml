@@ -7,9 +7,9 @@ spring:
     import: "aws-parameterstore:/prod/"
 
   datasource:
-    url: ${mysql-url}
-    username: ${mysql-name}
-    password: ${mysql-pw}
+    url: ${RDS_ENDPOINT}
+    username: ${MYSQL_USER_NAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
