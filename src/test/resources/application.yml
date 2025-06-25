@@ -22,10 +22,13 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: create-drop
-    defer-datasource-initialization: true
 
   flyway:
     enabled: false
+
+  sql:
+    init:
+      mode: never
 
 oauth:
   clientId: abcd1234
