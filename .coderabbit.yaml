@@ -10,8 +10,8 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-  base_branches:
-    - "main"
-    - "develop"
+    base_branches:
+      - "main"
+      - "develop"
 chat:
   auto_reply: true
