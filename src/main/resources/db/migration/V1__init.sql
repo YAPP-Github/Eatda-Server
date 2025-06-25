@@ -1,25 +1,11 @@
-CREATE DATABASE IF NOT EXISTS timeeat CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE timeeat;
-
-drop table if exists member;
-drop table if exists store;
-drop table if exists bookmark;
-drop table if exists menu;
-
 CREATE TABLE `store`
 (
-    `id`            BIGINT       NOT NULL,
+    `id`            BIGINT       NOT NULL AUTO_INCREMENT,
     `name`          VARCHAR(255) NOT NULL,
     `category`      VARCHAR(255) NOT NULL,
     `introduction`  TEXT         NOT NULL,
     `phone_number`  VARCHAR(255) NOT NULL COMMENT '(`-` 없이))',
-    `interest_area` ENUM (
-        '종로구', '중구', '용산구', '성동구', '광진구',
-        '동대문구', '중랑구', '성북구', '강북구', '도봉구',
-        '노원구', '은평구', '서대문구', '마포구', '양천구',
-        '강서구', '구로구', '금천구', '영등포구', '동작구',
-        '관악구', '서초구', '강남구', '송파구', '강동구'
-        )                        NOT NULL COMMENT '(서울시 25개 구)',
+    `interest_area` VARCHAR(50)  NOT NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, GANGNAM)',
     `address`       VARCHAR(255) NOT NULL COMMENT '(전체주소)',
     `latitude`      DOUBLE       NOT NULL,
     `longitude`     DOUBLE       NOT NULL,
@@ -31,24 +17,18 @@ CREATE TABLE `store`
 
 CREATE TABLE `member`
 (
-    `id`               BIGINT       NOT NULL,
+    `id`               BIGINT       NOT NULL AUTO_INCREMENT,
     `social_id`        BIGINT       NOT NULL,
     `nickname`         VARCHAR(255) NULL,
     `phone_number`     VARCHAR(255) NULL COMMENT '(`-` 없이))',
-    `interest_area`    ENUM (
-        '종로구', '중구', '용산구', '성동구', '광진구',
-        '동대문구', '중랑구', '성북구', '강북구', '도봉구',
-        '노원구', '은평구', '서대문구', '마포구', '양천구',
-        '강서구', '구로구', '금천구', '영등포구', '동작구',
-        '관악구', '서초구', '강남구', '송파구', '강동구'
-        )                           NULL COMMENT '(서울시 25개 구)',
+    `interest_area`    VARCHAR(50)  NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, JONGNO)',
     `opt_in_marketing` BOOLEAN      NULL DEFAULT true,
     PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `bookmark`
 (
-    `id`        BIGINT NOT NULL,
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
     `member_id` BIGINT NOT NULL,
     `store_id`  BIGINT NOT NULL,
     PRIMARY KEY (`id`),
@@ -57,7 +37,7 @@ CREATE TABLE `bookmark`
 
 CREATE TABLE `menu`
 (
-    `id`                  BIGINT       NOT NULL,
+    `id`                  BIGINT       NOT NULL AUTO_INCREMENT,
     `store_id`            BIGINT       NOT NULL,
     `name`                VARCHAR(255) NOT NULL,
     `description`         VARCHAR(255) NULL,
