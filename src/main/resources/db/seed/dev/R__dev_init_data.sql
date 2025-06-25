@@ -1,4 +1,4 @@
--- member 초기 데이터
+-- member 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
 INSERT INTO member (id, social_id, nickname, phone_number, interest_area, opt_in_marketing)
 VALUES (1, 123456789, '이승로', '01012345678', 'GANGNAM', true),
        (2, 987654321, '이충안', '01087654321', 'SEOCHO', false),
@@ -6,10 +6,15 @@ VALUES (1, 123456789, '이승로', '01012345678', 'GANGNAM', true),
        (4, 789123456, '서준환', '01078912345', 'MAPO', true),
        (5, 321251287, '신민선', '01034574568', 'GANGSEO', false),
        (6, 324569987, '박희수', '01043609998', 'SEODAEMUN', false),
-       (7, 323487985, '하아얀', '01065083298', 'SEONGDONG', false);
+       (7, 323487985, '하아얀', '01065083298', 'SEONGDONG', false)
+ON DUPLICATE KEY UPDATE social_id        = VALUES(social_id),
+                        nickname         = VALUES(nickname),
+                        phone_number     = VALUES(phone_number),
+                        interest_area    = VALUES(interest_area),
+                        opt_in_marketing = VALUES(opt_in_marketing);
 
 
--- store 초기 데이터
+-- store 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
 INSERT INTO store (id, name, category, latitude, longitude, address, phone_number, image_url, open_time, close_time,
                    introduction, interest_area)
 VALUES (1, '맛있는 한식당', '한식', 37.5665, 126.9780, '서울특별시 강남구 테헤란로 123', '0212345678', 'https://example.com/store1.jpg',
@@ -31,9 +36,20 @@ VALUES (1, '맛있는 한식당', '한식', 37.5665, 126.9780, '서울특별시 
        (9, '편리한 편의점', '편의점', 37.5620, 126.9765, '서울특별시 마포구 홍대로 369', '0244444444', 'https://example.com/store9.jpg',
         '00:00:00', '24:00:00', '24시간 편리한 편의점입니다.', 'MAPO'),
        (10, '특별한 기타매장', '기타', 37.5700, 126.9805, '서울특별시 종로구 종로 741', '0255555555', 'https://example.com/store10.jpg',
-        '09:00:00', '18:00:00', '특별한 상품들을 만나보세요.', 'JONGNO');
+        '09:00:00', '18:00:00', '특별한 상품들을 만나보세요.', 'JONGNO')
+ON DUPLICATE KEY UPDATE name          = VALUES(name),
+                        category      = VALUES(category),
+                        latitude      = VALUES(latitude),
+                        longitude     = VALUES(longitude),
+                        address       = VALUES(address),
+                        phone_number  = VALUES(phone_number),
+                        image_url     = VALUES(image_url),
+                        open_time     = VALUES(open_time),
+                        close_time    = VALUES(close_time),
+                        introduction  = VALUES(introduction),
+                        interest_area = VALUES(interest_area);
 
--- menu 초기 데이터
+-- menu 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
 INSERT INTO menu (id, store_id, name, description, price, discount_price, discount_start_time, discount_end_time,
                   image_url)
 VALUES (1, 1, '불고기', '맛있는 불고기', 15000, 12000, '14:00:00', '16:00:00', 'https://example.com/menu1.jpg'),
@@ -55,9 +71,17 @@ VALUES (1, 1, '불고기', '맛있는 불고기', 15000, 12000, '14:00:00', '16:
        (17, 9, '삼각김밥', '맛있는 삼각김밥', 1500, 1200, '22:00:00', '06:00:00', 'https://example.com/menu17.jpg'),
        (18, 9, '커피', '편의점 커피', 1500, NULL, NULL, NULL, 'https://example.com/menu18.jpg'),
        (19, 10, '특별상품A', '특별한 상품 A', 50000, 40000, '10:00:00', '12:00:00', 'https://example.com/menu19.jpg'),
-       (20, 10, '특별상품B', '특별한 상품 B', 30000, NULL, NULL, NULL, 'https://example.com/menu20.jpg');
+       (20, 10, '특별상품B', '특별한 상품 B', 30000, NULL, NULL, NULL, 'https://example.com/menu20.jpg')
+ON DUPLICATE KEY UPDATE store_id            = VALUES(store_id),
+                        name                = VALUES(name),
+                        description         = VALUES(description),
+                        price               = VALUES(price),
+                        discount_price      = VALUES(discount_price),
+                        discount_start_time = VALUES(discount_start_time),
+                        discount_end_time   = VALUES(discount_end_time),
+                        image_url           = VALUES(image_url);
 
--- bookmark 초기 데이터
+-- bookmark 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
 INSERT INTO bookmark (id, member_id, store_id)
 VALUES (1, 1, 1),
        (2, 1, 3),
@@ -73,5 +97,6 @@ VALUES (1, 1, 1),
        (12, 2, 1),
        (13, 3, 7),
        (14, 4, 2),
-       (15, 5, 4);
-
+       (15, 5, 4)
+ON DUPLICATE KEY UPDATE member_id = VALUES(member_id),
+                        store_id  = VALUES(store_id);
