@@ -1,0 +1,33 @@
+logging:
+  level:
+    org.hibernate.SQL: INFO
+
+spring:
+  config:
+    import: "aws-parameterstore:/prod/"
+
+  datasource:
+    url: ${mysql-url}
+    username: ${mysql-name}
+    password: ${mysql-pw}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    baseline-version: 0
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed/prod
+
+jwt:
+  secret-key: ${jwt-secret-key}
+
+cors:
+  origin:
+    - "https://www.eatda.net"
+    - "https://eatda.net"
