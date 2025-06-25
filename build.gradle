@@ -84,7 +84,7 @@ dependencies {
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
 
     // aws
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.2.1'
 }
 
 bootJar {
