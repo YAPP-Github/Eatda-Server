@@ -25,7 +25,7 @@ spring:
       - classpath:db/seed/prod
 
 jwt:
-  secret-key: ${jwt-secret-key}
+  secret-key: ${JWT_SECRET_KEY}
 
 cors:
   origin:
