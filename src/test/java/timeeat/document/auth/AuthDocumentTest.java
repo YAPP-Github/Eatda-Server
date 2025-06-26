@@ -73,7 +73,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
                     .contentType(ContentType.JSON)
                     .body(request)
                     .when().post("/api/auth/reissue")
-                    .then().statusCode(200);
+                    .then().statusCode(201);
         }
     }
 }

@@ -50,7 +50,7 @@ class AuthControllerTest extends BaseControllerTest {
                     .contentType(ContentType.JSON)
                     .when().post("/api/auth/reissue")
                     .then()
-                    .statusCode(200)
+                    .statusCode(201)
                     .extract().as(TokenResponse.class);
 
             assertAll(

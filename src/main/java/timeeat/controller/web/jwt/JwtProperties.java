@@ -2,6 +2,7 @@ package timeeat.controller.web.jwt;
 
 import io.jsonwebtoken.security.Keys;
 import java.time.Duration;
+import java.util.Base64;
 import javax.crypto.SecretKey;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,7 +22,7 @@ public class JwtProperties {
         validate(accessTokenExpiration);
         validate(refreshTokenExpiration);
 
-        this.secretKey = secretKey;
+        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
