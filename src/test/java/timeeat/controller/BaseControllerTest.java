@@ -1,7 +1,5 @@
 package timeeat.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import timeeat.DatabaseCleaner;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import timeeat.DatabaseCleaner;
 import timeeat.controller.web.jwt.JwtManager;
 
 @ExtendWith(DatabaseCleaner.class)

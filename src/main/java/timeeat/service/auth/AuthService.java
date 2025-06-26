@@ -1,9 +1,9 @@
 package timeeat.service.auth;
 
 import java.net.URI;
+import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;

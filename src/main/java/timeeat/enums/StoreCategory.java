@@ -1,7 +1,6 @@
 package timeeat.enums;
 
 import java.util.Arrays;
-
 import lombok.Getter;
 import timeeat.exception.BusinessErrorCode;
 import timeeat.exception.BusinessException;
