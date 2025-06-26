@@ -30,3 +30,6 @@ spring:
 oauth:
   clientId: abcd1234
   redirectUri: http://localhost:3000/hello
+
+cors:
+  origin: "https://example.eat-da.com"
