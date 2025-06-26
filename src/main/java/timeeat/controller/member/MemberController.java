@@ -2,6 +2,7 @@ package timeeat.controller.member;
 
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class MemberController {
         URI oauthLoginUrl = memberService.getOauthLoginUrl();
 
         return ResponseEntity
-                .status(302)
+                .status(HttpStatus.FOUND)
                 .location(oauthLoginUrl)
                 .build();
     }
