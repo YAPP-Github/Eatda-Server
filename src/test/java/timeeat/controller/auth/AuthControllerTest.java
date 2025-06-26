@@ -3,11 +3,11 @@ package timeeat.controller.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import io.restassured.http.ContentType;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
+import io.restassured.http.ContentType;
 import timeeat.controller.BaseControllerTest;
 
 class AuthControllerTest extends BaseControllerTest {
