@@ -36,7 +36,12 @@ public enum BusinessErrorCode {
     DUPLICATE_BOOKMARK("BOK001", "이미 북마크된 매장입니다."),
     BOOKMARK_NOT_FOUND("BOK002", "북마크를 찾을 수 없습니다."),
     BOOKMARK_MEMBER_REQUIRED("BOK003", "북마크 생성 시 회원 정보는 필수입니다."),
-    BOOKMARK_STORE_REQUIRED("BOK004", "북마크 생성 시 가게 정보는 필수입니다.");
+    BOOKMARK_STORE_REQUIRED("BOK004", "북마크 생성 시 가게 정보는 필수입니다."),
+
+    // Auth
+    UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다."),
+    EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다."),
+    ;
 
     private final String code;
     private final String message;
