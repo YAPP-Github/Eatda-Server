@@ -23,3 +23,6 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
+
+cors:
+  origin: "https://example.eat-da.com"
