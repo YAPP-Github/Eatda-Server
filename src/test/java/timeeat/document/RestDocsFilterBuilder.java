@@ -4,7 +4,6 @@ import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.do
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
