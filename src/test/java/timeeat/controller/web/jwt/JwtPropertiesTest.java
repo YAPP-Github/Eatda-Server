@@ -54,10 +54,10 @@ class JwtPropertiesTest {
         }
 
         @Test
-        void 만료기간이_0이거나_음수이면_예외를_발생시킨다() {
-            assertThatThrownBy(() -> new JwtProperties(secretKey, Duration.ofHours(1), Duration.ZERO))
+        void 만료기간이_음수이면_예외를_발생시킨다() {
+            assertThatThrownBy(() -> new JwtProperties(secretKey, Duration.ofHours(1), Duration.ofSeconds(-1)))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessage("JWT token duration must be positive and non-zero");
+                    .hasMessage("JWT token duration must be positive");
         }
     }
 }
