@@ -23,6 +23,10 @@ spring:
     defer-datasource-initialization: true
   flyway:
     enabled: false
+
+cors:
+  origin: "https://example.eat-da.com"
+
 jwt:
   secret-key: test-secret-key-test-secret-key-test-key-test-secret-key-test
   access-token-expiration: 1h
