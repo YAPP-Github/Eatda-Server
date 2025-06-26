@@ -9,8 +9,9 @@ import java.io.IOException;
 public class OauthMemberInformationDeserializer extends JsonDeserializer<OauthMemberInformation> {
 
     @Override
-    public OauthMemberInformation deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        JsonNode root = p.getCodec().readTree(p);
+    public OauthMemberInformation deserialize(JsonParser jsonParser,
+                                              DeserializationContext deserializationContext) throws IOException {
+        JsonNode root = jsonParser.getCodec().readTree(jsonParser);
 
         long id = root.path("id").asLong();
         String nickname = root
