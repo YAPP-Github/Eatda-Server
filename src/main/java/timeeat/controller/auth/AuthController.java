@@ -1,4 +1,4 @@
-package timeeat.controller.member;
+package timeeat.controller.auth;
 
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import timeeat.controller.web.jwt.JwtManager;
-import timeeat.service.member.MemberService;
+import timeeat.service.auth.AuthService;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberController {
+public class AuthController {
 
     private final JwtManager jwtManager;
-    private final MemberService memberService;
+    private final AuthService authService;
 
-    @GetMapping("/api/member/login/auth")
+    @GetMapping("/api/auth/login/oauth")
     public ResponseEntity<Void> redirectOauthLoginPage() {
-        URI oauthLoginUrl = memberService.getOauthLoginUrl();
+        URI oauthLoginUrl = authService.getOauthLoginUrl();
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -28,9 +28,9 @@ public class MemberController {
                 .build();
     }
 
-    @PostMapping("/api/member/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<TokenResponse> login(@RequestBody MemberLoginRequest request) {
-        memberService.login(request);
+        authService.login(request);
 
         TokenResponse response = new TokenResponse(
                 jwtManager.issueAccessToken(1L),
@@ -40,7 +40,7 @@ public class MemberController {
                 .body(response);
     }
 
-    @PostMapping("/api/member/reissue")
+    @PostMapping("/api/auth/reissue")
     public ResponseEntity<TokenResponse> reissueToken(@RequestBody ReissueRequest request) {
         long id = jwtManager.resolveRefreshToken(request.refreshToken());
 

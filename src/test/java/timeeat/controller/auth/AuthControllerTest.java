@@ -1,4 +1,4 @@
-package timeeat.controller.member;
+package timeeat.controller.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import timeeat.controller.BaseControllerTest;
 
-class MemberControllerTest extends BaseControllerTest {
+class AuthControllerTest extends BaseControllerTest {
 
     @Nested
     class RedirectOauthLoginPage {
@@ -26,7 +26,7 @@ class MemberControllerTest extends BaseControllerTest {
             String location = given()
                     .redirects().follow(false)
                     .when()
-                    .get("/api/member/login/auth")
+                    .get("/api/auth/login/oauth")
                     .then()
                     .statusCode(302)
                     .extract().header(HttpHeaders.LOCATION);
@@ -48,7 +48,7 @@ class MemberControllerTest extends BaseControllerTest {
 
             TokenResponse response = given().body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/api/member/reissue")
+                    .when().post("/api/auth/reissue")
                     .then()
                     .statusCode(200)
                     .extract().as(TokenResponse.class);

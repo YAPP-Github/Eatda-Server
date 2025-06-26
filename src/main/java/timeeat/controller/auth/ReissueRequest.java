@@ -1,4 +1,4 @@
-package timeeat.controller.member;
+package timeeat.controller.auth;
 
 public record ReissueRequest(String refreshToken) {
 }

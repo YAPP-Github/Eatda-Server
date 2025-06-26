@@ -1,4 +1,4 @@
-package timeeat.document.member;
+package timeeat.document.auth;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -8,13 +8,13 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import timeeat.controller.member.ReissueRequest;
+import timeeat.controller.auth.ReissueRequest;
 import timeeat.document.BaseDocumentTest;
 import timeeat.document.RestDocsRequest;
 import timeeat.document.RestDocsResponse;
 import timeeat.document.Tag;
 
-public class MemberDocumentTest extends BaseDocumentTest {
+public class AuthDocumentTest extends BaseDocumentTest {
 
     @Nested
     class RedirectOauthLoginPage {
@@ -38,7 +38,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             given(document)
                     .redirects().follow(false)
                     .when()
-                    .get("/api/member/login/auth")
+                    .get("/api/auth/login/oauth")
                     .then()
                     .statusCode(302);
         }
@@ -72,7 +72,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             given(document)
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/api/member/reissue")
+                    .when().post("/api/auth/reissue")
                     .then().statusCode(200);
         }
     }
