@@ -2,11 +2,13 @@ package timeeat.controller.web.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 class JwtManagerTest {
 
@@ -59,18 +61,20 @@ class JwtManagerTest {
             long id = 12345L;
             String accessToken = jwtManager.issueAccessToken(id);
 
-            assertThatThrownBy(() -> jwtManager.resolveAccessToken(accessToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("이미 만료된 토큰입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveAccessToken(accessToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.EXPIRED_TOKEN);
         }
 
         @Test
         void 유효하지_않은_액세스_토큰을_해석하면_에러가_발생한다() {
             String accessToken = "aaa.bbb.ccc";
 
-            assertThatThrownBy(() -> jwtManager.resolveAccessToken(accessToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("인증되지 않은 회원입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveAccessToken(accessToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
 
         @Test
@@ -78,9 +82,10 @@ class JwtManagerTest {
             long id = 12345L;
             String refreshToken = jwtManager.issueRefreshToken(id);
 
-            assertThatThrownBy(() -> jwtManager.resolveAccessToken(refreshToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("인증되지 않은 회원입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveAccessToken(refreshToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
 
@@ -105,18 +110,20 @@ class JwtManagerTest {
             long id = 12345L;
             String refreshToken = jwtManager.issueRefreshToken(id);
 
-            assertThatThrownBy(() -> jwtManager.resolveRefreshToken(refreshToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("이미 만료된 토큰입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveRefreshToken(refreshToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.EXPIRED_TOKEN);
         }
 
         @Test
         void 유효하지_않은_리프레시_토큰을_해석하면_에러가_발생한다() {
             String refreshToken = "aaa.bbb.ccc";
 
-            assertThatThrownBy(() -> jwtManager.resolveRefreshToken(refreshToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("인증되지 않은 회원입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveRefreshToken(refreshToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
 
         @Test
@@ -124,9 +131,10 @@ class JwtManagerTest {
             long id = 12345L;
             String accessToken = jwtManager.issueAccessToken(id);
 
-            assertThatThrownBy(() -> jwtManager.resolveRefreshToken(accessToken))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("인증되지 않은 회원입니다.");
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> jwtManager.resolveRefreshToken(accessToken));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
 }

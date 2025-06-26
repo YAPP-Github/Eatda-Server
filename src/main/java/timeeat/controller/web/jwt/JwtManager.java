@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.util.Date;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 @Component
 @EnableConfigurationProperties(JwtProperties.class)
@@ -56,19 +58,16 @@ public class JwtManager {
             validateTokenType(claims, tokenType);
             return Long.parseLong(claims.getSubject());
         } catch (ExpiredJwtException exception) {
-            // TODO : BusinessException 으로 변경 - EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다.");
-            throw new RuntimeException("이미 만료된 토큰입니다.");
+            throw new BusinessException(BusinessErrorCode.EXPIRED_TOKEN);
         } catch (Exception e) {
-            // TODO : BusinessException 으로 변경 - UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다.");
-            throw new RuntimeException("인증되지 않은 회원입니다.");
+            throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
 
     private void validateTokenType(Claims claims, TokenType tokenType) {
         String extractTokenType = claims.get("type", String.class);
         if (!extractTokenType.equals(tokenType.name())) {
-            // TODO : BusinessException 으로 변경 - UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다.");
-            throw new RuntimeException("인증되지 않은 회원입니다.");
+            throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_MEMBER);
         }
     }
 }
