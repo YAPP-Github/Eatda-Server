@@ -6,7 +6,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 import java.net.URI;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,26 +14,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.web.client.RestClient;
 
 @RestClientTest(OauthClient.class)
 class OauthClientTest {
 
+    @Autowired
     private MockRestServiceServer mockServer;
 
     @Autowired
-    private RestClient.Builder restClientBuilder;
+    private OauthClient oauthClient;
 
     @Autowired
     private OauthProperties properties;
-
-    private OauthClient oauthClient;
-
-    @BeforeEach
-    void setUp() {
-        this.mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
-        this.oauthClient = new OauthClient(restClientBuilder, properties);
-    }
 
     @Nested
     class GetOauthLoginUrl {
