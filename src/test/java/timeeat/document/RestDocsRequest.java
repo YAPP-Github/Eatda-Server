@@ -6,14 +6,15 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
-import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.restdocs.cookies.CookieDescriptor;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.restdocs.snippet.Snippet;
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 
 public class RestDocsRequest {
 
