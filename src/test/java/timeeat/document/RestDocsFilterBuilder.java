@@ -2,15 +2,16 @@ package timeeat.document;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 
-import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Snippet;
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 
 public class RestDocsFilterBuilder {
 
