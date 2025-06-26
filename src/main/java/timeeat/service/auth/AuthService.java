@@ -1,4 +1,4 @@
-package timeeat.service.member;
+package timeeat.service.auth;
 
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
-import timeeat.controller.member.MemberLoginRequest;
+import timeeat.controller.auth.MemberLoginRequest;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class AuthService {
 
     private final OauthClient oauthClient;
 
