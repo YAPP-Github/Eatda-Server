@@ -1,7 +1,6 @@
 package timeeat.domain.store;
 
 import java.util.regex.Pattern;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

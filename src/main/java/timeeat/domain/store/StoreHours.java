@@ -1,7 +1,6 @@
 package timeeat.domain.store;
 
 import java.time.LocalTime;
-
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

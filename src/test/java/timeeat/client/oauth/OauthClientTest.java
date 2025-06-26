@@ -27,6 +27,12 @@ class OauthClientTest {
     @Autowired
     private OauthProperties properties;
 
+    public void setMockServer(HttpMethod method, String uri, String responseBody) {
+        mockServer.expect(requestTo(uri))
+                .andExpect(method(method))
+                .andRespond(MockRestResponseCreators.withSuccess(responseBody, MediaType.APPLICATION_JSON));
+    }
+
     @Nested
     class GetOauthLoginUrl {
 
@@ -93,11 +99,5 @@ class OauthClientTest {
                     () -> assertThat(memberInfo.nickname()).isEqualTo("홍길동")
             );
         }
-    }
-
-    public void setMockServer(HttpMethod method, String uri, String responseBody) {
-        mockServer.expect(requestTo(uri))
-                .andExpect(method(method))
-                .andRespond(MockRestResponseCreators.withSuccess(responseBody, MediaType.APPLICATION_JSON));
     }
 }
