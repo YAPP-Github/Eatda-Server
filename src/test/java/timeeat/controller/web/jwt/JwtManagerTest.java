@@ -53,7 +53,7 @@ class JwtManagerTest {
 
         @Test
         void 만료된_액세스_토큰을_해석하면_에러가_발생한다() {
-            Duration accessTokenExpiration = Duration.ofNanos(1);
+            Duration accessTokenExpiration = Duration.ZERO;
             JwtManager jwtManager = new JwtManager(
                     new JwtProperties(secretKey, accessTokenExpiration, Duration.ofDays(14)));
             long id = 12345L;
@@ -99,7 +99,7 @@ class JwtManagerTest {
 
         @Test
         void 만료된_리프레시_토큰을_해석하면_에러가_발생한다() {
-            Duration refreshTokenExpiration = Duration.ofNanos(1);
+            Duration refreshTokenExpiration = Duration.ZERO;
             JwtManager jwtManager = new JwtManager(
                     new JwtProperties(secretKey, Duration.ofHours(1), refreshTokenExpiration));
             long id = 12345L;

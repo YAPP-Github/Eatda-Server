@@ -1,10 +1,10 @@
 package timeeat.controller.web.jwt;
 
+import io.jsonwebtoken.security.Keys;
 import java.time.Duration;
 import javax.crypto.SecretKey;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import io.jsonwebtoken.security.Keys;
 
 @Getter
 @ConfigurationProperties(prefix = "jwt")
@@ -37,8 +37,8 @@ public class JwtProperties {
         if (expiration == null) {
             throw new RuntimeException("JWT token duration cannot be null");
         }
-        if (expiration.isZero() || expiration.isNegative()) {
-            throw new RuntimeException("JWT token duration must be positive and non-zero");
+        if (expiration.isNegative()) {
+            throw new RuntimeException("JWT token duration must be positive");
         }
     }
 
