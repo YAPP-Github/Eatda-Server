@@ -2,6 +2,7 @@ package timeeat.client.oauth;
 
 import java.net.URI;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,7 +18,9 @@ public class OauthClient {
     private final OauthProperties properties;
 
     public OauthClient(RestClient.Builder restClientBuilder, OauthProperties oauthProperties) {
-        this.restClient = restClientBuilder.build();
+        this.restClient = restClientBuilder
+                .defaultStatusHandler(HttpStatusCode::is5xxServerError, new OauthServerErrorHandler())
+                .build();
         this.properties = oauthProperties;
     }
 
