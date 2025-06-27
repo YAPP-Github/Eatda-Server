@@ -9,6 +9,7 @@ variable "ecs_task_definitions" {
     execution_role_arn = string
     requires_compatibilities = list(string)
     container_port = list(number)
+    command = optional(string)
     host_port = list(number)
     volumes = optional(list(object({
       name      = string
