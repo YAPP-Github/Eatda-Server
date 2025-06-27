@@ -1,5 +1,5 @@
 output "ecs_task_definitions_check" {
-  value = local.ecs_task_definitions
+  value = local.final_ecs_definitions_for_module
 }
 
 output "ecr_repository_name" {

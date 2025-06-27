@@ -19,6 +19,6 @@ module "service" {
 
 module "task" {
   source               = "./task"
-  ecs_task_definitions = local.final_task_definitions
+  ecs_task_definitions = var.ecs_task_definitions
   tags                 = var.tags
 }
