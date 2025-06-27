@@ -10,7 +10,7 @@ module "ec2" {
 module "ecs" {
   source                = "./ecs"
   alb_target_group_arns = local.alb_target_group_arns
-  ecr_repo_urls        = local.ecr_repo_urls
+  ecr_repo_urls         = local.ecr_repo_urls
   ecs_services          = var.ecs_services
   ecs_task_definitions  = local.ecs_task_definitions
   environment           = local.environment
