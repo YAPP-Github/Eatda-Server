@@ -1,5 +1,5 @@
 locals {
-  alb_name            = "timeeat-alb"
+  alb_name            = "eatda-alb"
   deletion_protection = false
   loadbalancer_type   = "application"
   internal            = false
