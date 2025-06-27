@@ -83,12 +83,12 @@ locals {
         memory    = def.memory
         essential = true
         stopTimeout = lookup(def, "stop_timeout", var.default_stop_timeout)
-        command = [
+        command   = svc == "api-dev" ? [
           "java",
           "-Dspring.profiles.active=dev",
           "-jar",
           "/api.jar"
-        ]
+        ] : null
 
         portMappings = [
           for idx, port in def.container_port : {
