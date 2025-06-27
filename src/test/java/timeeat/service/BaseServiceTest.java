@@ -37,4 +37,8 @@ public abstract class BaseServiceTest {
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
     }
+
+    protected final String getDefaultSocialId() {
+        return Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId());
+    }
 }

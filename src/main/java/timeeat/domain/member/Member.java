@@ -79,10 +79,16 @@ public class Member {
     }
 
     public String getPhoneNumber() {
+        if (mobilePhoneNumber == null) {
+            return null;
+        }
         return mobilePhoneNumber.getValue();
     }
 
     public String getInterestAreaName() {
+        if (interestArea == null) {
+            return null;
+        }
         return interestArea.getAreaName();
     }
 }

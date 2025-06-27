@@ -1,13 +1,17 @@
 package timeeat.service.auth;
 
 import java.net.URI;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
 import timeeat.controller.auth.MemberLoginRequest;
+import timeeat.controller.member.MemberResponse;
+import timeeat.domain.member.Member;
+import timeeat.repository.member.MemberRepository;
 
 @Slf4j
 @Service
@@ -15,14 +19,20 @@ import timeeat.controller.auth.MemberLoginRequest;
 public class AuthService {
 
     private final OauthClient oauthClient;
+    private final MemberRepository memberRepository;
 
     public URI getOauthLoginUrl() {
         return oauthClient.getOauthLoginUrl();
     }
 
-    public void login(MemberLoginRequest request) {
+    public MemberResponse login(MemberLoginRequest request) {
         OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
-        OauthMemberInformation oauthMemberInformation = oauthClient.requestMemberInformation(oauthToken);
-        log.info("Oauth 로그인 성공: {}", oauthMemberInformation); // TODO 회원 정보 저장 로직 추가
+        OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
+
+        Optional<Member> optionalMember = memberRepository.findBySocialId(Long.toString(oauthInformation.socialId()));
+        boolean isFirstLogin = optionalMember.isEmpty();
+        return new MemberResponse(
+                optionalMember.orElseGet(() -> memberRepository.save(oauthInformation.toMember())),
+                isFirstLogin);
     }
 }
