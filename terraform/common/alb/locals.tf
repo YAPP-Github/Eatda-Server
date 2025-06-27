@@ -80,7 +80,7 @@ locals {
     }
     "dev-path-rule" = {
       priority         = 2
-      host_header      = "dev.eatda.net"
+      host_header      = "api-dev.eatda.net"
       action_type      = "forward"
       target_group_arn = module.target_groups.target_group_arns["api-dev"]
     }
