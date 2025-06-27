@@ -1,6 +1,14 @@
 package timeeat.domain.member;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,9 +42,10 @@ public class Member {
     @Column(name = "opt_in_marketing")
     private Boolean optInMarketing;
 
-    public Member(String socialId) {
+    public Member(String socialId, String nickname) {
         validateSocialId(socialId);
         this.socialId = socialId;
+        this.nickname = nickname;
     }
 
     public Member(
@@ -46,9 +55,8 @@ public class Member {
             String interestArea,
             Boolean optInMarketing
     ) {
-        this(socialId);
+        this(socialId, nickname);
         validateOptInMarketing(optInMarketing);
-        this.nickname = nickname;
         this.mobilePhoneNumber = new MobilePhoneNumber(mobilePhoneNumber);
         this.interestArea = InterestArea.from(interestArea);
         this.optInMarketing = optInMarketing;
@@ -68,6 +76,14 @@ public class Member {
 
     public boolean isOptInMarketing() {
         return Boolean.TRUE.equals(optInMarketing);
+    }
+
+    public String getPhoneNumber() {
+        return mobilePhoneNumber.getValue();
+    }
+
+    public String getInterestAreaName() {
+        return interestArea.getAreaName();
     }
 }
 

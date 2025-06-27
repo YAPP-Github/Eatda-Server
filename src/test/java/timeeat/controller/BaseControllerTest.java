@@ -21,6 +21,8 @@ import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
 import timeeat.controller.web.jwt.JwtManager;
+import timeeat.fixture.MemberGenerator;
+import timeeat.repository.member.MemberRepository;
 
 @ExtendWith(DatabaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -34,6 +36,12 @@ public class BaseControllerTest {
 
     @LocalServerPort
     private int port;
+
+    @Autowired
+    protected MemberGenerator memberGenerator;
+
+    @Autowired
+    protected MemberRepository memberRepository;
 
     @Autowired
     private JwtManager jwtManager;
