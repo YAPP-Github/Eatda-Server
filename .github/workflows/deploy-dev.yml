@@ -144,7 +144,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean build -Dspring.profiles.active=dev
 
       - name: Login to Amazon ECR
         id: login-ecr
