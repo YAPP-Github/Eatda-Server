@@ -177,6 +177,14 @@ locals {
       protocol                  = "tcp"
       description               = "Dynamic ports from ALB"
     }
+    ec2_from_self_mysql = {
+      source_security_group_key = "ec2"
+      target_security_group_key = "ec2"
+      from_port                 = 3306
+      to_port                   = 3306
+      protocol                  = "tcp"
+      description               = "MySQL access within same SG (self-access)"
+    }
     rds_from_ec2 = {
       source_security_group_key = "ec2"
       target_security_group_key = "rds"
@@ -187,7 +195,3 @@ locals {
     }
   }
 }
-
-
-
-
