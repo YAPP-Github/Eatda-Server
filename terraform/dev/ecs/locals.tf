@@ -84,7 +84,7 @@ locals {
         essential = true
         stopTimeout = lookup(def, "stop_timeout", var.default_stop_timeout)
 
-        command = svc == "api-dev" ? [
+        command = def.task_definition_name == "api-dev" ? [
           "java",
           "-Dspring.profiles.active=dev",
           "-jar",
