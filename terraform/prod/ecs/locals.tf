@@ -56,8 +56,8 @@ locals {
 
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
-      name          = name
-      iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
+      name         = name
+      iam_role_arn = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }
   }

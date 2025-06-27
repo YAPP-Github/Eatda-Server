@@ -1,6 +1,6 @@
 locals {
   group_name   = "power"
-  project_name = "time-eat"
+  project_name = "eatda"
 
   policy_arns = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
@@ -61,7 +61,7 @@ locals {
 }
 
 locals {
-  domain_name       = "time-eat.com"
+  domain_name       = "eatda.net"
   validation_method = "DNS"
   record_type       = "A"
   alb_alias = {
@@ -78,28 +78,28 @@ locals {
 locals {
   security_groups = {
     alb = {
-      name        = "timeeat-alb-sg"
+      name        = "eatda-alb-sg"
       description = "ALB SG"
       tags = {
-        Name        = "timeeat-alb-sg"
+        Name        = "eatda-alb-sg"
         Environment = "common"
         Service     = "alb"
       }
     }
     ec2 = {
-      name        = "timeeat-ec2-sg"
+      name        = "eatda-ec2-sg"
       description = "EC2 SG"
       tags = {
-        Name        = "timeeat-ec2-sg"
+        Name        = "eatda-ec2-sg"
         Environment = "common"
         Service     = "ec2"
       }
     }
     rds = {
-      name        = "timeeat-rds-sg"
+      name        = "eatda-rds-sg"
       description = "RDS SG"
       tags = {
-        Name        = "timeeat-rds-sg"
+        Name        = "eatda-rds-sg"
         Environment = "common"
         Service     = "rds"
       }

@@ -25,7 +25,7 @@ locals {
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
       environment = {
-        MYSQL_DATABASE = "time-eat"
+        MYSQL_DATABASE = "eatda"
       }
       secrets = [
         {
@@ -68,8 +68,8 @@ locals {
 
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
-      name          = name
-      iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
+      name         = name
+      iam_role_arn = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }
   }
@@ -110,7 +110,7 @@ locals {
         mountPoints = [
           for vol in (def.volumes != null ? def.volumes : []) : {
             sourceVolume = vol.name
-            containerPath = lookup(var.volume_mount_paths, vol.name, "/time-eat")
+            containerPath = lookup(var.volume_mount_paths, vol.name, "/eatda")
             readOnly     = false
           }
         ]

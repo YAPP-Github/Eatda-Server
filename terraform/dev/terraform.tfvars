@@ -25,7 +25,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "dev-api-volume"
-        host_path = "/home/ec2-user/time-eat/dev/"
+        host_path = "/home/ec2-user/eatda/dev/"
       }
     ]
   }
@@ -40,7 +40,7 @@ ecs_task_definitions_base = {
     requires_compatibilities = ["EC2"]
     container_image   = "mysql:8"
     environment = {
-      MYSQL_DATABASE = "time-eat"
+      MYSQL_DATABASE = "eatda"
     }
     secrets = [
       {
@@ -59,7 +59,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "dev-mysql-volume"
-        host_path = "/home/ec2-user/time-eat/mysql/"
+        host_path = "/home/ec2-user/eatda/mysql/"
       }
     ]
   }
