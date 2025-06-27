@@ -30,15 +30,15 @@ locals {
       secrets = [
         {
           name      = "MYSQL_USER"
-          valueFrom = "/dev/mysql-name"
+          valueFrom = "/dev/MYSQL_USER_NAME"
         },
         {
           name      = "MYSQL_ROOT_PASSWORD"
-          valueFrom = "/dev/mysql-root-pw"
+          valueFrom = "/dev/MYSQL_ROOT_PASSWORD"
         },
         {
           name      = "MYSQL_PASSWORD"
-          valueFrom = "/dev/mysql-pw"
+          valueFrom = "/dev/MYSQL_PASSWORD"
         }
       ]
     }) : merge(def, {
