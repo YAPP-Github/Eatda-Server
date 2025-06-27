@@ -9,6 +9,8 @@ import io.restassured.filter.Filter;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
 import timeeat.controller.web.jwt.JwtManager;
+import timeeat.domain.member.Member;
 import timeeat.fixture.MemberGenerator;
 import timeeat.repository.member.MemberRepository;
 
@@ -60,7 +63,8 @@ public class BaseControllerTest {
     }
 
     @BeforeEach
-    final void mockingClient() {
+    final void mockingClient() throws URISyntaxException {
+        doReturn(new URI("http://localhost:8080")).when(oauthClient).getOauthLoginUrl();
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
     }
@@ -70,12 +74,12 @@ public class BaseControllerTest {
     }
 
     protected final String accessToken() {
-        // TODO : 실제 회원 생성
-        return jwtManager.issueAccessToken(1L);
+        Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
+        return jwtManager.issueAccessToken(member.getId());
     }
 
     protected final String refreshToken() {
-        // TODO : 실제 회원 생성
-        return jwtManager.issueRefreshToken(1L);
+        Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
+        return jwtManager.issueRefreshToken(member.getId());
     }
 }

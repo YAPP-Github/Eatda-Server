@@ -18,14 +18,14 @@ class MemberTest {
     class CreateOauthMember {
 
         @Test
-        void socialId만으로_생성_시_나머지_필드는_null_상태이다() {
+        void socialId와_nickname만으로_생성_시_나머지_필드는_null_상태이다() {
             String socialId = "oauth-user-id";
 
             Member member = new Member(socialId, "nickname");
 
             assertAll(
                     () -> assertThat(member.getSocialId()).isEqualTo(socialId),
-                    () -> assertThat(member.getNickname()).isNull(),
+                    () -> assertThat(member.getNickname()).isNotNull(),
                     () -> assertThat(member.getMobilePhoneNumber()).isNull(),
                     () -> assertThat(member.getInterestArea()).isNull(),
                     () -> assertThat(member.getOptInMarketing()).isNull()

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
-import timeeat.controller.auth.MemberLoginRequest;
+import timeeat.controller.auth.LoginRequest;
 import timeeat.controller.member.MemberResponse;
 import timeeat.domain.member.Member;
 import timeeat.repository.member.MemberRepository;
@@ -25,7 +25,7 @@ public class AuthService {
         return oauthClient.getOauthLoginUrl();
     }
 
-    public MemberResponse login(MemberLoginRequest request) {
+    public MemberResponse login(LoginRequest request) {
         OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
         OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
 

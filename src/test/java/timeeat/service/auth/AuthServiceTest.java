@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import timeeat.controller.auth.MemberLoginRequest;
+import timeeat.controller.auth.LoginRequest;
 import timeeat.controller.member.MemberResponse;
 import timeeat.service.BaseServiceTest;
 
@@ -20,7 +20,7 @@ class AuthServiceTest extends BaseServiceTest {
 
         @Test
         void 로그인_최초_요청_시_회원가입_및_로그인_처리를_한다() {
-            MemberLoginRequest request = new MemberLoginRequest("auth_code");
+            LoginRequest request = new LoginRequest("auth_code");
 
             MemberResponse response = authService.login(request);
 
@@ -36,7 +36,7 @@ class AuthServiceTest extends BaseServiceTest {
         @Test
         void 로그인_최초_요청이_아닐_경우_로그인만_처리를_한다() {
             memberGenerator.generate("123");
-            MemberLoginRequest request = new MemberLoginRequest("auth_code");
+            LoginRequest request = new LoginRequest("auth_code");
 
             MemberResponse response = authService.login(request);
 
