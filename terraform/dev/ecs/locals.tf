@@ -123,4 +123,13 @@ locals {
       }
     ]
   }
+
+  final_task_definitions = {
+    for key, task_def in local.resolved_task_definitions : key => merge(
+      task_def,
+      {
+        container_definitions = local.container_definitions_map[key]
+      }
+    )
+  }
 }
