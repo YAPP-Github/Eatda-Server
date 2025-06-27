@@ -17,3 +17,7 @@ output "ecs_api_service_name" {
 output "ecs_api_container_name" {
   value = module.ecs.container_names["api-dev"]
 }
+
+output "ec2_private_ip" {
+  value = module.ec2.private_ip
+}
