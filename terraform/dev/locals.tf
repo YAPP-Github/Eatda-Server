@@ -77,7 +77,16 @@ EOF
           { name = "${svc}-${port}-tcp", containerPort = port, hostPort = def.host_port[idx], protocol = "tcp" }
         ]
         environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
-        secrets     = [for s in lookup(def, "secrets", []) : { name = s.name, valueFrom = s.valueFrom }]
+        secrets     = svc == "mysql-dev" ? [
+          { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
+          { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
+          { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
+        ] : [
+          for s in lookup(def, "secrets", []) : {
+            name      = s.name
+            valueFrom = s.valueFrom
+          }
+        ]
         mountPoints = [
           for vol in lookup(def, "volumes", []) :{
             sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/eatda"),
