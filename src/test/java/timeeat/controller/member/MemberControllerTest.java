@@ -24,6 +24,7 @@ class MemberControllerTest extends BaseControllerTest {
                     .body(request)
                     .when().put("/api/member")
                     .then()
+                    .statusCode(200)
                     .extract().as(MemberResponse.class);
 
             assertAll(
