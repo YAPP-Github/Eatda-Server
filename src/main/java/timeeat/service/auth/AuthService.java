@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
@@ -25,6 +26,7 @@ public class AuthService {
         return oauthClient.getOauthLoginUrl();
     }
 
+    @Transactional
     public MemberResponse login(LoginRequest request) {
         OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
         OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);

@@ -62,6 +62,13 @@ public class Member {
         this.optInMarketing = optInMarketing;
     }
 
+    public Member(String nickname, String mobilePhoneNumber, String interestArea, boolean optInMarketing) {
+        this.nickname = nickname;
+        this.mobilePhoneNumber = new MobilePhoneNumber(mobilePhoneNumber);
+        this.interestArea = InterestArea.from(interestArea);
+        this.optInMarketing = optInMarketing;
+    }
+
     private void validateSocialId(String socialId) {
         if (socialId == null || socialId.trim().isEmpty()) {
             throw new BusinessException(BusinessErrorCode.INVALID_SOCIAL_ID);
@@ -72,6 +79,13 @@ public class Member {
         if (optInMarketing == null) {
             throw new BusinessException(BusinessErrorCode.INVALID_MARKETING_CONSENT);
         }
+    }
+
+    public void update(Member member) {
+        this.nickname = member.nickname;
+        this.mobilePhoneNumber = member.mobilePhoneNumber;
+        this.interestArea = member.interestArea;
+        this.optInMarketing = member.optInMarketing;
     }
 
     public boolean isOptInMarketing() {
