@@ -1,6 +1,6 @@
 package timeeat.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -9,19 +9,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    private final String[] corsOrigin;
+    private final CorsProperties corsProperties;
 
-    public CorsConfig(@Value("${cors.origin}") String[] corsOrigin) {
-        validate(corsOrigin);
-        this.corsOrigin = corsOrigin;
+    public CorsConfig(CorsProperties corsProperties) {
+        this.corsProperties = corsProperties;
+        validate(corsProperties.getOrigin());
     }
 
-    private void validate(String[] corsOrigin) {
-        if (corsOrigin == null || corsOrigin.length == 0) {
-            // TODO Initialize error 논의
+    private void validate(List<String> corsOriginList) {
+        if (corsOriginList == null || corsOriginList.isEmpty()) {
             throw new RuntimeException("Initialization Error: CORS origin cannot be empty.");
         }
-        for (String origin : corsOrigin) {
+        for (String origin : corsOriginList) {
             if (origin == null || origin.isBlank()) {
                 throw new RuntimeException("Initialization Error: CORS origin string cannot be blank.");
             }
@@ -30,8 +29,10 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = corsProperties.getOrigin().toArray(new String[0]);
+
         registry.addMapping("/**")
-                .allowedOriginPatterns(corsOrigin)
+                .allowedOriginPatterns(origins)
                 .allowedMethods(
                         HttpMethod.GET.name(),
                         HttpMethod.POST.name(),
