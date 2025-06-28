@@ -32,7 +32,7 @@ class JwtManagerTest {
     class IssueRefreshToken {
 
         @Test
-        void 액세스_토큰을_발행할_수_있다() {
+        void 리프레시_토큰을_발행할_수_있다() {
             long id = 12345L;
 
             assertThatCode(() -> jwtManager.issueRefreshToken(id))
