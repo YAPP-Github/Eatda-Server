@@ -94,8 +94,8 @@ locals {
   }
 
   subdomains = {
-    api = local.alb_alias
-    dev = local.alb_alias
+    api     = local.alb_alias
+    api-dev = local.alb_alias
   }
 }
 
