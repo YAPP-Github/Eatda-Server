@@ -17,6 +17,7 @@ import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import timeeat.controller.web.jwt.JwtManager;
 import timeeat.service.auth.AuthService;
+import timeeat.service.service.MemberService;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,6 +28,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected AuthService authService;
+
+    @MockitoBean
+    protected MemberService memberService;
 
     @LocalServerPort
     private int port;

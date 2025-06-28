@@ -16,6 +16,7 @@ public class MemberController {
 
     @PutMapping("/api/member")
     public ResponseEntity<MemberResponse> updateMember(LoginMember member, @RequestBody MemberUpdateRequest request) {
-        return null;
+        MemberResponse response = memberService.update(member.id(), request);
+        return ResponseEntity.ok(response);
     }
 }
