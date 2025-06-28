@@ -30,20 +30,23 @@ ON DUPLICATE KEY UPDATE name          = VALUES(name),
                         interest_area = VALUES(interest_area);
 
 -- menu 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
-INSERT INTO menu (id, store_id, name, description, price, discount_price, discount_start_time, discount_end_time,
+INSERT INTO menu (id, store_id, name, description, price, discount_price, start_time, end_time,
                   image_url)
-VALUES (1, 1, '불고기', '맛있는 불고기', 15000, 12000, '14:00:00', '16:00:00', 'https://example.com/menu1.jpg'),
+VALUES (1, 1, '불고기', '맛있는 불고기', 15000, 12000, '2025-06-28 14:00:00', '2025-06-28 16:00:00',
+        'https://example.com/menu1.jpg'),
        (2, 1, '비빔밥', '신선한 채소가 들어간 비빔밥', 12000, NULL, NULL, NULL, 'https://example.com/menu2.jpg'),
-       (3, 2, '짜장면', '정통 중국 짜장면', 8000, 6000, '12:00:00', '14:00:00', 'https://example.com/menu3.jpg'),
-       (4, 3, '초밥 세트', '신선한 회로 만든 초밥 세트', 25000, 20000, '15:00:00', '17:00:00', 'https://example.com/menu5.jpg')
-ON DUPLICATE KEY UPDATE store_id            = VALUES(store_id),
-                        name                = VALUES(name),
-                        description         = VALUES(description),
-                        price               = VALUES(price),
-                        discount_price      = VALUES(discount_price),
-                        discount_start_time = VALUES(discount_start_time),
-                        discount_end_time   = VALUES(discount_end_time),
-                        image_url           = VALUES(image_url);
+       (3, 2, '짜장면', '정통 중국 짜장면', 8000, 6000, '2025-06-28 12:00:00', '2025-06-28 14:00:00',
+        'https://example.com/menu3.jpg'),
+       (4, 3, '초밥 세트', '신선한 회로 만든 초밥 세트', 25000, 20000, '2025-06-28 15:00:00', '2025-06-28 17:00:00',
+        'https://example.com/menu5.jpg')
+ON DUPLICATE KEY UPDATE store_id       = VALUES(store_id),
+                        name           = VALUES(name),
+                        description    = VALUES(description),
+                        price          = VALUES(price),
+                        discount_price = VALUES(discount_price),
+                        start_time     = VALUES(start_time),
+                        end_time       = VALUES(end_time),
+                        image_url      = VALUES(image_url);
 
 -- bookmark 테이블: PK(id)가 중복될 경우, 나머지 컬럼을 스크립트의 값으로 업데이트합니다.
 INSERT INTO bookmark (id, member_id, store_id)

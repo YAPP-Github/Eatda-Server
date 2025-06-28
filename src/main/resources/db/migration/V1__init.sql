@@ -18,7 +18,7 @@ CREATE TABLE `store`
 CREATE TABLE `member`
 (
     `id`               BIGINT       NOT NULL AUTO_INCREMENT,
-    `social_id`        BIGINT       NOT NULL,
+    `social_id`        VARCHAR(255) NOT NULL,
     `nickname`         VARCHAR(255) NULL,
     `phone_number`     VARCHAR(255) NULL COMMENT '(`-` 없이))',
     `interest_area`    VARCHAR(50)  NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, JONGNO)',
@@ -37,14 +37,14 @@ CREATE TABLE `bookmark`
 
 CREATE TABLE `menu`
 (
-    `id`                  BIGINT       NOT NULL AUTO_INCREMENT,
-    `store_id`            BIGINT       NOT NULL,
-    `name`                VARCHAR(255) NOT NULL,
-    `description`         VARCHAR(255) NULL,
-    `price`               INTEGER      NOT NULL,
-    `discount_price`      INTEGER      NULL,
-    `discount_start_time` TIME         NULL,
-    `discount_end_time`   TIME         NULL,
-    `image_url`           VARCHAR(511) NULL,
+    `id`             BIGINT       NOT NULL AUTO_INCREMENT,
+    `store_id`       BIGINT       NOT NULL,
+    `name`           VARCHAR(255) NOT NULL,
+    `description`    VARCHAR(255) NULL,
+    `price`          INTEGER      NOT NULL,
+    `discount_price` INTEGER      NULL,
+    `start_time`     DATETIME     NULL,
+    `end_time`       DATETIME     NULL,
+    `image_url`      VARCHAR(511) NULL,
     PRIMARY KEY (`id`)
 );
