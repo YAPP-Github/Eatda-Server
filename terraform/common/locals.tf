@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 locals {
   group_name   = "power"
   project_name = "eatda"
@@ -53,6 +56,27 @@ locals {
         "arn:aws:iam::aws:policy/AmazonS3FullAccess",
         "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
       ]
+      custom_inline_policies = {
+        ssm_kms_access = {
+          name        = "ssm-kms-access-for-${local.project_name}-app"
+          description = "Allows reading from Parameter Store and decrypting with KMS"
+          policy_document = {
+            Version = "2012-10-17",
+            Statement = [
+              {
+                Effect   = "Allow",
+                Action = ["ssm:GetParametersByPath", "ssm:GetParameter"],
+                Resource = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/*"
+              },
+              {
+                Effect   = "Allow",
+                Action   = "kms:Decrypt",
+                Resource = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/${"alias/aws/ssm"}"
+              }
+            ]
+          }
+        }
+      }
       tags = {
         Purpose = "ECS Application Task Role"
       }
