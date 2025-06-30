@@ -48,8 +48,8 @@ resource "aws_db_instance" "prod" {
   engine_version          = var.engine_version
   instance_class          = var.instance_class
   allocated_storage       = var.allocated_storage
-  username                = random_pet.rds_user_name
-  password                = random_password.rds_password
+  username                = random_pet.rds_user_name.id
+  password                = random_password.rds_password.result
   vpc_security_group_ids  = var.vpc_security_group_ids
   db_subnet_group_name    = aws_db_subnet_group.private.name
   multi_az                = var.multi_az
