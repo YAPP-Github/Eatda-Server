@@ -1,5 +1,6 @@
 package timeeat.domain.member;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -92,6 +93,7 @@ public class Member {
         return Boolean.TRUE.equals(optInMarketing);
     }
 
+    @Nullable
     public String getPhoneNumber() {
         if (mobilePhoneNumber == null) {
             return null;
@@ -99,6 +101,7 @@ public class Member {
         return mobilePhoneNumber.getValue();
     }
 
+    @Nullable
     public String getInterestAreaName() {
         if (interestArea == null) {
             return null;
