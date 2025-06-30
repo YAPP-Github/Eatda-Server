@@ -38,6 +38,6 @@ cors:
   origin: "https://example.eat-da.com"
 
 jwt:
-  secret-key: test-secret-key-test-secret-key-test-key-test-secret-key-test
+  secret-key: dGVzdC1zZWNyZXQta2V5LXRlc3Qtc2VjcmV0LWtleS10ZXN0LWtleS10ZXN0LXNlY3JldC1rZXktdGVzdA==
   access-token-expiration: 1h
   refresh-token-expiration: 1d
