@@ -79,6 +79,7 @@ locals {
 }
 
 locals {
+  db_name           = "eatda"
   allocated_storage = 20
   identifier        = "${local.project_name}-${local.environment}-db"
   instance_class    = "db.t3.micro"

@@ -38,6 +38,10 @@ variable "allocated_storage" {
   type        = number
 }
 
+variable "db_name" {
+  type = string
+}
+
 variable "username" {
   description = "Master username"
   type        = string

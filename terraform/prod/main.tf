@@ -37,6 +37,7 @@ module "rds" {
   engine                  = local.engine
   engine_version          = local.engine_version
   allocated_storage       = local.allocated_storage
+  db_name                 = local.db_name
   username                = data.aws_ssm_parameter.rds_user_name.value
   password                = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids  = local.vpc_security_group_ids

@@ -50,6 +50,7 @@ resource "aws_db_instance" "prod" {
   engine_version          = var.engine_version
   instance_class          = var.instance_class
   allocated_storage       = var.allocated_storage
+  db_name                 = var.db_name
   username                = random_pet.rds_user_name.id
   password                = random_password.rds_password.result
   vpc_security_group_ids  = var.vpc_security_group_ids
