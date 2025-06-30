@@ -12,7 +12,6 @@ ON DUPLICATE KEY UPDATE social_id        = new.social_id,
                         interest_area    = new.interest_area,
                         opt_in_marketing = new.opt_in_marketing;
 
-
 INSERT INTO store (id, name, category, latitude, longitude, address, phone_number, image_url, open_time, close_time,
                    introduction, interest_area)
     VALUES (1, '맛있는 한식당', '한식', 37.5665, 126.9780, '서울특별시 강남구 테헤란로 123', '0212345678', 'https://example.com/store1.jpg',
@@ -53,9 +52,7 @@ ON DUPLICATE KEY UPDATE name          = new.name,
                         introduction  = new.introduction,
                         interest_area = new.interest_area;
 
-
-INSERT INTO menu (id, store_id, name, description, price, discount_price, discount_start_time, discount_end_time,
-                  image_url)
+INSERT INTO menu (id, store_id, name, description, price, discount_price, start_time, end_time, image_url)
     VALUES (1, 1, '불고기', '맛있는 불고기', 15000, 12000, '2025-06-28 14:00:00', '2025-06-28 16:00:00',
             'https://example.com/menu1.jpg'),
            (2, 1, '비빔밥', '신선한 채소가 들어간 비빔밥', 12000, NULL, NULL, NULL, 'https://example.com/menu2.jpg'),
@@ -86,15 +83,14 @@ INSERT INTO menu (id, store_id, name, description, price, discount_price, discou
            (19, 10, '특별상품A', '특별한 상품 A', 50000, 40000, '2025-06-28 10:00:00', '2025-06-28 12:00:00',
             'https://example.com/menu19.jpg'),
            (20, 10, '특별상품B', '특별한 상품 B', 30000, NULL, NULL, NULL, 'https://example.com/menu20.jpg') AS new
-ON DUPLICATE KEY UPDATE store_id            = new.store_id,
-                        name                = new.name,
-                        description         = new.description,
-                        price               = new.price,
-                        discount_price      = new.discount_price,
-                        discount_start_time = new.discount_start_time,
-                        discount_end_time   = new.discount_end_time,
-                        image_url           = new.image_url;
-
+ON DUPLICATE KEY UPDATE store_id       = new.store_id,
+                        name           = new.name,
+                        description    = new.description,
+                        price          = new.price,
+                        discount_price = new.discount_price,
+                        start_time     = new.start_time,
+                        end_time       = new.end_time,
+                        image_url      = new.image_url;
 
 INSERT INTO bookmark (id, member_id, store_id)
     VALUES (1, 1, 1),
