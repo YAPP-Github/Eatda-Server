@@ -9,7 +9,7 @@ on:
       - main
 env:
   AWS_REGION: ap-northeast-2
-  
+
 jobs:
   test:
     runs-on: ubuntu-latest
