@@ -17,9 +17,11 @@ output "ecs_api_container_name" {
 output "rds_endpoint" {
   description = "RDS endpoint address"
   value       = module.rds.endpoint
+  sensitive   = true
 }
 
 output "rds_arn" {
   description = "RDS instance ARN"
   value       = module.rds.arn
+  sensitive   = true
 }

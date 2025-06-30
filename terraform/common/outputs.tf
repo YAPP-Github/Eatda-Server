@@ -27,10 +27,12 @@ output "private_subnet_ids" {
     dev  = module.vpc.private_subnet_ids.dev
     prod = module.vpc.private_subnet_ids.prod
   }
+  sensitive = true
 }
 
 output "security_group_ids" {
-  value = module.security_group.security_group_ids
+  value     = module.security_group.security_group_ids
+  sensitive = true
 }
 
 output "target_group_arns" {
@@ -42,7 +44,8 @@ output "target_group_names" {
 }
 
 output "user_name" {
-  value = module.iam.user_name
+  value     = module.iam.user_name
+  sensitive = true
 }
 
 output "role_name" {
@@ -50,6 +53,7 @@ output "role_name" {
     for k, mod in module.iam_role :
     k => mod.role_name
   }
+  sensitive = true
 }
 
 output "role_arn" {
@@ -57,6 +61,7 @@ output "role_arn" {
     for k, mod in module.iam_role :
     k => mod.role_arn
   }
+  sensitive = true
 }
 
 output "instance_profile_name" {
