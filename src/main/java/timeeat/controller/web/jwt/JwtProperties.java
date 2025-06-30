@@ -13,7 +13,7 @@ public class JwtProperties {
 
     private static final int SECRET_KEY_MIN_BYTES = 32;
 
-    private final String secretKey;
+    private final byte[] secretKey;
     private final Duration accessTokenExpiration;
     private final Duration refreshTokenExpiration;
 
@@ -22,7 +22,7 @@ public class JwtProperties {
         validate(accessTokenExpiration);
         validate(refreshTokenExpiration);
 
-        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        this.secretKey = secretKey.getBytes();
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
@@ -44,6 +44,6 @@ public class JwtProperties {
     }
 
     public SecretKey getSecretKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
     }
 }
