@@ -116,7 +116,7 @@ jobs:
       - name: Update DB URL in Parameter Store
         run: |
           aws ssm put-parameter \
-            --name "/prod/mysql-url" \
+            --name "/prod/RDS_ENDPOINT" \
             --value "jdbc:mysql://${{ env.RDS_ENDPOINT }}:3306/eatda?useUnicode=true&characterEncoding=UTF-8" \
             --type SecureString \
             --overwrite
