@@ -1,6 +1,7 @@
 package timeeat.exception;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum BusinessErrorCode {
@@ -39,15 +40,21 @@ public enum BusinessErrorCode {
     BOOKMARK_STORE_REQUIRED("BOK004", "북마크 생성 시 가게 정보는 필수입니다."),
 
     // Auth
-    UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다."),
-    EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다."),
+    UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다.", HttpStatus.UNAUTHORIZED),
+    EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
     ;
 
     private final String code;
     private final String message;
+    private final HttpStatus status;
 
-    BusinessErrorCode(String code, String message) {
+    BusinessErrorCode(String code, String message, HttpStatus status) {
         this.code = code;
         this.message = message;
+        this.status = status;
+    }
+
+    BusinessErrorCode(String code, String message) {
+        this(code, message, HttpStatus.BAD_REQUEST);
     }
 }
