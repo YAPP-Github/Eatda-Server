@@ -64,14 +64,17 @@ locals {
             Version = "2012-10-17",
             Statement = [
               {
-                Effect   = "Allow",
+                Effect = "Allow",
                 Action = ["ssm:GetParametersByPath", "ssm:GetParameter"],
-                Resource = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/*"
+                Resource = [
+                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/*",
+                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/prod/*"
+                ]
               },
               {
                 Effect   = "Allow",
                 Action   = "kms:Decrypt",
-                Resource = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/${"alias/aws/ssm"}"
+                Resource = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
               }
             ]
           }
