@@ -64,7 +64,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
         void 토큰_재발급_성공() {
             ReissueRequest request = new ReissueRequest(refreshToken());
 
-            var document = document("member/reissue", 200)
+            var document = document("member/reissue", 201)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
