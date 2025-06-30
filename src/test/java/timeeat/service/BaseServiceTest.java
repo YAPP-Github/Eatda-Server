@@ -3,6 +3,8 @@ package timeeat.service;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +35,9 @@ public abstract class BaseServiceTest {
     private OauthClient oauthClient;
 
     @BeforeEach
-    protected final void mockingClient() {
+    protected final void mockingClient() throws URISyntaxException {
+        doReturn(new URI("http://localhost:8080/login/callback")).when(oauthClient).getOauthLoginUrl();
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
-    }
-
-    protected final String getDefaultSocialId() {
-        return Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId());
     }
 }

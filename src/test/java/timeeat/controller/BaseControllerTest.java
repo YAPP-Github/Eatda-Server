@@ -64,7 +64,7 @@ public class BaseControllerTest {
 
     @BeforeEach
     final void mockingClient() throws URISyntaxException {
-        doReturn(new URI("http://localhost:8080")).when(oauthClient).getOauthLoginUrl();
+        doReturn(new URI("http://localhost:8080/login/callback")).when(oauthClient).getOauthLoginUrl();
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
     }
