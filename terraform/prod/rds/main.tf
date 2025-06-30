@@ -33,6 +33,7 @@ resource "aws_ssm_parameter" "mysql_user_name" {
   type        = "SecureString"
   value       = random_pet.rds_user_name.id
   description = "Generated MySQL user name for prod RDS"
+  overwrite   = true
 }
 
 resource "aws_ssm_parameter" "mysql_password" {
@@ -40,6 +41,7 @@ resource "aws_ssm_parameter" "mysql_password" {
   type        = "SecureString"
   value       = random_password.rds_password.result
   description = "Generated MySQL user name for prod RDS"
+  overwrite   = true
 }
 
 resource "aws_db_instance" "prod" {
