@@ -151,11 +151,24 @@ jobs:
           architecture: 'x64'
           cache: 'gradle'
 
+      - name: Get TEST_JWT_SECRET_KEY from SSM
+        id: get-test-secret
+        run: |
+          SECRET_VALUE=$(aws ssm get-parameter \
+            --name "/common/TEST_JWT_SECRET_KEY" \
+            --with-decryption \
+            --region "${{ env.AWS_REGION }}" \
+            --query "Parameter.Value" \
+            --output text)
+          echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
+
       - name: Build with Gradle
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
           ./gradlew clean build -Dspring.profiles.active=dev
+        env:
+          TEST_JWT_SECRET_KEY: ${{ env.TEST_JWT_SECRET_KEY }}
 
       - name: Login to Amazon ECR
         id: login-ecr
