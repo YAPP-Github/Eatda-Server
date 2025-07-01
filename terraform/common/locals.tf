@@ -100,6 +100,12 @@ locals {
     api     = local.alb_alias
     api-dev = local.alb_alias
   }
+
+  frontend_domains = {
+    "eatda.net" = { type = "A", value = "76.76.21.21" }
+    "www" = { type = "CNAME", value = "cname.vercel-dns.com" }
+    "dev" = { type = "CNAME", value = "cname.vercel-dns.com" }
+  }
 }
 
 locals {

@@ -37,6 +37,7 @@ module "route53" {
   validation_method = local.validation_method
   record_type       = local.record_type
   subdomains        = local.subdomains
+  frontend_domains  = local.frontend_domains
 }
 
 module "alb" {
