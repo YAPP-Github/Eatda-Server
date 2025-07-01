@@ -50,3 +50,14 @@ resource "aws_route53_record" "subdomains" {
     evaluate_target_health = true
   }
 }
+
+resource "aws_route53_record" "frontend_subdomains" {
+  for_each = var.frontend_domains
+
+  zone_id = data.aws_route53_zone.common.zone_id
+  name    = each.key == "eatda.net" ? var.domain_name : "${each.key}.${var.domain_name}"
+  type    = each.value.type
+
+  ttl = 300
+  records = [each.value.value]
+}
