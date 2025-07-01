@@ -44,4 +44,4 @@ oauth:
   client-id: abcd1234
   redirect-path: /callback
   allowed-origins:
-    - http://localhost:3000
+    - "https://example.eat-da.com"

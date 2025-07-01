@@ -4,10 +4,11 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import io.restassured.http.ContentType;
 import timeeat.controller.auth.ReissueRequest;
 import timeeat.document.BaseDocumentTest;
 import timeeat.document.RestDocsRequest;
@@ -19,9 +20,15 @@ public class AuthDocumentTest extends BaseDocumentTest {
     @Nested
     class RedirectOauthLoginPage {
 
+        @Value("${oauth.allowed-origins[0]}")
+        private String origin;
+
         RestDocsRequest requestDocument = request()
                 .tag(Tag.MEMBER_API)
-                .summary("OAuth 로그인 페이지 리다이렉트");
+                .summary("OAuth 로그인 페이지 리다이렉트")
+                .requestHeader(
+                        headerWithName(HttpHeaders.ORIGIN).description("요청 Origin")
+                );
 
         RestDocsResponse responseDocument = response()
                 .responseHeader(
@@ -37,6 +44,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .redirects().follow(false)
+                    .header(HttpHeaders.ORIGIN, origin)
                     .when()
                     .get("/api/auth/login/oauth")
                     .then()

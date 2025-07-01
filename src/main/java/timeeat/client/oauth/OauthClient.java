@@ -9,6 +9,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 @Component
 @EnableConfigurationProperties(OauthProperties.class)
@@ -17,17 +19,22 @@ public class OauthClient {
     private final RestClient restClient;
     private final OauthProperties properties;
 
-    public OauthClient(RestClient.Builder restClientBuilder, OauthProperties oauthProperties) {
+    public OauthClient(RestClient.Builder restClientBuilder,
+                       OauthProperties oauthProperties) {
         this.restClient = restClientBuilder
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, new OauthServerErrorHandler())
                 .build();
         this.properties = oauthProperties;
     }
 
-    public URI getOauthLoginUrl() {
+    public URI getOauthLoginUrl(String origin) {
+        if (!properties.isAllowedOrigin(origin)) {
+            throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
+        }
+
         return UriComponentsBuilder.fromUriString("https://kauth.kakao.com/oauth/authorize")
                 .queryParam("client_id", properties.getClientId())
-                .queryParam("redirect_uri", properties.getRedirectUri())
+                .queryParam("redirect_uri", origin + properties.getRedirectPath())
                 .queryParam("response_type", "code")
                 .build()
                 .toUri();
@@ -37,7 +44,7 @@ public class OauthClient {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", properties.getClientId());
-        body.add("redirect_uri", properties.getRedirectUri());
+        body.add("redirect_uri", properties.getRedirectPath());
         body.add("code", code);
 
         return restClient.post()

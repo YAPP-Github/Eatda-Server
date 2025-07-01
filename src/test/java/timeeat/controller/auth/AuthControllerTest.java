@@ -3,11 +3,11 @@ package timeeat.controller.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import io.restassured.http.ContentType;
+import org.springframework.http.HttpHeaders;
 import timeeat.controller.BaseControllerTest;
 
 class AuthControllerTest extends BaseControllerTest {
@@ -15,15 +15,22 @@ class AuthControllerTest extends BaseControllerTest {
     @Nested
     class RedirectOauthLoginPage {
 
-        @Value("${oauth.clientId}")
+        @Value("${oauth.client-id}")
         private String clientId;
 
-        @Value("${oauth.redirectUri}")
-        private String redirectUri;
+        @Value("${oauth.redirect-path}")
+        private String redirectPath;
+
+        @Value("${oauth.allowed-origins[0]}")
+        private String allowedOrigin;
 
         @Test
         void Oauth_로그인_페이지로_리다이렉트_할_수_있다() {
+            String origin = allowedOrigin;
+            String expectedRedirectPath = origin + redirectPath;
+
             String location = given()
+                    .header(HttpHeaders.ORIGIN, origin)
                     .redirects().follow(false)
                     .when()
                     .get("/api/auth/login/oauth")
@@ -34,7 +41,7 @@ class AuthControllerTest extends BaseControllerTest {
             assertThat(location)
                     .contains("https://kauth.kakao.com/oauth/authorize")
                     .contains("client_id=%s".formatted(clientId))
-                    .contains("redirect_uri=%s".formatted(redirectUri))
+                    .contains("redirect_uri=%s".formatted(expectedRedirectPath))
                     .contains("response_type=code");
         }
     }

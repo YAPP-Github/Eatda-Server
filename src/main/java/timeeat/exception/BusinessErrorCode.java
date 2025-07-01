@@ -41,6 +41,7 @@ public enum BusinessErrorCode {
     // Auth
     UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다."),
     EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다."),
+    UNAUTHORIZED_ORIGIN("AUTH003", "허용되지 않은 오리진입니다."),
     ;
 
     private final String code;

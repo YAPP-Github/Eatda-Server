@@ -1,11 +1,13 @@
 package timeeat.controller.auth;
 
 import java.net.URI;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import timeeat.controller.web.jwt.JwtManager;
@@ -19,8 +21,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/api/auth/login/oauth")
-    public ResponseEntity<Void> redirectOauthLoginPage() {
-        URI oauthLoginUrl = authService.getOauthLoginUrl();
+    public ResponseEntity<Void> redirectOauthLoginPage(@RequestHeader(HttpHeaders.ORIGIN) String origin) {
+        URI oauthLoginUrl = authService.getOauthLoginUrl(origin);
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)
