@@ -56,7 +56,6 @@ public class OauthProperties {
 
         if (uri.getScheme() == null || uri.getHost() == null || !uri.getPath().isBlank()) {
             // TODO InitializeException 을 이용
-            System.out.println("Path: " + uri.getPath());
             throw new RuntimeException("Allowed origin must be a valid origin form: " + origin);
         }
     }
