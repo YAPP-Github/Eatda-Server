@@ -32,10 +32,6 @@ spring:
     init:
       mode: never
 
-oauth:
-  clientId: abcd1234
-  redirectUri: http://localhost:3000/hello
-
 cors:
   origin: "https://example.eat-da.com"
 
@@ -43,3 +39,9 @@ jwt:
   secret-key: ${TEST_JWT_SECRET_KEY}
   access-token-expiration: 1h
   refresh-token-expiration: 1d
+
+oauth:
+  client-id: abcd1234
+  redirect-path: /callback
+  allowed-origins:
+    - http://localhost:3000

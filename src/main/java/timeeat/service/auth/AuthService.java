@@ -16,8 +16,8 @@ public class AuthService {
 
     private final OauthClient oauthClient;
 
-    public URI getOauthLoginUrl() {
-        return oauthClient.getOauthLoginUrl();
+    public URI getOauthLoginUrl(String origin) {
+        return oauthClient.getOauthLoginUrl(origin);
     }
 
     public void login(MemberLoginRequest request) {
