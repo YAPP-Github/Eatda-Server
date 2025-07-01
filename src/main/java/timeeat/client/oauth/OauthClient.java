@@ -44,7 +44,7 @@ public class OauthClient {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", properties.getClientId());
-        body.add("redirect_uri", properties.getRedirectPath());
+        body.add("redirect_uri", origin + properties.getRedirectPath());
         body.add("code", code);
 
         return restClient.post()
