@@ -28,9 +28,7 @@ public class OauthClient {
     }
 
     public URI getOauthLoginUrl(String origin) {
-        if (!properties.isAllowedOrigin(origin)) {
-            throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
-        }
+        validateOrigin(origin);
 
         return UriComponentsBuilder.fromUriString("https://kauth.kakao.com/oauth/authorize")
                 .queryParam("client_id", properties.getClientId())
@@ -40,7 +38,9 @@ public class OauthClient {
                 .toUri();
     }
 
-    public OauthToken requestOauthToken(String code) {
+    public OauthToken requestOauthToken(String code, String origin) {
+        validateOrigin(origin);
+
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", properties.getClientId());
@@ -53,6 +53,12 @@ public class OauthClient {
                 .body(body)
                 .retrieve()
                 .body(OauthToken.class);
+    }
+
+    private void validateOrigin(String origin) {
+        if (!properties.isAllowedOrigin(origin)) {
+            throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
+        }
     }
 
     public OauthMemberInformation requestMemberInformation(OauthToken token) {

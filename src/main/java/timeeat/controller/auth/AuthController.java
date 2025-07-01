@@ -1,6 +1,7 @@
 package timeeat.controller.auth;
 
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import lombok.RequiredArgsConstructor;
 import timeeat.controller.web.jwt.JwtManager;
 import timeeat.service.auth.AuthService;
 
@@ -30,9 +30,11 @@ public class AuthController {
                 .build();
     }
 
+    // TODO : login() ControllerTest, DocumentTest 수정
     @PostMapping("/api/auth/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody MemberLoginRequest request) {
-        authService.login(request);
+    public ResponseEntity<TokenResponse> login(@RequestBody MemberLoginRequest request,
+                                               @RequestHeader(HttpHeaders.ORIGIN) String origin) {
+        authService.login(request, origin);
 
         TokenResponse response = new TokenResponse(
                 jwtManager.issueAccessToken(1L),

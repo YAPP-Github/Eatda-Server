@@ -20,8 +20,8 @@ public class AuthService {
         return oauthClient.getOauthLoginUrl(origin);
     }
 
-    public void login(MemberLoginRequest request) {
-        OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
+    public void login(MemberLoginRequest request, String origin) {
+        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), origin);
         OauthMemberInformation oauthMemberInformation = oauthClient.requestMemberInformation(oauthToken);
         log.info("Oauth 로그인 성공: {}", oauthMemberInformation); // TODO 회원 정보 저장 로직 추가
     }

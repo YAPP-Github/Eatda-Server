@@ -71,6 +71,7 @@ class OauthClientTest {
 
         @Test
         void Oauth_토큰을_요청할_수_있다() {
+            String origin = properties.getAllowedOrigins().getFirst();
             setMockServer(HttpMethod.POST, "https://kauth.kakao.com/oauth/token", """
                     {
                         "token_type":"bearer",
@@ -82,9 +83,20 @@ class OauthClientTest {
                     }""");
             String code = "test_code";
 
-            OauthToken token = oauthClient.requestOauthToken(code);
+            OauthToken token = oauthClient.requestOauthToken(code, origin);
 
             assertThat(token.accessToken()).isEqualTo("test-access-token");
+        }
+
+        @Test
+        void 허용된_오리진이_아니라면_예외를_발생시킨다() {
+            String origin = "https://not-allowed-origin.com";
+            String code = "test_code";
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> oauthClient.requestOauthToken(code, origin));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
         }
     }
 
