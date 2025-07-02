@@ -11,6 +11,8 @@ public enum BusinessErrorCode {
     INVALID_MARKETING_CONSENT("MEM003", "마케팅 동의 여부는 필수입니다."),
     INVALID_MEMBER_ID("MEM004", "유효하지 않은 회원 ID입니다."),
     INVALID_SOCIAL_ID("MEM005", "소셜 ID는 필수입니다."),
+    DUPLICATE_NICKNAME("MEM006", "이미 사용 중인 닉네임입니다."),
+    DUPLICATE_PHONE_NUMBER("MEM007", "이미 사용 중인 전화번호입니다."),
 
     // Store
     INVALID_STORE_CATEGORY("STO001", "유효하지 않은 매장 카테고리입니다."),

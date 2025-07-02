@@ -18,14 +18,14 @@ class MemberTest {
     class CreateOauthMember {
 
         @Test
-        void socialId만으로_생성_시_나머지_필드는_null_상태이다() {
+        void socialId와_nickname만으로_생성_시_나머지_필드는_null_상태이다() {
             String socialId = "oauth-user-id";
 
-            Member member = new Member(socialId);
+            Member member = new Member(socialId, "nickname");
 
             assertAll(
                     () -> assertThat(member.getSocialId()).isEqualTo(socialId),
-                    () -> assertThat(member.getNickname()).isNull(),
+                    () -> assertThat(member.getNickname()).isNotNull(),
                     () -> assertThat(member.getMobilePhoneNumber()).isNull(),
                     () -> assertThat(member.getInterestArea()).isNull(),
                     () -> assertThat(member.getOptInMarketing()).isNull()
@@ -36,7 +36,7 @@ class MemberTest {
         void socialId가_null이면_예외가_발생한다() {
             String socialId = null;
 
-            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId));
+            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId, "nickname"));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_SOCIAL_ID);
         }
@@ -90,7 +90,8 @@ class MemberTest {
             String interestArea = "강남구";
             Boolean optInMarketing = null;
 
-            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MARKETING_CONSENT);
         }
@@ -103,9 +104,73 @@ class MemberTest {
             String interestArea = "부산";
             Boolean optInMarketing = true;
 
-            BusinessException exception = assertThrows(BusinessException.class, () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_INTEREST_AREA);
+        }
+    }
+
+    @Nested
+    class UpdateMember {
+
+        @Test
+        void 회원_정보를_정상적으로_수정한다() {
+            Member member = new Member("social-id", "nickname");
+            Member updatedMember = new Member("new-nickname", "01012345678", "강남구", true);
+
+            member.update(updatedMember);
+
+            assertAll(
+                    () -> assertThat(member.getNickname()).isEqualTo("new-nickname"),
+                    () -> assertThat(member.getPhoneNumber()).isEqualTo("01012345678"),
+                    () -> assertThat(member.getInterestArea()).isEqualTo(InterestArea.GANGNAM),
+                    () -> assertThat(member.isOptInMarketing()).isTrue()
+            );
+        }
+    }
+
+    @Nested
+    class IsSameNicknameTest {
+
+        @Test
+        void 동일한_닉네임을_비교하면_true를_반환한다() {
+            Member member = new Member("social-id", "nickname");
+
+            boolean result = member.isSameNickname("nickname");
+
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void 다른_닉네임을_비교하면_false를_반환한다() {
+            Member member = new Member("social-id", "nickname");
+
+            boolean result = member.isSameNickname("different-nickname");
+
+            assertThat(result).isFalse();
+        }
+    }
+
+    @Nested
+    class IsSameMobilePhoneNumberTest {
+
+        @Test
+        void 동일한_전화번호를_비교하면_true를_반환한다() {
+            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+
+            boolean result = member.isSameMobilePhoneNumber("01012345678");
+
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void 다른_전화번호를_비교하면_false를_반환한다() {
+            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+
+            boolean result = member.isSameMobilePhoneNumber("01087654321");
+
+            assertThat(result).isFalse();
         }
     }
 }
