@@ -1,7 +1,6 @@
 package timeeat.document.auth;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
@@ -37,7 +36,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
                 .tag(Tag.AUTH_API)
                 .summary("OAuth 로그인 페이지 리다이렉트")
                 .requestHeader(
-                        headerWithName(HttpHeaders.ORIGIN).description("요청 Origin")
+                        headerWithName(HttpHeaders.REFERER).description("요청 Origin")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -56,7 +55,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .redirects().follow(false)
-                    .header(HttpHeaders.ORIGIN, origin)
+                    .header(HttpHeaders.REFERER, origin)
                     .when()
                     .get("/api/auth/login/oauth")
                     .then()
@@ -70,11 +69,9 @@ public class AuthDocumentTest extends BaseDocumentTest {
         RestDocsRequest requestDocument = request()
                 .tag(Tag.AUTH_API)
                 .summary("로그인")
-                .requestHeader(
-                        headerWithName(HttpHeaders.ORIGIN).description("요청 Origin")
-                )
                 .requestBodyField(
-                        fieldWithPath("code").type(STRING).description("Oauth 인가 코드")
+                        fieldWithPath("code").type(STRING).description("Oauth 인가 코드"),
+                        fieldWithPath("origin").type(STRING).description("요청 Origin")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -93,9 +90,9 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
         @Test
         void 로그인_성공() {
-            LoginRequest request = new LoginRequest("code");
+            LoginRequest request = new LoginRequest("code", "http://localhost:3000");
             MemberResponse response = new MemberResponse(1L, true, "닉네임", null, null, null);
-            doReturn(response).when(authService).login(eq(request), anyString());
+            doReturn(response).when(authService).login(request);
 
             var document = document("auth/login", 201)
                     .request(requestDocument)
@@ -104,7 +101,6 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .header(HttpHeaders.ORIGIN, origin)
                     .body(request)
                     .when().post("/api/auth/login")
                     .then().statusCode(201);
