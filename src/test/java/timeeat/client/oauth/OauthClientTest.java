@@ -49,8 +49,8 @@ class OauthClientTest {
             assertAll(
                     () -> assertThat(uri.getHost()).isEqualTo("kauth.kakao.com"),
                     () -> assertThat(uri.getPath()).isEqualTo("/oauth/authorize"),
-                    () -> assertThat(uri.getQuery()).contains("client_id=%s".formatted(properties.getClientId())),
-                    () -> assertThat(uri.getQuery()).contains("redirect_uri=%s".formatted(redirectUri)),
+                    () -> assertThat(uri.getQuery()).contains("client_id=%s&".formatted(properties.getClientId())),
+                    () -> assertThat(uri.getQuery()).contains("redirect_uri=%s&".formatted(redirectUri)),
                     () -> assertThat(uri.getQuery()).contains("response_type=code")
             );
         }
@@ -63,6 +63,16 @@ class OauthClientTest {
                     () -> oauthClient.getOauthLoginUrl(origin));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
+        }
+
+        @Test
+        void origin_뒤에_슬래시가_붙어도_정상적으로_처리된다() {
+            String origin = properties.getAllowedOrigins().getFirst();
+            String redirectUri = origin + properties.getRedirectPath();
+
+            URI uri = oauthClient.getOauthLoginUrl(origin + "/");
+
+            assertThat(uri.getQuery()).contains("redirect_uri=%s&".formatted(redirectUri));
         }
     }
 

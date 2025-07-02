@@ -32,7 +32,7 @@ public class OauthClient {
 
         return UriComponentsBuilder.fromUriString("https://kauth.kakao.com/oauth/authorize")
                 .queryParam("client_id", properties.getClientId())
-                .queryParam("redirect_uri", origin + properties.getRedirectPath())
+                .queryParam("redirect_uri", createRedirectUri(origin))
                 .queryParam("response_type", "code")
                 .build()
                 .toUri();
@@ -44,7 +44,7 @@ public class OauthClient {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", properties.getClientId());
-        body.add("redirect_uri", origin + properties.getRedirectPath());
+        body.add("redirect_uri", createRedirectUri(origin));
         body.add("code", code);
 
         return restClient.post()
@@ -59,6 +59,13 @@ public class OauthClient {
         if (!properties.isAllowedOrigin(origin)) {
             throw new BusinessException(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
         }
+    }
+
+    private String createRedirectUri(String origin) {
+        return UriComponentsBuilder.fromUriString(origin)
+                .path(properties.getRedirectPath())
+                .build()
+                .toString();
     }
 
     public OauthMemberInformation requestMemberInformation(OauthToken token) {
