@@ -16,7 +16,3 @@ springdoc:
     persist-authorization: true
     display-request-duration: true
     default-model-expand-depth: 10
-
-jwt:
-  access-token-expiration: 1h
-  refresh-token-expiration: 1d

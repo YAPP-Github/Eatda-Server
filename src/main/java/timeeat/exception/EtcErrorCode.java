@@ -13,6 +13,7 @@ public enum EtcErrorCode {
     MEDIA_TYPE_NOT_SUPPORTED("CLIENT005", "허용되지 않은 미디어 타입입니다.", HttpStatus.UNSUPPORTED_MEDIA_TYPE),
     NO_RESOURCE_FOUND("CLIENT006", "요청한 리소스를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     NO_COOKIE_FOUND("CLIENT007", "필수 쿠키 값이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    NO_HEADER_FOUND("CLIENT007", "필수 헤더 값이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 
     INTERNAL_SERVER_ERROR("SERVER001", "서버 내부 에러가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

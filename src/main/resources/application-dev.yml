@@ -28,9 +28,18 @@ spring:
       - classpath:db/seed/dev
 
 jwt:
+  access-token-expiration: 1h
+  refresh-token-expiration: 14d
   secret-key: ${JWT_SECRET_KEY}
 
 cors:
   origin:
     - "http://localhost:3000"
     - "https://api-dev.eatda.net"
+
+oauth:
+  client-id: ${OAUTH_CLIENT_ID}
+  redirect-path: /login/callback
+  allowed-origins:
+    - "http://localhost:3000"
+    - "https://dev.eatda.net"

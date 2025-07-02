@@ -2,6 +2,7 @@ package timeeat.client.oauth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
@@ -14,6 +15,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import timeeat.exception.BusinessErrorCode;
+import timeeat.exception.BusinessException;
 
 @RestClientTest(OauthClient.class)
 class OauthClientTest {
@@ -38,15 +41,28 @@ class OauthClientTest {
 
         @Test
         void Oauth_로그인_URL을_생성할_수_있다() {
-            URI uri = oauthClient.getOauthLoginUrl();
+            String origin = properties.getAllowedOrigins().getFirst();
+            String redirectUri = origin + properties.getRedirectPath();
+
+            URI uri = oauthClient.getOauthLoginUrl(origin);
 
             assertAll(
                     () -> assertThat(uri.getHost()).isEqualTo("kauth.kakao.com"),
                     () -> assertThat(uri.getPath()).isEqualTo("/oauth/authorize"),
                     () -> assertThat(uri.getQuery()).contains("client_id=%s".formatted(properties.getClientId())),
-                    () -> assertThat(uri.getQuery()).contains("redirect_uri=%s".formatted(properties.getRedirectUri())),
+                    () -> assertThat(uri.getQuery()).contains("redirect_uri=%s".formatted(redirectUri)),
                     () -> assertThat(uri.getQuery()).contains("response_type=code")
             );
+        }
+
+        @Test
+        void 허용된_Origin이_아니라면_예외를_발생시킨다() {
+            String origin = "https://not-allowed-origin.com";
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> oauthClient.getOauthLoginUrl(origin));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
         }
     }
 
@@ -55,6 +71,7 @@ class OauthClientTest {
 
         @Test
         void Oauth_토큰을_요청할_수_있다() {
+            String origin = properties.getAllowedOrigins().getFirst();
             setMockServer(HttpMethod.POST, "https://kauth.kakao.com/oauth/token", """
                     {
                         "token_type":"bearer",
@@ -66,9 +83,20 @@ class OauthClientTest {
                     }""");
             String code = "test_code";
 
-            OauthToken token = oauthClient.requestOauthToken(code);
+            OauthToken token = oauthClient.requestOauthToken(code, origin);
 
             assertThat(token.accessToken()).isEqualTo("test-access-token");
+        }
+
+        @Test
+        void 허용된_오리진이_아니라면_예외를_발생시킨다() {
+            String origin = "https://not-allowed-origin.com";
+            String code = "test_code";
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> oauthClient.requestOauthToken(code, origin));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.UNAUTHORIZED_ORIGIN);
         }
     }
 

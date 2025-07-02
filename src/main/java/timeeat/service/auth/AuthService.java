@@ -22,13 +22,13 @@ public class AuthService {
     private final OauthClient oauthClient;
     private final MemberRepository memberRepository;
 
-    public URI getOauthLoginUrl() {
-        return oauthClient.getOauthLoginUrl();
+    public URI getOauthLoginUrl(String origin) {
+        return oauthClient.getOauthLoginUrl(origin);
     }
 
     @Transactional
-    public MemberResponse login(LoginRequest request) {
-        OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
+    public MemberResponse login(LoginRequest request, String origin) {
+        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), origin);
         OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
 
         Optional<Member> optionalMember = memberRepository.findBySocialId(Long.toString(oauthInformation.socialId()));

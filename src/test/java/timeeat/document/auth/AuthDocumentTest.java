@@ -1,5 +1,7 @@
 package timeeat.document.auth;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
@@ -13,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import timeeat.controller.auth.LoginRequest;
 import timeeat.controller.auth.ReissueRequest;
@@ -24,12 +27,18 @@ import timeeat.document.Tag;
 
 public class AuthDocumentTest extends BaseDocumentTest {
 
+    @Value("${oauth.allowed-origins[0]}")
+    private String origin;
+
     @Nested
     class RedirectOauthLoginPage {
 
         RestDocsRequest requestDocument = request()
                 .tag(Tag.AUTH_API)
-                .summary("OAuth 로그인 페이지 리다이렉트");
+                .summary("OAuth 로그인 페이지 리다이렉트")
+                .requestHeader(
+                        headerWithName(HttpHeaders.ORIGIN).description("요청 Origin")
+                );
 
         RestDocsResponse responseDocument = response()
                 .responseHeader(
@@ -38,7 +47,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
         @Test
         void Oauth_로그인_페이지로_리다이렉트_할_수_있다() throws URISyntaxException {
-            doReturn(new URI("http://localhost:8080")).when(authService).getOauthLoginUrl();
+            doReturn(new URI("http://localhost:8080")).when(authService).getOauthLoginUrl(anyString());
 
             var document = document("auth/oauth_redirect", 302)
                     .request(requestDocument)
@@ -47,6 +56,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .redirects().follow(false)
+                    .header(HttpHeaders.ORIGIN, origin)
                     .when()
                     .get("/api/auth/login/oauth")
                     .then()
@@ -82,7 +92,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
         void 로그인_성공() {
             LoginRequest request = new LoginRequest("code");
             MemberResponse response = new MemberResponse(1L, true, "닉네임", null, null, null);
-            doReturn(response).when(authService).login(request);
+            doReturn(response).when(authService).login(eq(request), anyString());
 
             var document = document("auth/login", 201)
                     .request(requestDocument)
@@ -91,6 +101,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .header(HttpHeaders.ORIGIN, origin)
                     .body(request)
                     .when().post("/api/auth/login")
                     .then().statusCode(201);
