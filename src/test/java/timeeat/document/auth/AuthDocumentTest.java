@@ -70,6 +70,9 @@ public class AuthDocumentTest extends BaseDocumentTest {
         RestDocsRequest requestDocument = request()
                 .tag(Tag.AUTH_API)
                 .summary("로그인")
+                .requestHeader(
+                        headerWithName(HttpHeaders.ORIGIN).description("요청 Origin")
+                )
                 .requestBodyField(
                         fieldWithPath("code").type(STRING).description("Oauth 인가 코드")
                 );
