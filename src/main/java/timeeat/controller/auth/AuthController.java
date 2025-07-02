@@ -31,7 +31,6 @@ public class AuthController {
                 .build();
     }
 
-    // TODO : login() ControllerTest, DocumentTest 수정
     @PostMapping("/api/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         MemberResponse member = authService.login(request);

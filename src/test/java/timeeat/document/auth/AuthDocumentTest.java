@@ -48,7 +48,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
         void Oauth_로그인_페이지로_리다이렉트_할_수_있다() throws URISyntaxException {
             doReturn(new URI("http://localhost:8080")).when(authService).getOauthLoginUrl(anyString());
 
-            var document = document("auth/oauth_redirect", 302)
+            var document = document("auth/oauth-redirect", 302)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();

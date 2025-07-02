@@ -35,7 +35,7 @@ public class BaseControllerTest {
 
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
-            new OauthMemberInformation(123L, "nickname");
+            new OauthMemberInformation(314159248183772L, "nickname");
 
     @LocalServerPort
     private int port;
@@ -81,5 +81,9 @@ public class BaseControllerTest {
     protected final String refreshToken() {
         Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
         return jwtManager.issueRefreshToken(member.getId());
+    }
+
+    protected final String oauthLoginSocialId() {
+        return Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId());
     }
 }
