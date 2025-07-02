@@ -12,6 +12,59 @@ import timeeat.controller.BaseControllerTest;
 class MemberControllerTest extends BaseControllerTest {
 
     @Nested
+    class CheckNickname {
+
+        @Test
+        void 중복되지_않는_닉네임을_확인할_수_있다() {
+            given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("nickname", "new-nickname")
+                    .when().get("/api/member/nickname/check")
+                    .then()
+                    .statusCode(204);
+        }
+
+        @Test
+        void 중복된_닉네임을_확인할_수_있다() {
+            String existingNickname = "existing-nickname";
+            memberGenerator.generateRegisteredMember("123", existingNickname, "01012345678");
+
+            given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("nickname", existingNickname)
+                    .when().get("/api/member/nickname/check")
+                    .then()
+                    .statusCode(400);
+        }
+    }
+
+    @Nested
+    class CheckPhoneNumber {
+
+        @Test
+        void 중복되지_않는_전화번호를_확인할_수_있다() {
+            given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("phoneNumber", "01098765432")
+                    .when().get("/api/member/phone-number/check")
+                    .then()
+                    .statusCode(204);
+        }
+
+        @Test
+        void 중복된_전화번호를_확인할_수_있다() {
+            String existingPhoneNumber = "01012345678";
+            memberGenerator.generateRegisteredMember("123", "nickname", existingPhoneNumber);
+            given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("phoneNumber", existingPhoneNumber)
+                    .when().get("/api/member/phone-number/check")
+                    .then()
+                    .statusCode(400);
+        }
+    }
+
+    @Nested
     class UpdateMember {
 
         @Test
