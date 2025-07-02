@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import timeeat.exception.InitializeException;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")
@@ -25,22 +26,19 @@ public class OauthProperties {
 
     private void validateClientId(String clientId) {
         if (clientId == null || clientId.isBlank()) {
-            // TODO InitializeException 을 이용
-            throw new RuntimeException("Client ID must not be null or empty");
+            throw new InitializeException("Client ID must not be null or empty");
         }
     }
 
     private void validateRedirectPath(String redirectPath) {
         if (redirectPath == null || !redirectPath.startsWith("/")) {
-            // TODO InitializeException 을 이용
-            throw new RuntimeException("Redirect path must not be null or start with '/'");
+            throw new InitializeException("Redirect path must not be null or start with '/'");
         }
     }
 
     private void validateOrigins(List<String> origins) {
         if (origins == null || origins.isEmpty()) {
-            // TODO InitializeException 을 이용
-            throw new RuntimeException("Allowed origins must not be null or empty");
+            throw new InitializeException("Allowed origins must not be null or empty");
         }
         origins.forEach(this::validateOrigin);
     }
@@ -50,18 +48,16 @@ public class OauthProperties {
         try {
             uri = new URI(origin);
         } catch (Exception e) {
-            // TODO InitializeException 을 이용
-            throw new RuntimeException("Allowed origin must be a valid origin form: " + origin, e);
+            throw new InitializeException("Allowed origin must be a valid origin form: " + origin, e);
         }
 
         if (uri.getScheme() == null || uri.getHost() == null || !uri.getPath().isBlank()) {
-            // TODO InitializeException 을 이용
-            throw new RuntimeException("Allowed origin must be a valid origin form: " + origin);
+            throw new InitializeException("Allowed origin must be a valid origin form: " + origin);
         }
     }
 
     public boolean isAllowedOrigin(String origin) {
         return allowedOrigins.stream()
-                .anyMatch(allowedOrigin -> allowedOrigin.equalsIgnoreCase(origin.trim()));
+                .anyMatch(allowedOrigin -> origin.trim().startsWith(allowedOrigin));
     }
 }
