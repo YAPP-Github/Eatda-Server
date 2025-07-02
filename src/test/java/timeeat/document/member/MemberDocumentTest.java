@@ -18,6 +18,7 @@ import timeeat.controller.member.MemberUpdateRequest;
 import timeeat.document.BaseDocumentTest;
 import timeeat.document.RestDocsRequest;
 import timeeat.document.RestDocsResponse;
+import timeeat.document.Tag;
 
 public class MemberDocumentTest extends BaseDocumentTest {
 
@@ -25,6 +26,8 @@ public class MemberDocumentTest extends BaseDocumentTest {
     class updateMember {
 
         RestDocsRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("회원 정보 수정")
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 ).requestBodyField(

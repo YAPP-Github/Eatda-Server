@@ -31,10 +31,9 @@ public class AuthController {
                 .build();
     }
 
-    // TODO : login() ControllerTest, DocumentTest 수정
     @PostMapping("/api/auth/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
-                                               @RequestHeader(HttpHeaders.ORIGIN) String origin) {
+    public ResponseEntity<LoginResponse> login(@RequestHeader(HttpHeaders.ORIGIN) String origin,
+                                               @RequestBody LoginRequest request) {
         MemberResponse member = authService.login(request, origin);
         TokenResponse token = new TokenResponse(
                 jwtManager.issueAccessToken(member.id()),

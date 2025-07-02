@@ -82,4 +82,8 @@ public class BaseControllerTest {
         Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
         return jwtManager.issueRefreshToken(member.getId());
     }
+
+    protected final String oauthLoginSocialId() {
+        return Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId());
+    }
 }
