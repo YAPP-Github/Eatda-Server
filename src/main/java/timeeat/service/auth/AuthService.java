@@ -15,14 +15,21 @@ import timeeat.controller.auth.MemberLoginRequest;
 public class AuthService {
 
     private final OauthClient oauthClient;
+    private final MemberRepository memberRepository;
 
     public URI getOauthLoginUrl(String origin) {
         return oauthClient.getOauthLoginUrl(origin);
     }
 
-    public void login(MemberLoginRequest request, String origin) {
-        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), origin);
-        OauthMemberInformation oauthMemberInformation = oauthClient.requestMemberInformation(oauthToken);
-        log.info("Oauth 로그인 성공: {}", oauthMemberInformation); // TODO 회원 정보 저장 로직 추가
+    @Transactional
+    public MemberResponse login(LoginRequest request) {
+        OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
+        OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
+
+        Optional<Member> optionalMember = memberRepository.findBySocialId(Long.toString(oauthInformation.socialId()));
+        boolean isFirstLogin = optionalMember.isEmpty();
+        return new MemberResponse(
+                optionalMember.orElseGet(() -> memberRepository.save(oauthInformation.toMember())),
+                isFirstLogin);
     }
 }

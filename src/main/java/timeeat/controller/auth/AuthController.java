@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import timeeat.controller.member.MemberResponse;
 import timeeat.controller.web.jwt.JwtManager;
 import timeeat.service.auth.AuthService;
 
@@ -32,16 +33,15 @@ public class AuthController {
 
     // TODO : login() ControllerTest, DocumentTest 수정
     @PostMapping("/api/auth/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody MemberLoginRequest request,
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
                                                @RequestHeader(HttpHeaders.ORIGIN) String origin) {
-        authService.login(request, origin);
-
-        TokenResponse response = new TokenResponse(
-                jwtManager.issueAccessToken(1L),
-                jwtManager.issueRefreshToken(1L));
+        MemberResponse member = authService.login(request, origin);
+        TokenResponse token = new TokenResponse(
+                jwtManager.issueAccessToken(member.id()),
+                jwtManager.issueRefreshToken(member.id()));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(new LoginResponse(token, member));
     }
 
     @PostMapping("/api/auth/reissue")

@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.http.ContentType;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
+import io.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import org.springframework.http.HttpHeaders;
 import timeeat.controller.BaseControllerTest;
 
@@ -43,6 +46,28 @@ class AuthControllerTest extends BaseControllerTest {
                     .contains("client_id=%s".formatted(clientId))
                     .contains("redirect_uri=%s".formatted(expectedRedirectPath))
                     .contains("response_type=code");
+        }
+    }
+
+    @Nested
+    class Login {
+
+        @Test
+        void 인가코드를_통해_로그인할_수_있다() {
+            LoginRequest request = new LoginRequest("auth-code");
+
+            LoginResponse response = given().body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/auth/login")
+                    .then()
+                    .statusCode(201)
+                    .extract().as(LoginResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.token().accessToken()).isNotBlank(),
+                    () -> assertThat(response.token().refreshToken()).isNotBlank(),
+                    () -> assertThat(response.information().isSignUp()).isTrue()
+            );
         }
     }
 
