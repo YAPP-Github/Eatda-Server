@@ -58,6 +58,11 @@ public class OauthProperties {
 
     public boolean isAllowedOrigin(String origin) {
         return allowedOrigins.stream()
-                .anyMatch(allowedOrigin -> origin.trim().startsWith(allowedOrigin));
+                .anyMatch(allowedOrigin -> isMatchedOrigin(allowedOrigin, origin));
+    }
+
+    private boolean isMatchedOrigin(String allowedOrigin, String origin) {
+        return origin.trim().equals(allowedOrigin)
+                || origin.trim().equals(allowedOrigin + "/");
     }
 }

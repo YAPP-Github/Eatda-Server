@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -56,7 +55,8 @@ class OauthPropertiesTest {
             assertThat(isAllowed).isTrue();
         }
 
-        @Test
+        @ParameterizedTest
+        @ValueSource(strings = {"https://not-allowed.com", "http://localhost:8080/path", "http://localhost:8080nono"})
         void 허용되지_않은_오리진인_경우_false를_반환한다() {
             OauthProperties oauthProperties = new OauthProperties("client-id", "/path",
                     List.of("http://localhost:8080"));
