@@ -116,8 +116,8 @@ jobs:
       - name: Update DB URL in Parameter Store
         run: |
           aws ssm put-parameter \
-            --name "/prod/mysql-url" \
-            --value "jdbc:mysql://${{ env.RDS_ENDPOINT }}:3306/eatda?useUnicode=true&characterEncoding=UTF-8" \
+            --name "/prod/RDS_ENDPOINT" \
+            --value "jdbc:mysql://${{ env.RDS_ENDPOINT }}/eatda?useUnicode=true&characterEncoding=UTF-8" \
             --type SecureString \
             --overwrite
 
@@ -163,11 +163,24 @@ jobs:
           architecture: 'x64'
           cache: 'gradle'
 
+      - name: Get TEST_JWT_SECRET_KEY from SSM
+        id: get-test-secret
+        run: |
+          SECRET_VALUE=$(aws ssm get-parameter \
+            --name "/common/TEST_JWT_SECRET_KEY" \
+            --with-decryption \
+            --region "${{ env.AWS_REGION }}" \
+            --query "Parameter.Value" \
+            --output text)
+          echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
+
       - name: Build with Gradle
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean build -Dspring.profiles.active=prod
+        env:
+          TEST_JWT_SECRET_KEY: ${{ env.TEST_JWT_SECRET_KEY }}
 
       - name: Login to Amazon ECR
         id: login-ecr

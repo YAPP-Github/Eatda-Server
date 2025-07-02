@@ -3,6 +3,10 @@ logging:
     org.hibernate.SQL: INFO
 
 spring:
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
   config:
     import: "aws-parameterstore:/prod/"
 

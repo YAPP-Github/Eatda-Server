@@ -8,6 +8,8 @@ spring:
   config:
     activate:
       on-profile: test
+    import:
+      - optional:file:.env-local[.properties]
 
   datasource:
     driver-class-name: org.h2.Driver
@@ -38,6 +40,6 @@ cors:
   origin: "https://example.eat-da.com"
 
 jwt:
-  secret-key: test-secret-key-test-secret-key-test-key-test-secret-key-test
+  secret-key: ${TEST_JWT_SECRET_KEY}
   access-token-expiration: 1h
   refresh-token-expiration: 1d

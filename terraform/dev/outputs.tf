@@ -1,5 +1,6 @@
 output "ecs_task_definitions_check" {
-  value = local.ecs_task_definitions
+  value     = local.final_ecs_definitions_for_module
+  sensitive = true
 }
 
 output "ecr_repository_name" {
@@ -16,4 +17,9 @@ output "ecs_api_service_name" {
 
 output "ecs_api_container_name" {
   value = module.ecs.container_names["api-dev"]
+}
+
+output "ec2_private_ip" {
+  value     = module.ec2.private_ip
+  sensitive = true
 }

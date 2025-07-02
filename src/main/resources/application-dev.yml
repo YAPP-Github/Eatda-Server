@@ -3,6 +3,10 @@ logging:
     org.hibernate.SQL: DEBUG
 
 spring:
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
   config:
     import: "aws-parameterstore:/dev/"
 
@@ -29,4 +33,4 @@ jwt:
 cors:
   origin:
     - "http://localhost:3000"
-    - "https://dev.eatda.net"
+    - "https://api-dev.eatda.net"

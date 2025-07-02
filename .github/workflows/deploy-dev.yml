@@ -95,6 +95,7 @@ jobs:
           echo "ECS_CLUSTER=$(echo "$TF_OUTPUTS" | jq -r '.ecs_cluster_name.value')" >> $GITHUB_ENV
           echo "ECS_SERVICE=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_service_name.value')" >> $GITHUB_ENV
           echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_container_name.value')" >> $GITHUB_ENV
+          echo "PRIVATE_IP=$(echo "$TF_OUTPUTS" | jq -r '.ec2_private_ip.value')" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -102,6 +103,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update MYSQL_URL in Parameter Store
+        run: |
+          MYSQL_URL="jdbc:mysql://${PRIVATE_IP}:3306/eatda?useUnicode=true&characterEncoding=UTF-8"
+
+          aws ssm put-parameter \
+            --name "/dev/MYSQL_URL" \
+            --type "SecureString" \
+            --value "$MYSQL_URL" \
+            --overwrite
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -140,11 +151,24 @@ jobs:
           architecture: 'x64'
           cache: 'gradle'
 
+      - name: Get TEST_JWT_SECRET_KEY from SSM
+        id: get-test-secret
+        run: |
+          SECRET_VALUE=$(aws ssm get-parameter \
+            --name "/common/TEST_JWT_SECRET_KEY" \
+            --with-decryption \
+            --region "${{ env.AWS_REGION }}" \
+            --query "Parameter.Value" \
+            --output text)
+          echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
+
       - name: Build with Gradle
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean build -Dspring.profiles.active=dev
+        env:
+          TEST_JWT_SECRET_KEY: ${{ env.TEST_JWT_SECRET_KEY }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -175,7 +199,7 @@ jobs:
           image: ${{ env.image }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
