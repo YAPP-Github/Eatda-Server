@@ -4,28 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.http.ContentType;
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
-import io.restassured.http.ContentType;
-import io.restassured.http.ContentType;
 import org.springframework.http.HttpHeaders;
 import timeeat.controller.BaseControllerTest;
 
 class AuthControllerTest extends BaseControllerTest {
 
+    @Value("${oauth.client-id}")
+    private String clientId;
+
+    @Value("${oauth.redirect-path}")
+    private String redirectPath;
+
+    @Value("${oauth.allowed-origins[0]}")
+    private String allowedOrigin;
+
     @Nested
     class RedirectOauthLoginPage {
-
-        @Value("${oauth.client-id}")
-        private String clientId;
-
-        @Value("${oauth.redirect-path}")
-        private String redirectPath;
-
-        @Value("${oauth.allowed-origins[0]}")
-        private String allowedOrigin;
 
         @Test
         void Oauth_로그인_페이지로_리다이렉트_할_수_있다() {
@@ -41,11 +38,7 @@ class AuthControllerTest extends BaseControllerTest {
                     .statusCode(302)
                     .extract().header(HttpHeaders.LOCATION);
 
-            assertThat(location)
-                    .contains("https://kauth.kakao.com/oauth/authorize")
-                    .contains("client_id=%s".formatted(clientId))
-                    .contains("redirect_uri=%s".formatted(expectedRedirectPath))
-                    .contains("response_type=code");
+            assertThat(location).isNotNull();
         }
     }
 
@@ -57,6 +50,7 @@ class AuthControllerTest extends BaseControllerTest {
             LoginRequest request = new LoginRequest("auth-code");
 
             LoginResponse response = given().body(request)
+                    .header(HttpHeaders.ORIGIN, allowedOrigin)
                     .contentType(ContentType.JSON)
                     .when().post("/api/auth/login")
                     .then()

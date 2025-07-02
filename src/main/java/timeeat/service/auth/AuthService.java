@@ -1,13 +1,18 @@
 package timeeat.service.auth;
 
 import java.net.URI;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import timeeat.client.oauth.OauthClient;
 import timeeat.client.oauth.OauthMemberInformation;
 import timeeat.client.oauth.OauthToken;
-import timeeat.controller.auth.MemberLoginRequest;
+import timeeat.controller.auth.LoginRequest;
+import timeeat.controller.member.MemberResponse;
+import timeeat.domain.member.Member;
+import timeeat.repository.member.MemberRepository;
 
 @Slf4j
 @Service
@@ -22,8 +27,8 @@ public class AuthService {
     }
 
     @Transactional
-    public MemberResponse login(LoginRequest request) {
-        OauthToken oauthToken = oauthClient.requestOauthToken(request.code());
+    public MemberResponse login(LoginRequest request, String origin) {
+        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), origin);
         OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
 
         Optional<Member> optionalMember = memberRepository.findBySocialId(Long.toString(oauthInformation.socialId()));
