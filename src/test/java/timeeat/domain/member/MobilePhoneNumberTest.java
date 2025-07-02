@@ -43,4 +43,26 @@ class MobilePhoneNumberTest {
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MOBILE_PHONE_NUMBER);
         }
     }
+
+    @Nested
+    class isSameValue {
+
+        @Test
+        void 동일한_값을_비교하면_true를_반환한다() {
+            MobilePhoneNumber phoneNumber = new MobilePhoneNumber("01012345678");
+
+            boolean result = phoneNumber.isSame("01012345678");
+
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void 다른_값을_비교하면_false를_반환한다() {
+            MobilePhoneNumber phoneNumber = new MobilePhoneNumber("01012345678");
+
+            boolean result = phoneNumber.isSame("01012345679");
+
+            assertThat(result).isFalse();
+        }
+    }
 }

@@ -31,4 +31,8 @@ public class MobilePhoneNumber {
             throw new BusinessException(BusinessErrorCode.INVALID_MOBILE_PHONE_NUMBER);
         }
     }
+
+    public boolean isSame(String value) {
+        return this.value.equals(value);
+    }
 }

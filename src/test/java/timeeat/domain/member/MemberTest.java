@@ -110,4 +110,67 @@ class MemberTest {
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_INTEREST_AREA);
         }
     }
+
+    @Nested
+    class UpdateMember {
+
+        @Test
+        void 회원_정보를_정상적으로_수정한다() {
+            Member member = new Member("social-id", "nickname");
+            Member updatedMember = new Member("new-nickname", "01012345678", "강남구", true);
+
+            member.update(updatedMember);
+
+            assertAll(
+                    () -> assertThat(member.getNickname()).isEqualTo("new-nickname"),
+                    () -> assertThat(member.getPhoneNumber()).isEqualTo("01012345678"),
+                    () -> assertThat(member.getInterestArea()).isEqualTo(InterestArea.GANGNAM),
+                    () -> assertThat(member.isOptInMarketing()).isTrue()
+            );
+        }
+    }
+
+    @Nested
+    class IsSameNicknameTest {
+
+        @Test
+        void 동일한_닉네임을_비교하면_true를_반환한다() {
+            Member member = new Member("social-id", "nickname");
+
+            boolean result = member.isSameNickname("nickname");
+
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void 다른_닉네임을_비교하면_false를_반환한다() {
+            Member member = new Member("social-id", "nickname");
+
+            boolean result = member.isSameNickname("different-nickname");
+
+            assertThat(result).isFalse();
+        }
+    }
+
+    @Nested
+    class IsSameMobilePhoneNumberTest {
+
+        @Test
+        void 동일한_전화번호를_비교하면_true를_반환한다() {
+            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+
+            boolean result = member.isSameMobilePhoneNumber("01012345678");
+
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void 다른_전화번호를_비교하면_false를_반환한다() {
+            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+
+            boolean result = member.isSameMobilePhoneNumber("01087654321");
+
+            assertThat(result).isFalse();
+        }
+    }
 }

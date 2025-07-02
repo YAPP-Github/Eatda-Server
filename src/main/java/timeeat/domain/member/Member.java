@@ -89,6 +89,17 @@ public class Member {
         this.optInMarketing = member.optInMarketing;
     }
 
+    public boolean isSameNickname(String nickname) {
+        return this.nickname.equals(nickname);
+    }
+
+    public boolean isSameMobilePhoneNumber(String phoneNumber) {
+        if (this.mobilePhoneNumber == null) {
+            return false;
+        }
+        return this.mobilePhoneNumber.getValue().equals(phoneNumber);
+    }
+
     public boolean isOptInMarketing() {
         return Boolean.TRUE.equals(optInMarketing);
     }
