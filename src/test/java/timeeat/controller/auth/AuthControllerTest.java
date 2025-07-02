@@ -46,7 +46,7 @@ class AuthControllerTest extends BaseControllerTest {
     class Login {
 
         @Test
-        void 인가코드를_통해_로그인할_수_있다() {
+        void 인가코드를_통해_회원가입할_수_있다() {
             LoginRequest request = new LoginRequest("auth-code");
 
             LoginResponse response = given().body(request)
@@ -61,6 +61,26 @@ class AuthControllerTest extends BaseControllerTest {
                     () -> assertThat(response.token().accessToken()).isNotBlank(),
                     () -> assertThat(response.token().refreshToken()).isNotBlank(),
                     () -> assertThat(response.information().isSignUp()).isTrue()
+            );
+        }
+
+        @Test
+        void 인가코드를_통해_로그인할_수_있다() {
+            memberGenerator.generate(oauthLoginSocialId());
+            LoginRequest request = new LoginRequest("auth-code");
+
+            LoginResponse response = given().body(request)
+                    .header(HttpHeaders.ORIGIN, allowedOrigin)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/auth/login")
+                    .then()
+                    .statusCode(201)
+                    .extract().as(LoginResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.token().accessToken()).isNotBlank(),
+                    () -> assertThat(response.token().refreshToken()).isNotBlank(),
+                    () -> assertThat(response.information().isSignUp()).isFalse()
             );
         }
     }
