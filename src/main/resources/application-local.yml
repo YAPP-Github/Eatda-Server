@@ -23,7 +23,7 @@ spring:
 jwt:
   access-token-expiration: 1h
   refresh-token-expiration: 1d
-  secret-key: ${JWT_SECRET_KEY}
+  secret-key: ${LOCAL_JWT_SECRET_KEY}
 
 cors:
   origin:
