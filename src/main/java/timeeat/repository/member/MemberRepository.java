@@ -18,4 +18,8 @@ public interface MemberRepository extends Repository<Member, Long> {
     }
 
     Optional<Member> findBySocialId(String socialId);
+
+    boolean existsByNickname(String nickname);
+
+    boolean existsByMobilePhoneNumberValue(String phoneNumber);
 }

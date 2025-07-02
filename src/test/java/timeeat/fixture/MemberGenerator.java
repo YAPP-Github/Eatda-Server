@@ -16,4 +16,8 @@ public class MemberGenerator {
     public Member generate(String socialId) {
         return memberRepository.save(new Member(socialId, "nickname"));
     }
+
+    public Member generate(String socialId, String nickname) {
+        return memberRepository.save(new Member(socialId, nickname));
+    }
 }
