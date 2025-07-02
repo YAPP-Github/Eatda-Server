@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import timeeat.exception.InitializeException;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
@@ -18,11 +19,11 @@ public class CorsConfig implements WebMvcConfigurer {
 
     private void validate(List<String> corsOriginList) {
         if (corsOriginList == null || corsOriginList.isEmpty()) {
-            throw new RuntimeException("Initialization Error: CORS origin cannot be empty.");
+            throw new InitializeException("CORS origin cannot be empty.");
         }
         for (String origin : corsOriginList) {
             if (origin == null || origin.isBlank()) {
-                throw new RuntimeException("Initialization Error: CORS origin string cannot be blank.");
+                throw new InitializeException("CORS origin string cannot be blank.");
             }
         }
     }
