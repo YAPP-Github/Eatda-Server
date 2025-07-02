@@ -22,7 +22,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/api/auth/login/oauth")
-    public ResponseEntity<Void> redirectOauthLoginPage(@RequestHeader(HttpHeaders.ORIGIN) String origin) {
+    public ResponseEntity<Void> redirectOauthLoginPage(@RequestHeader(HttpHeaders.REFERER) String origin) {
         URI oauthLoginUrl = authService.getOauthLoginUrl(origin);
 
         return ResponseEntity
@@ -33,9 +33,8 @@ public class AuthController {
 
     // TODO : login() ControllerTest, DocumentTest 수정
     @PostMapping("/api/auth/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
-                                               @RequestHeader(HttpHeaders.ORIGIN) String origin) {
-        MemberResponse member = authService.login(request, origin);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        MemberResponse member = authService.login(request);
         TokenResponse token = new TokenResponse(
                 jwtManager.issueAccessToken(member.id()),
                 jwtManager.issueRefreshToken(member.id()));

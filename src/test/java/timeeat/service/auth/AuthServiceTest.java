@@ -20,9 +20,9 @@ class AuthServiceTest extends BaseServiceTest {
 
         @Test
         void 로그인_최초_요청_시_회원가입_및_로그인_처리를_한다() {
-            LoginRequest request = new LoginRequest("auth_code");
+            LoginRequest request = new LoginRequest("auth_code", "http://localhost:3000");
 
-            MemberResponse response = authService.login(request, "http://localhost:8080");
+            MemberResponse response = authService.login(request);
 
             assertAll(
                     () -> assertThat(response.isSignUp()).isTrue(),
@@ -36,9 +36,9 @@ class AuthServiceTest extends BaseServiceTest {
         @Test
         void 로그인_최초_요청이_아닐_경우_로그인만_처리를_한다() {
             memberGenerator.generate("123");
-            LoginRequest request = new LoginRequest("auth_code");
+            LoginRequest request = new LoginRequest("auth_code", "http://localhost:3000");
 
-            MemberResponse response = authService.login(request, "http://localhost:8080");
+            MemberResponse response = authService.login(request);
 
             assertThat(response.isSignUp()).isFalse();
         }

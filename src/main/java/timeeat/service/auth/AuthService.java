@@ -27,8 +27,8 @@ public class AuthService {
     }
 
     @Transactional
-    public MemberResponse login(LoginRequest request, String origin) {
-        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), origin);
+    public MemberResponse login(LoginRequest request) {
+        OauthToken oauthToken = oauthClient.requestOauthToken(request.code(), request.origin());
         OauthMemberInformation oauthInformation = oauthClient.requestMemberInformation(oauthToken);
 
         Optional<Member> optionalMember = memberRepository.findBySocialId(Long.toString(oauthInformation.socialId()));

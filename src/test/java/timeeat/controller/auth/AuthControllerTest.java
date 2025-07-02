@@ -12,12 +12,6 @@ import timeeat.controller.BaseControllerTest;
 
 class AuthControllerTest extends BaseControllerTest {
 
-    @Value("${oauth.client-id}")
-    private String clientId;
-
-    @Value("${oauth.redirect-path}")
-    private String redirectPath;
-
     @Value("${oauth.allowed-origins[0]}")
     private String allowedOrigin;
 
@@ -26,11 +20,8 @@ class AuthControllerTest extends BaseControllerTest {
 
         @Test
         void Oauth_로그인_페이지로_리다이렉트_할_수_있다() {
-            String origin = allowedOrigin;
-            String expectedRedirectPath = origin + redirectPath;
-
             String location = given()
-                    .header(HttpHeaders.ORIGIN, origin)
+                    .header(HttpHeaders.REFERER, allowedOrigin)
                     .redirects().follow(false)
                     .when()
                     .get("/api/auth/login/oauth")
@@ -47,10 +38,9 @@ class AuthControllerTest extends BaseControllerTest {
 
         @Test
         void 인가코드를_통해_로그인할_수_있다() {
-            LoginRequest request = new LoginRequest("auth-code");
+            LoginRequest request = new LoginRequest("auth-code", allowedOrigin);
 
             LoginResponse response = given().body(request)
-                    .header(HttpHeaders.ORIGIN, allowedOrigin)
                     .contentType(ContentType.JSON)
                     .when().post("/api/auth/login")
                     .then()
