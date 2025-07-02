@@ -56,7 +56,7 @@ class MemberServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class validatePhoneNumber {
+    class ValidatePhoneNumber {
 
         @Test
         void 중복되지_않은_전화번호이면_예외가_발생하지_않는다() {
