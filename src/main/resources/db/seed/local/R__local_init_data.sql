@@ -1,4 +1,4 @@
-INSERT INTO member (id, social_id, nickname, phone_number, interest_area, opt_in_marketing)
+INSERT INTO member (id, social_id, nickname, phone_number, opt_in_marketing)
     VALUES (1, 123456789, '로컬개발자', '01012345678', true),
            (2, 987654321, '단위테스터', '01087654321', false) AS new
 ON DUPLICATE KEY UPDATE social_id        = new.social_id,
