@@ -49,7 +49,6 @@ class MemberTest {
             String socialId = "test-social-id-123";
             String nickname = "맛있는녀석들-32";
             String mobilePhoneNumber = "01012345678";
-            String interestArea = "강남구";
             Boolean optInMarketing = true;
 
             Member member = new Member(socialId, nickname, mobilePhoneNumber, optInMarketing);
@@ -67,7 +66,6 @@ class MemberTest {
             String socialId = "test-social-id-123";
             String nickname = null;
             String mobilePhoneNumber = null;
-            String interestArea = "강남구";
             Boolean optInMarketing = false;
 
             Member member = new Member(socialId, nickname, mobilePhoneNumber, optInMarketing);
