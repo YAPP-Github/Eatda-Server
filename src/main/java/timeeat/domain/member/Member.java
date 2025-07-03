@@ -55,6 +55,7 @@ public class Member {
     }
 
     public Member(String nickname, String mobilePhoneNumber, boolean optInMarketing) {
+        validateOptInMarketing(optInMarketing);
         this.nickname = nickname;
         this.mobilePhoneNumber = new MobilePhoneNumber(mobilePhoneNumber);
         this.optInMarketing = optInMarketing;
