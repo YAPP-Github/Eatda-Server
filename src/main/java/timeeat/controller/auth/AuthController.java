@@ -1,13 +1,16 @@
 package timeeat.controller.auth;
 
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import lombok.RequiredArgsConstructor;
+import timeeat.controller.member.MemberResponse;
 import timeeat.controller.web.jwt.JwtManager;
 import timeeat.service.auth.AuthService;
 
@@ -19,8 +22,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/api/auth/login/oauth")
-    public ResponseEntity<Void> redirectOauthLoginPage() {
-        URI oauthLoginUrl = authService.getOauthLoginUrl();
+    public ResponseEntity<Void> redirectOauthLoginPage(@RequestHeader(HttpHeaders.REFERER) String origin) {
+        URI oauthLoginUrl = authService.getOauthLoginUrl(origin);
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -29,15 +32,14 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody MemberLoginRequest request) {
-        authService.login(request);
-
-        TokenResponse response = new TokenResponse(
-                jwtManager.issueAccessToken(1L),
-                jwtManager.issueRefreshToken(1L));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        MemberResponse member = authService.login(request);
+        TokenResponse token = new TokenResponse(
+                jwtManager.issueAccessToken(member.id()),
+                jwtManager.issueRefreshToken(member.id()));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(new LoginResponse(token, member));
     }
 
     @PostMapping("/api/auth/reissue")

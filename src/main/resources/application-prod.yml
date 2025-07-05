@@ -28,9 +28,18 @@ spring:
       - classpath:db/seed/prod
 
 jwt:
+  access-token-expiration: 1h
+  refresh-token-expiration: 14d
   secret-key: ${JWT_SECRET_KEY}
 
 cors:
   origin:
+    - "https://www.eatda.net"
+    - "https://eatda.net"
+
+oauth:
+  client-id: ${OAUTH_CLIENT_ID}
+  redirect-path: /login/callback
+  allowed-origins:
     - "https://www.eatda.net"
     - "https://eatda.net"

@@ -21,8 +21,16 @@ spring:
       - classpath:db/seed/local
 
 jwt:
+  access-token-expiration: 1h
+  refresh-token-expiration: 1d
   secret-key: ${LOCAL_JWT_SECRET_KEY}
 
 cors:
   origin:
+    - "http://localhost:3000"
+
+oauth:
+  client-id: ${OAUTH_CLIENT_ID}
+  redirect-path: /login/callback
+  allowed-origins:
     - "http://localhost:3000"

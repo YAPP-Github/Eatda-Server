@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import timeeat.exception.InitializeException;
 
 class JwtPropertiesTest {
 
@@ -19,7 +20,7 @@ class JwtPropertiesTest {
         void 비밀키가_비어있으면_예외를_발생시킨다(String secretKey) {
 
             assertThatThrownBy(() -> new JwtProperties(secretKey, Duration.ofMinutes(30), Duration.ofDays(14)))
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(InitializeException.class)
                     .hasMessage("JWT secret key must be at least 32 bytes");
         }
 
@@ -28,7 +29,7 @@ class JwtPropertiesTest {
             String secretKey = "1".repeat(31); // 31 bytes
 
             assertThatThrownBy(() -> new JwtProperties(secretKey, Duration.ofMinutes(30), Duration.ofDays(14)))
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(InitializeException.class)
                     .hasMessage("JWT secret key must be at least 32 bytes");
         }
 
@@ -49,14 +50,14 @@ class JwtPropertiesTest {
         @Test
         void 만료기간이_비어있으면_예외를_발생시킨다() {
             assertThatThrownBy(() -> new JwtProperties(secretKey, null, Duration.ofDays(14)))
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(InitializeException.class)
                     .hasMessage("JWT token duration cannot be null");
         }
 
         @Test
         void 만료기간이_음수이면_예외를_발생시킨다() {
             assertThatThrownBy(() -> new JwtProperties(secretKey, Duration.ofHours(1), Duration.ofSeconds(-1)))
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(InitializeException.class)
                     .hasMessage("JWT token duration must be positive");
         }
     }

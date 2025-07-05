@@ -11,6 +11,14 @@ variable "subdomains" {
   }))
 }
 
+variable "frontend_domains" {
+  description = "frontend domains (A record or CNAME)"
+  type = map(object({
+    type  = string
+    value = string
+  }))
+}
+
 variable "validation_method" {
   type = string
 }

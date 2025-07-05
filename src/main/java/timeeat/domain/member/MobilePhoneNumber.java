@@ -18,7 +18,7 @@ public class MobilePhoneNumber {
 
     private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^\\d{11}$");
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String value;
 
     public MobilePhoneNumber(String value) {
@@ -30,5 +30,9 @@ public class MobilePhoneNumber {
         if (number != null && !PHONE_NUMBER_PATTERN.matcher(number).matches()) {
             throw new BusinessException(BusinessErrorCode.INVALID_MOBILE_PHONE_NUMBER);
         }
+    }
+
+    public boolean isSame(String value) {
+        return this.value.equals(value);
     }
 }
