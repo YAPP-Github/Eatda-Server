@@ -23,6 +23,12 @@ locals {
   environment  = "prod"
   name_prefix  = "eatda"
 
+  bucket_name_prefix = "eatda-storage"
+  allowed_origins = [
+    "https://eatda.net",
+    "https://www.eatda.net"
+  ]
+
   ec2_sg_id                 = data.terraform_remote_state.common.outputs.security_group_ids["ec2"]
   instance_definitions      = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
   instance_subnet_map       = data.terraform_remote_state.common.outputs.public_subnet_ids
