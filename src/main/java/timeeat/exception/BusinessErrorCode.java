@@ -28,6 +28,9 @@ public enum BusinessErrorCode {
     OUT_OF_SEOUL_LATITUDE_RANGE("STO010", "서비스 지역(서울)을 벗어난 위도 값입니다."),
     OUT_OF_SEOUL_LONGITUDE_RANGE("STO011", "서비스 지역(서울)을 벗어난 경도 값입니다."),
 
+    // Map
+    MAP_SERVER_ERROR("MAP001", "지도 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // Menu
     INVALID_MENU_NAME("MEN001", "메뉴명은 필수입니다."),
     INVALID_MENU_PRICE("MEN002", "메뉴 가격은 0보다 커야 합니다."),

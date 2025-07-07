@@ -43,3 +43,6 @@ oauth:
   allowed-origins:
     - "http://localhost:3000"
     - "https://dev.eatda.net"
+
+kakao:
+  api-key: ${KAKAO_API_KEY}

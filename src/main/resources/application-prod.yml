@@ -43,3 +43,6 @@ oauth:
   allowed-origins:
     - "https://www.eatda.net"
     - "https://eatda.net"
+
+kakao:
+  api-key: ${KAKAO_API_KEY}
