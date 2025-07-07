@@ -27,8 +27,8 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "baegam_eatda"
-        property "sonar.organization", "baegam"
+        property "sonar.projectKey", "YAPP-Github_26th-Web-Team-1-BE"
+        property "sonar.organization", "YAPP - 작은 아이디어로 세상을 크게 변화시키다."
         property "sonar.host.url", "https://sonarcloud.io"
         property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.java.coveragePlugin', 'jacoco'
@@ -85,6 +85,7 @@ dependencies {
 
     // aws
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.2.1'
+    implementation 'software.amazon.awssdk:s3:2.31.77'
 }
 
 bootJar {
