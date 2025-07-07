@@ -1,5 +1,11 @@
 package eatda.document;
 
+import eatda.controller.web.jwt.JwtManager;
+import eatda.service.auth.AuthService;
+import eatda.service.service.MemberService;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,26 +18,17 @@ import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured.RestAssuredRestDocumentationConfigurer;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import eatda.controller.web.jwt.JwtManager;
-import eatda.service.auth.AuthService;
-import eatda.service.service.MemberService;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.specification.RequestSpecification;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseDocumentTest {
 
-    @Autowired
-    private JwtManager jwtManager;
-
     @MockitoBean
     protected AuthService authService;
-
     @MockitoBean
     protected MemberService memberService;
-
+    @Autowired
+    private JwtManager jwtManager;
     @LocalServerPort
     private int port;
 

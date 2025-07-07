@@ -1,8 +1,8 @@
 package eatda.enums;
 
-import java.util.Arrays;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import java.util.Arrays;
 import lombok.Getter;
 
 @Getter

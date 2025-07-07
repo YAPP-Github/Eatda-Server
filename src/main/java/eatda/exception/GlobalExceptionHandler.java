@@ -1,5 +1,7 @@
 package eatda.exception;
 
+import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import jakarta.validation.ConstraintViolationException;
-import lombok.RequiredArgsConstructor;
 
 @RestControllerAdvice
 @RequiredArgsConstructor

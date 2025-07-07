@@ -1,7 +1,5 @@
 package eatda.service.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import eatda.controller.member.MemberResponse;
 import eatda.controller.member.MemberUpdateRequest;
 import eatda.domain.member.Member;
@@ -9,6 +7,8 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,9 +1,9 @@
 package eatda.fixture;
 
-import org.springframework.stereotype.Component;
 import eatda.domain.member.Member;
 import eatda.enums.InterestArea;
 import eatda.repository.member.MemberRepository;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MemberGenerator {

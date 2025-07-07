@@ -3,12 +3,12 @@ package eatda.client.oauth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import eatda.exception.InitializeException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import eatda.exception.InitializeException;
 
 class OauthPropertiesTest {
 

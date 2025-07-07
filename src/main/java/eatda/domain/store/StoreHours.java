@@ -1,9 +1,9 @@
 package eatda.domain.store;
 
-import java.time.LocalTime;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.persistence.Embeddable;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

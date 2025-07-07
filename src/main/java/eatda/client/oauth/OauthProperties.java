@@ -1,10 +1,10 @@
 package eatda.client.oauth;
 
+import eatda.exception.InitializeException;
 import java.net.URI;
 import java.util.List;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import eatda.exception.InitializeException;
 import lombok.Getter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @ConfigurationProperties(prefix = "oauth")

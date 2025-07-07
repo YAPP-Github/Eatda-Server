@@ -1,14 +1,14 @@
 package eatda.controller.web.jwt;
 
-import java.time.Duration;
-import java.util.Date;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import java.time.Duration;
+import java.util.Date;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties(JwtProperties.class)

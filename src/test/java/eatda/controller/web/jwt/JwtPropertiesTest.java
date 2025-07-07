@@ -3,12 +3,12 @@ package eatda.controller.web.jwt;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import eatda.exception.InitializeException;
 import java.time.Duration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import eatda.exception.InitializeException;
 
 class JwtPropertiesTest {
 

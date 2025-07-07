@@ -3,12 +3,12 @@ package eatda.service.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import eatda.controller.auth.LoginRequest;
 import eatda.controller.member.MemberResponse;
 import eatda.service.BaseServiceTest;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class AuthServiceTest extends BaseServiceTest {
 

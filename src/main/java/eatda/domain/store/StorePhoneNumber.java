@@ -1,10 +1,10 @@
 package eatda.domain.store;
 
-import java.util.regex.Pattern;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

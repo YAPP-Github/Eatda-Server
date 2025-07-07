@@ -3,15 +3,6 @@ package eatda.controller;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import eatda.DatabaseCleaner;
 import eatda.client.oauth.OauthClient;
 import eatda.client.oauth.OauthMemberInformation;
@@ -26,6 +17,15 @@ import io.restassured.filter.Filter;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ExtendWith(DatabaseCleaner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,16 +36,12 @@ public class BaseControllerTest {
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
             new OauthMemberInformation(314159248183772L, "nickname");
-
-    @LocalServerPort
-    private int port;
-
     @Autowired
     protected MemberGenerator memberGenerator;
-
     @Autowired
     protected MemberRepository memberRepository;
-
+    @LocalServerPort
+    private int port;
     @Autowired
     private JwtManager jwtManager;
 

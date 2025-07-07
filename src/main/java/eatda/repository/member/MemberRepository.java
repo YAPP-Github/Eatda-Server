@@ -1,10 +1,10 @@
 package eatda.repository.member;
 
-import java.util.Optional;
-import org.springframework.data.repository.Repository;
 import eatda.domain.member.Member;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import java.util.Optional;
+import org.springframework.data.repository.Repository;
 
 public interface MemberRepository extends Repository<Member, Long> {
 

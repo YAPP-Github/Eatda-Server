@@ -1,12 +1,12 @@
 package eatda.controller.web.jwt;
 
+import eatda.exception.InitializeException;
+import io.jsonwebtoken.security.Keys;
 import java.time.Duration;
 import java.util.Base64;
 import javax.crypto.SecretKey;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import eatda.exception.InitializeException;
-import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @ConfigurationProperties(prefix = "jwt")
