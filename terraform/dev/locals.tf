@@ -30,7 +30,7 @@ locals {
   ]
 
   ec2_sg_id             = data.terraform_remote_state.common.outputs.security_group_ids["ec2"]
-  instance_subnet_map = data.terraform_remote_state.common.outputs.public_subnet_ids # 에러가 났던 부분
+  instance_subnet_map   = data.terraform_remote_state.common.outputs.public_subnet_ids
   ecr_repo_urls         = data.terraform_remote_state.bootstrap.outputs.ecr_repo_urls
   ecs_services          = var.ecs_services
   alb_target_group_arns = data.terraform_remote_state.common.outputs.target_group_arns
