@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "dev" {
+resource "aws_s3_bucket" "prod" {
   bucket = "${var.bucket_name_prefix}-${var.environment}"
 
   tags = {
@@ -8,8 +8,8 @@ resource "aws_s3_bucket" "dev" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "main" {
-  bucket = aws_s3_bucket.dev.id
+resource "aws_s3_bucket_public_access_block" "prod" {
+  bucket = aws_s3_bucket.prod.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -17,8 +17,8 @@ resource "aws_s3_bucket_public_access_block" "main" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
-  bucket = aws_s3_bucket.dev.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "prod" {
+  bucket = aws_s3_bucket.prod.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -27,12 +27,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
   }
 }
 
-resource "aws_s3_bucket_cors_configuration" "main" {
-  bucket = aws_s3_bucket.dev.id
+resource "aws_s3_bucket_cors_configuration" "prod" {
+  bucket = aws_s3_bucket.prod.id
 
   cors_rule {
     allowed_headers = ["*"]
-    allowed_methods = ["GET", "PUT", "POST", "DELETE"]
+    allowed_methods = ["GET"]
     allowed_origins = var.allowed_origins
     expose_headers = ["ETag"]
     max_age_seconds = 3000
