@@ -1,4 +1,4 @@
-package timeeat.repository;
+package eatda.repository;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -9,13 +9,51 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 class DatabaseSchemaTest {
 
-    // TODO : Flyway SQL 파일 관리 방법 및 Flyway 테스트 방법 논의
     @Nested
-    @SpringBootTest(webEnvironment = WebEnvironment.NONE)
     @ActiveProfiles({"test", "flyway"})
+    @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+    @TestPropertySource(properties = {
+            "spring.datasource.url=jdbc:h2:mem:flyway:local;MODE=MySQL",
+            "spring.flyway.locations=classpath:db/migration,classpath:db/seed/local"})
+    class LocalDatabaseSchemaTest {
+
+        @Autowired
+        private Flyway flyway;
+
+        @Test
+        void 로컬_데이터베이스_스키마가_정상적으로_동작한다() {
+            assertThatCode(() -> flyway.migrate()).doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    @ActiveProfiles({"test", "flyway"})
+    @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+    @TestPropertySource(properties = {
+            "spring.datasource.url=jdbc:h2:mem:flyway:dev;MODE=MySQL",
+            "spring.flyway.locations=classpath:db/migration,classpath:db/seed/dev"})
+    class DevelopDatabaseSchemaTest {
+
+
+        @Autowired
+        private Flyway flyway;
+
+        @Test
+        void 개발_데이터베이스_스키마가_정상적으로_동작한다() {
+            assertThatCode(() -> flyway.migrate()).doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    @ActiveProfiles({"test", "flyway"})
+    @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+    @TestPropertySource(properties = {
+            "spring.datasource.url=jdbc:h2:mem:flyway:prod;MODE=MySQL",
+            "spring.flyway.locations=classpath:db/migration,classpath:db/seed/prod"})
     class ProductionDatabaseSchemaTest {
 
         @Autowired
