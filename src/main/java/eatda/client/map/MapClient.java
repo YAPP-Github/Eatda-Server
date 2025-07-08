@@ -1,5 +1,6 @@
 package eatda.client.map;
 
+import eatda.domain.store.Coordinates;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,17 @@ public class MapClient {
 
     public ShopSearchResults searchShops(String query) {
         return restClient.get()
-                .uri("https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category={category}&page=1&size=15&sort=accuracy",
-                        query, "FD6")
+                .uri(builder -> builder
+                        .path("https://dapi.kakao.com/v2/local/search/keyword.json")
+                        .queryParam("query", query)
+                        .queryParam("category", "FD6")
+                        .queryParam("rect", "%s,%s,%s,%s".formatted(
+                                Coordinates.getMinLongitude(), Coordinates.getMinLatitude(),
+                                Coordinates.getMaxLongitude(), Coordinates.getMaxLatitude()))
+                        .queryParam("page", 1)
+                        .queryParam("size", 15)
+                        .queryParam("sort", "accuracy")
+                        .build())
                 .header("Authorization", "KakaoAK " + apiKey)
                 .retrieve()
                 .body(ShopSearchResults.class);

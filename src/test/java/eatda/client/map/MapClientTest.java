@@ -1,12 +1,11 @@
 package eatda.client.map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,8 @@ class MapClientTest {
     @Autowired
     private MapClient mapClient;
 
-    private void setMockServer(HttpMethod method, String uri, String responseBody) {
-        mockServer.expect(requestTo(uri))
+    private void setMockServer(HttpMethod method, String url, String responseBody) {
+        mockServer.expect(requestTo(startsWith(url)))
                 .andExpect(method(method))
                 .andRespond(MockRestResponseCreators.withSuccess(responseBody, MediaType.APPLICATION_JSON));
     }
@@ -36,9 +35,7 @@ class MapClientTest {
 
         @Test
         void 가게_검색을_할_수_있다() {
-            String query = "농민백암순대";
-            String uri = "https://dapi.kakao.com/v2/local/search/keyword.json?query=%s&category=%s&page=1&size=15&sort=accuracy"
-                    .formatted(URLEncoder.encode(query, StandardCharsets.UTF_8), "FD6");
+            String url = "https:/dapi.kakao.com/v2/local/search/keyword.json";
             String responseBody = """
                     {
                         "documents": [
@@ -68,12 +65,13 @@ class MapClientTest {
                             "total_count": 1
                         }
                     }""";
-            setMockServer(HttpMethod.GET, uri, responseBody);
+            setMockServer(HttpMethod.GET, url, responseBody);
 
             ShopSearchResults results = mapClient.searchShops("농민백암순대");
 
             ShopSearchResult result = results.results().getFirst();
             assertAll(
+                    () -> assertThat(results.results()).hasSize(1),
                     () -> assertThat(result.kakaoId()).isEqualTo("17163273"),
                     () -> assertThat(result.categoryGroupCode()).isEqualTo("FD6"),
                     () -> assertThat(result.categoryName()).isEqualTo("음식점 > 한식 > 국밥"),
