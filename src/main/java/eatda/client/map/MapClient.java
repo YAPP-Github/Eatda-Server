@@ -1,6 +1,7 @@
 package eatda.client.map;
 
 import eatda.domain.store.Coordinates;
+import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class MapClient {
         this.kakaoProperties = properties;
     }
 
-    public ShopSearchResults searchShops(String query) {
+    public List<StoreSearchResult> searchShops(String query) {
         return restClient.get()
                 .uri(builder -> builder
                         .path("https://dapi.kakao.com/v2/local/search/keyword.json")
@@ -35,6 +36,7 @@ public class MapClient {
                         .build())
                 .header("Authorization", "KakaoAK " + kakaoProperties.getApiKey())
                 .retrieve()
-                .body(ShopSearchResults.class);
+                .body(StoreSearchResults.class)
+                .results();
     }
 }

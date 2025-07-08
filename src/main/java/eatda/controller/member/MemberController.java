@@ -1,7 +1,7 @@
 package eatda.controller.member;
 
 import eatda.controller.web.auth.LoginMember;
-import eatda.service.service.MemberService;
+import eatda.service.member.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

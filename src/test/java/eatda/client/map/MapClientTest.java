@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,19 +68,19 @@ class MapClientTest {
                     }""";
             setMockServer(HttpMethod.GET, url, responseBody);
 
-            ShopSearchResults results = mapClient.searchShops("농민백암순대");
+            List<StoreSearchResult> results = mapClient.searchShops("농민백암순대");
 
-            ShopSearchResult result = results.results().getFirst();
+            StoreSearchResult result = results.getFirst();
             assertAll(
-                    () -> assertThat(results.results()).hasSize(1),
+                    () -> assertThat(results).hasSize(1),
                     () -> assertThat(result.kakaoId()).isEqualTo("17163273"),
                     () -> assertThat(result.categoryGroupCode()).isEqualTo("FD6"),
                     () -> assertThat(result.categoryName()).isEqualTo("음식점 > 한식 > 국밥"),
                     () -> assertThat(result.phoneNumber()).isEqualTo("02-555-9603"),
-                    () -> assertThat(result.placeName()).isEqualTo("농민백암순대 본점"),
+                    () -> assertThat(result.name()).isEqualTo("농민백암순대 본점"),
                     () -> assertThat(result.placeUrl()).isEqualTo("http://place.map.kakao.com/17163273"),
-                    () -> assertThat(result.addressName()).isEqualTo("서울 강남구 대치동 896-33"),
-                    () -> assertThat(result.roadAddressName()).isEqualTo("서울 강남구 선릉로86길 40-4"),
+                    () -> assertThat(result.lotNumberAddress()).isEqualTo("서울 강남구 대치동 896-33"),
+                    () -> assertThat(result.roadAddress()).isEqualTo("서울 강남구 선릉로86길 40-4"),
                     () -> assertThat(result.latitude()).isEqualTo(37.503708148482524),
                     () -> assertThat(result.longitude()).isEqualTo(127.05300772497776)
             );
