@@ -1,22 +1,23 @@
 package eatda.client.map;
 
 import eatda.domain.store.Coordinates;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
+@EnableConfigurationProperties(KakaoProperties.class)
 public class MapClient {
 
     private final RestClient restClient;
-    private final String apiKey; // TODO NotBlank 검증
+    private final KakaoProperties kakaoProperties;
 
-    public MapClient(RestClient.Builder restClient, @Value("${kakao.api-key}") String apiKey) {
+    public MapClient(RestClient.Builder restClient, KakaoProperties properties) {
         this.restClient = restClient
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, new MapServerErrorHandler())
                 .build();
-        this.apiKey = apiKey;
+        this.kakaoProperties = properties;
     }
 
     public ShopSearchResults searchShops(String query) {
@@ -32,7 +33,7 @@ public class MapClient {
                         .queryParam("size", 15)
                         .queryParam("sort", "accuracy")
                         .build())
-                .header("Authorization", "KakaoAK " + apiKey)
+                .header("Authorization", "KakaoAK " + kakaoProperties.getApiKey())
                 .retrieve()
                 .body(ShopSearchResults.class);
     }
