@@ -3,6 +3,7 @@ package eatda.document;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.service.auth.AuthService;
 import eatda.service.member.MemberService;
+import eatda.service.store.StoreService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -27,6 +28,9 @@ public abstract class BaseDocumentTest {
     protected AuthService authService;
     @MockitoBean
     protected MemberService memberService;
+    @MockitoBean
+    protected StoreService storeService;
+
     @Autowired
     private JwtManager jwtManager;
     @LocalServerPort
