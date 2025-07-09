@@ -6,7 +6,7 @@ resource "aws_instance" "dev" {
   key_name                    = var.instance_definitions.key_name
   user_data                   = var.instance_definitions.user_data
   vpc_security_group_ids = [var.ec2_sg_id]
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   metadata_options {
     http_tokens   = "required"
