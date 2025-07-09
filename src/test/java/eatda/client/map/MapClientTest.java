@@ -85,5 +85,29 @@ class MapClientTest {
                     () -> assertThat(result.longitude()).isEqualTo(127.05300772497776)
             );
         }
+
+        @Test
+        void 검색_결과가_없을_경우_빈_리스트를_반환한다() {
+            String url = "https://dapi.kakao.com/v2/local/search/keyword.json";
+            String responseBody = """
+                    {
+                        "documents": [],
+                        "meta": {
+                            "is_end": true,
+                            "pageable_count": 0,
+                            "same_name": {
+                                "keyword": "존재하지 않는 가게",
+                                "region": [],
+                                "selected_region": ""
+                            },
+                            "total_count": 0
+                        }
+                    }""";
+            setMockServer(HttpMethod.GET, url, responseBody);
+
+            List<StoreSearchResult> results = mapClient.searchShops("존재하지 않는 가게");
+
+            assertThat(results).isEmpty();
+        }
     }
 }
