@@ -43,7 +43,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 중복되지_않는_닉네임을_확인할_수_있다() {
+        void 중복_닉네임_확인_성공() {
             doNothing().when(memberService).validateNickname(anyString(), anyLong());
 
             var document = document("member/nickname-check", 204)
@@ -61,11 +61,11 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class,
                 names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "DUPLICATE_NICKNAME"})
         @ParameterizedTest
-        void 중복된_닉네임을_확인할_수_있다(BusinessErrorCode errorCode) {
+        void 중복_닉네임_확인_실패(BusinessErrorCode errorCode) {
             doThrow(new BusinessException(errorCode))
                     .when(memberService).validateNickname(anyString(), anyLong());
 
-            var document = document("member/nickname-check", 409)
+            var document = document("member/nickname-check", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -92,7 +92,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 중복되지_않는_전화번호를_확인할_수_있다() {
+        void 중복_전화번호_확인_성공() {
             doNothing().when(memberService).validatePhoneNumber(anyString(), anyLong());
 
             var document = document("member/phone-number-check", 204)
@@ -110,11 +110,11 @@ public class MemberDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class,
                 names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "DUPLICATE_PHONE_NUMBER"})
         @ParameterizedTest
-        void 중복된_전화번호를_확인할_수_있다(BusinessErrorCode errorCode) {
+        void 중복_전화번호_확인_실패(BusinessErrorCode errorCode) {
             doThrow(new BusinessException(errorCode))
                     .when(memberService).validatePhoneNumber(anyString(), anyLong());
 
-            var document = document("member/phone-number-check", 409)
+            var document = document("member/phone-number-check", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -180,7 +180,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
             MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", "성북구", true);
             doThrow(new BusinessException(errorCode)).when(memberService).update(anyLong(), eq(request));
 
-            var document = document("member/update", errorCode.getStatus().value())
+            var document = document("member/update", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
