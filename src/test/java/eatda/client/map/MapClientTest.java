@@ -36,7 +36,7 @@ class MapClientTest {
 
         @Test
         void 가게_검색을_할_수_있다() {
-            String url = "https:/dapi.kakao.com/v2/local/search/keyword.json";
+            String url = "https://dapi.kakao.com/v2/local/search/keyword.json";
             String responseBody = """
                     {
                         "documents": [
