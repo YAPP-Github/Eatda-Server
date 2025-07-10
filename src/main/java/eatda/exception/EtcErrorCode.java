@@ -16,8 +16,7 @@ public enum EtcErrorCode {
     NO_HEADER_FOUND("CLIENT008", "필수 헤더 값이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NO_PARAMETER_FOUND("CLIENT009", "필수 파라미터 값이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 
-    INTERNAL_SERVER_ERROR("SERVER001", "서버 내부 에러가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    ;
+    INTERNAL_SERVER_ERROR("SERVER001", "서버 내부 에러가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;

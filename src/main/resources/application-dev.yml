@@ -7,6 +7,14 @@ spring:
     aws:
       region:
         static: ap-northeast-2
+      s3:
+        bucket: eatda-storage-dev
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+
   config:
     import: "aws-parameterstore:/dev/"
 
