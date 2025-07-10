@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -18,9 +19,13 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 
 public class MemberDocumentTest extends BaseDocumentTest {
@@ -38,7 +43,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 중복되지_않는_닉네임을_확인할_수_있다() {
+        void 중복_닉네임_확인_성공() {
             doNothing().when(memberService).validateNickname(anyString(), anyLong());
 
             var document = document("member/nickname-check", 204)
@@ -51,6 +56,26 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .queryParam("nickname", "new-nickname")
                     .when().get("/api/member/nickname/check")
                     .then().statusCode(204);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class,
+                names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "DUPLICATE_NICKNAME"})
+        @ParameterizedTest
+        void 중복_닉네임_확인_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode))
+                    .when(memberService).validateNickname(anyString(), anyLong());
+
+            var document = document("member/nickname-check", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("nickname", "existing-nickname")
+                    .when().get("/api/member/nickname/check")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
@@ -67,7 +92,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 중복되지_않는_전화번호를_확인할_수_있다() {
+        void 중복_전화번호_확인_성공() {
             doNothing().when(memberService).validatePhoneNumber(anyString(), anyLong());
 
             var document = document("member/phone-number-check", 204)
@@ -80,6 +105,26 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .queryParam("phoneNumber", "01098765432")
                     .when().get("/api/member/phone-number/check")
                     .then().statusCode(204);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class,
+                names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "DUPLICATE_PHONE_NUMBER"})
+        @ParameterizedTest
+        void 중복_전화번호_확인_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode))
+                    .when(memberService).validatePhoneNumber(anyString(), anyLong());
+
+            var document = document("member/phone-number-check", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("phoneNumber", "01012345678")
+                    .when().get("/api/member/phone-number/check")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
@@ -125,6 +170,27 @@ public class MemberDocumentTest extends BaseDocumentTest {
                     .body(request)
                     .when().put("/api/member")
                     .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class,
+                names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "DUPLICATE_NICKNAME", "DUPLICATE_PHONE_NUMBER",
+                        "INVALID_MOBILE_PHONE_NUMBER", "INVALID_MARKETING_CONSENT"})
+        @ParameterizedTest
+        void 회원_정보_수정_실패(BusinessErrorCode errorCode) {
+            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", "성북구", true);
+            doThrow(new BusinessException(errorCode)).when(memberService).update(anyLong(), eq(request));
+
+            var document = document("member/update", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .body(request)
+                    .when().put("/api/member")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }

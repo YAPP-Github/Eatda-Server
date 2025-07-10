@@ -3,6 +3,7 @@ package eatda.document.store;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -15,10 +16,14 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 
 public class StoreDocumentTest extends BaseDocumentTest {
@@ -44,7 +49,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 음식점_검색_결과를_반환한다() {
+        void 음식점_검색_성공() {
             String query = "농민백암순대";
             StoreSearchResponses responses = new StoreSearchResponses(List.of(
                     new StoreSearchResponse("17163273", "농민백암순대 본점", "서울 강남구 대치동 896-33"),
@@ -63,6 +68,26 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .queryParam("query", query)
                     .when().get("/api/shop/search")
                     .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class,
+                names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "MAP_SERVER_ERROR"})
+        @ParameterizedTest
+        void 음식점_검색_실패(BusinessErrorCode errorCode) {
+            String query = "농민백암순대";
+            doThrow(new BusinessException(errorCode)).when(storeService).searchStores(anyString());
+
+            var document = document("store/search", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .queryParam("query", query)
+                    .when().get("/api/shop/search")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }
