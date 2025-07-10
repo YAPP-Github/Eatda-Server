@@ -1,16 +1,17 @@
 CREATE TABLE `store`
 (
-    `id`           BIGINT       NOT NULL AUTO_INCREMENT,
-    `name`         VARCHAR(255) NOT NULL,
-    `category`     VARCHAR(255) NOT NULL,
-    `introduction` TEXT         NOT NULL,
-    `phone_number` VARCHAR(255) NOT NULL COMMENT '(`-` 없이))',
-    `address`      VARCHAR(255) NOT NULL COMMENT '(전체주소)',
-    `latitude`     DOUBLE       NOT NULL,
-    `longitude`    DOUBLE       NOT NULL,
-    `open_time`    TIME         NOT NULL,
-    `close_time`   TIME         NOT NULL,
-    `image_url`    VARCHAR(511) NULL,
+    `id`            BIGINT       NOT NULL AUTO_INCREMENT,
+    `name`          VARCHAR(255) NOT NULL,
+    `category`      VARCHAR(255) NOT NULL,
+    `introduction`  TEXT         NOT NULL,
+    `phone_number`  VARCHAR(255) NOT NULL COMMENT '(`-` 없이)',
+    `interest_area` VARCHAR(50)  NOT NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, GANGNAM)',
+    `address`       VARCHAR(255) NOT NULL COMMENT '(전체주소)',
+    `latitude`      DOUBLE       NOT NULL,
+    `longitude`     DOUBLE       NOT NULL,
+    `open_time`     TIME         NOT NULL,
+    `close_time`    TIME         NOT NULL,
+    `image_url`     VARCHAR(511) NULL,
     PRIMARY KEY (`id`)
 );
 

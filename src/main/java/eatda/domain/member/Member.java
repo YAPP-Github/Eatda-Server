@@ -1,6 +1,5 @@
 package eatda.domain.member;
 
-import eatda.enums.InterestArea;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.annotation.Nullable;
