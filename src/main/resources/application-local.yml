@@ -34,3 +34,6 @@ oauth:
   redirect-path: /login/callback
   allowed-origins:
     - "http://localhost:3000"
+
+kakao:
+  api-key: ${KAKAO_API_KEY}

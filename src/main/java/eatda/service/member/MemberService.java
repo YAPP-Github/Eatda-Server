@@ -1,4 +1,4 @@
-package eatda.service.service;
+package eatda.service.member;
 
 import eatda.controller.member.MemberResponse;
 import eatda.controller.member.MemberUpdateRequest;

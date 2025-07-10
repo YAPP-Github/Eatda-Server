@@ -19,6 +19,23 @@ public class Coordinates {
     private static final double MAX_LATITUDE = 37.715133;
     private static final double MIN_LONGITUDE = 126.734086;
     private static final double MAX_LONGITUDE = 127.269311;
+
+    public static double getMinLatitude() {
+        return MIN_LATITUDE;
+    }
+
+    public static double getMaxLatitude() {
+        return MAX_LATITUDE;
+    }
+
+    public static double getMinLongitude() {
+        return MIN_LONGITUDE;
+    }
+
+    public static double getMaxLongitude() {
+        return MAX_LONGITUDE;
+    }
+
     @Column(nullable = false)
     private Double latitude;
 
