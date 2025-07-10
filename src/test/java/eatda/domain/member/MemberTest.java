@@ -27,7 +27,6 @@ class MemberTest {
                     () -> assertThat(member.getSocialId()).isEqualTo(socialId),
                     () -> assertThat(member.getNickname()).isNotNull(),
                     () -> assertThat(member.getMobilePhoneNumber()).isNull(),
-                    () -> assertThat(member.getInterestArea()).isNull(),
                     () -> assertThat(member.getOptInMarketing()).isNull()
             );
         }
@@ -51,16 +50,14 @@ class MemberTest {
             String socialId = "test-social-id-123";
             String nickname = "맛있는녀석들-32";
             String mobilePhoneNumber = "01012345678";
-            String interestArea = "강남구";
             Boolean optInMarketing = true;
 
-            Member member = new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing);
+            Member member = new Member(socialId, nickname, mobilePhoneNumber, optInMarketing);
 
             assertAll(
                     () -> assertThat(member.getSocialId()).isEqualTo(socialId),
                     () -> assertThat(member.getNickname()).isEqualTo(nickname),
                     () -> assertThat(member.getMobilePhoneNumber().getValue()).isEqualTo(mobilePhoneNumber),
-                    () -> assertThat(member.getInterestArea()).isEqualTo(InterestArea.GANGNAM),
                     () -> assertThat(member.isOptInMarketing()).isTrue()
             );
         }
@@ -70,10 +67,9 @@ class MemberTest {
             String socialId = "test-social-id-123";
             String nickname = null;
             String mobilePhoneNumber = null;
-            String interestArea = "강남구";
             Boolean optInMarketing = false;
 
-            Member member = new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing);
+            Member member = new Member(socialId, nickname, mobilePhoneNumber, optInMarketing);
 
             assertAll(
                     () -> assertThat(member.getNickname()).isNull(),
@@ -91,23 +87,9 @@ class MemberTest {
             Boolean optInMarketing = null;
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
+                    () -> new Member(socialId, nickname, mobilePhoneNumber, optInMarketing));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MARKETING_CONSENT);
-        }
-
-        @Test
-        void 유효하지_않은_관심_지역으로_생성하면_예외를_던진다() {
-            String socialId = "test-social-id-123";
-            String nickname = "맛있는녀석들-32";
-            String mobilePhoneNumber = "01012345678";
-            String interestArea = "부산";
-            Boolean optInMarketing = true;
-
-            BusinessException exception = assertThrows(BusinessException.class,
-                    () -> new Member(socialId, nickname, mobilePhoneNumber, interestArea, optInMarketing));
-
-            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_INTEREST_AREA);
         }
     }
 
@@ -117,14 +99,13 @@ class MemberTest {
         @Test
         void 회원_정보를_정상적으로_수정한다() {
             Member member = new Member("social-id", "nickname");
-            Member updatedMember = new Member("new-nickname", "01012345678", "강남구", true);
+            Member updatedMember = new Member("new-nickname", "01012345678", true);
 
             member.update(updatedMember);
 
             assertAll(
                     () -> assertThat(member.getNickname()).isEqualTo("new-nickname"),
                     () -> assertThat(member.getPhoneNumber()).isEqualTo("01012345678"),
-                    () -> assertThat(member.getInterestArea()).isEqualTo(InterestArea.GANGNAM),
                     () -> assertThat(member.isOptInMarketing()).isTrue()
             );
         }
@@ -157,7 +138,7 @@ class MemberTest {
 
         @Test
         void 동일한_전화번호를_비교하면_true를_반환한다() {
-            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+            Member member = new Member("social-id", "nickname", "01012345678", true);
 
             boolean result = member.isSameMobilePhoneNumber("01012345678");
 
@@ -166,7 +147,7 @@ class MemberTest {
 
         @Test
         void 다른_전화번호를_비교하면_false를_반환한다() {
-            Member member = new Member("social-id", "nickname", "01012345678", "강남구", true);
+            Member member = new Member("social-id", "nickname", "01012345678", true);
 
             boolean result = member.isSameMobilePhoneNumber("01087654321");
 

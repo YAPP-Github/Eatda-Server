@@ -139,7 +139,6 @@ public class MemberDocumentTest extends BaseDocumentTest {
                 ).requestBodyField(
                         fieldWithPath("nickname").type(STRING).description("회원 닉네임"),
                         fieldWithPath("phoneNumber").type(STRING).description("회원 전화번호 ex) 01012345678"),
-                        fieldWithPath("interestArea").type(STRING).description("회원 관심 지역 ex) 종로구"),
                         fieldWithPath("optInMarketing").type(BOOLEAN).description("마케팅 동의 여부")
                 );
 
@@ -149,14 +148,13 @@ public class MemberDocumentTest extends BaseDocumentTest {
                         fieldWithPath("isSignUp").type(BOOLEAN).description("회원 가입 요청 여부 (false 고정)"),
                         fieldWithPath("nickname").type(STRING).description("회원 닉네임").optional(),
                         fieldWithPath("phoneNumber").type(STRING).description("회원 전화번호 ex) 01012345678").optional(),
-                        fieldWithPath("interestArea").type(STRING).description("회원 관심 지역 ex) 종로구").optional(),
                         fieldWithPath("optInMarketing").type(BOOLEAN).description("마케팅 동의 여부").optional()
                 );
 
         @Test
         void 회원_정보_수정_성공() {
-            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", "성북구", true);
-            MemberResponse response = new MemberResponse(1L, false, "update-nickname", "01012345678", "성북구", true);
+            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", true);
+            MemberResponse response = new MemberResponse(1L, false, "update-nickname", "01012345678", true);
             doReturn(response).when(memberService).update(anyLong(), eq(request));
 
             var document = document("member/update", 200)
@@ -177,7 +175,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                         "INVALID_MOBILE_PHONE_NUMBER", "INVALID_MARKETING_CONSENT"})
         @ParameterizedTest
         void 회원_정보_수정_실패(BusinessErrorCode errorCode) {
-            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", "성북구", true);
+            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", true);
             doThrow(new BusinessException(errorCode)).when(memberService).update(anyLong(), eq(request));
 
             var document = document("member/update", errorCode)

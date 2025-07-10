@@ -4,7 +4,7 @@ CREATE TABLE `store`
     `name`          VARCHAR(255) NOT NULL,
     `category`      VARCHAR(255) NOT NULL,
     `introduction`  TEXT         NOT NULL,
-    `phone_number`  VARCHAR(255) NOT NULL COMMENT '(`-` 없이))',
+    `phone_number`  VARCHAR(255) NOT NULL COMMENT '(`-` 없이)',
     `interest_area` VARCHAR(50)  NOT NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, GANGNAM)',
     `address`       VARCHAR(255) NOT NULL COMMENT '(전체주소)',
     `latitude`      DOUBLE       NOT NULL,
@@ -21,7 +21,6 @@ CREATE TABLE `member`
     `social_id`        VARCHAR(255) NOT NULL,
     `nickname`         VARCHAR(255) NULL,
     `phone_number`     VARCHAR(255) NULL COMMENT '(`-` 없이))',
-    `interest_area`    VARCHAR(50)  NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, JONGNO)',
     `opt_in_marketing` BOOLEAN      NULL DEFAULT true,
     PRIMARY KEY (`id`)
 );
@@ -48,3 +47,4 @@ CREATE TABLE `menu`
     `image_url`      VARCHAR(511) NULL,
     PRIMARY KEY (`id`)
 );
+
