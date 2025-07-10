@@ -175,7 +175,7 @@ public class MemberDocumentTest extends BaseDocumentTest {
                         "INVALID_MOBILE_PHONE_NUMBER", "INVALID_MARKETING_CONSENT"})
         @ParameterizedTest
         void 회원_정보_수정_실패(BusinessErrorCode errorCode) {
-            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", "성북구", true);
+            MemberUpdateRequest request = new MemberUpdateRequest("update-nickname", "01012345678", true);
             doThrow(new BusinessException(errorCode)).when(memberService).update(anyLong(), eq(request));
 
             var document = document("member/update", errorCode)
