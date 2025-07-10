@@ -2,6 +2,7 @@ package eatda.document.auth;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -16,11 +17,15 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import io.restassured.http.ContentType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 
@@ -45,7 +50,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void Oauth_로그인_페이지로_리다이렉트_할_수_있다() throws URISyntaxException {
+        void Oauth_로그인_페이지_리다이렉트_성공() throws URISyntaxException {
             doReturn(new URI("http://localhost:8080")).when(authService).getOauthLoginUrl(anyString());
 
             var document = document("auth/oauth-redirect", 302)
@@ -60,6 +65,22 @@ public class AuthDocumentTest extends BaseDocumentTest {
                     .get("/api/auth/login/oauth")
                     .then()
                     .statusCode(302);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_ORIGIN"})
+        @ParameterizedTest
+        void Oauth_로그인_페이지_리다이렉트_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(authService).getOauthLoginUrl(anyString());
+
+            var document = document("auth/oauth-redirect", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .header(HttpHeaders.REFERER, origin)
+                    .when().get("/api/auth/login/oauth")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 
@@ -105,6 +126,24 @@ public class AuthDocumentTest extends BaseDocumentTest {
                     .when().post("/api/auth/login")
                     .then().statusCode(201);
         }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_ORIGIN", "OAUTH_SERVER_ERROR"})
+        @ParameterizedTest
+        void 로그인_실패(BusinessErrorCode errorCode) {
+            LoginRequest request = new LoginRequest("code", "http://localhost:3000");
+            doThrow(new BusinessException(errorCode)).when(authService).login(request);
+
+            var document = document("auth/login", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/auth/login")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
     }
 
     @Nested
@@ -137,6 +176,24 @@ public class AuthDocumentTest extends BaseDocumentTest {
                     .body(request)
                     .when().post("/api/auth/reissue")
                     .then().statusCode(201);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"EXPIRED_TOKEN", "UNAUTHORIZED_MEMBER"})
+        @ParameterizedTest
+        void 토큰_재발급_실패(BusinessErrorCode errorCode) {
+            ReissueRequest request = new ReissueRequest(refreshToken());
+            doThrow(new BusinessException(errorCode)).when(jwtManager).resolveRefreshToken(request.refreshToken());
+
+            var document = document("auth/reissue", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().post("/api/auth/reissue")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }
