@@ -77,7 +77,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
             String query = "농민백암순대";
             doThrow(new BusinessException(errorCode)).when(storeService).searchStores(anyString());
 
-            var document = document("store/search", 404)
+            var document = document("store/search", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
