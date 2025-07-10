@@ -10,13 +10,10 @@ import static org.mockito.Mockito.when;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.exception.EtcErrorCode;
-import eatda.exception.S3ServiceException;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,17 +116,16 @@ class ImageServiceTest {
         }
 
         @Test
-        @DisplayName("Presigner가 예외를 던지면 S3ServiceException으로 전환하여 던진다")
-        void Presigner가_예외를_던지면_S3ServiceException으로_전환하여_던진다() {
+        void Presigner가_예외를_던지면_BusinessException으로_전환하여_던진다() {
             String key = "stores/image.jpg";
 
             when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
                     .thenThrow(SdkClientException.create("AWS SDK 통신 실패"));
 
-            S3ServiceException exception = assertThrows(S3ServiceException.class,
+            BusinessException exception = assertThrows(BusinessException.class,
                     () -> imageService.getPresignedUrl(key));
 
-            assertThat(exception.getErrorCode()).isEqualTo(EtcErrorCode.PRESIGNED_URL_GENERATION_FAILED);
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.PRESIGNED_URL_GENERATION_FAILED);
         }
     }
 }

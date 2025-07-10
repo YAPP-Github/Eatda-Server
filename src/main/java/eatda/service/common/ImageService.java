@@ -2,8 +2,6 @@ package eatda.service.common;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.exception.EtcErrorCode;
-import eatda.exception.S3ServiceException;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Set;
@@ -55,7 +53,7 @@ public class ImageService {
             s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             return key;
         } catch (IOException exception) {
-            throw new S3ServiceException(EtcErrorCode.FILE_UPLOAD_FAILED, exception);
+            throw new BusinessException(BusinessErrorCode.FILE_UPLOAD_FAILED);
         }
     }
 
@@ -87,7 +85,7 @@ public class ImageService {
 
             return s3Presigner.presignGetObject(presignRequest).url().toString();
         } catch (Exception exception) {
-            throw new S3ServiceException(EtcErrorCode.PRESIGNED_URL_GENERATION_FAILED, exception);
+            throw new BusinessException(BusinessErrorCode.PRESIGNED_URL_GENERATION_FAILED);
         }
     }
 }

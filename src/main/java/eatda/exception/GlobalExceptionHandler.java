@@ -82,11 +82,6 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(S3ServiceException.class)
-    public ResponseEntity<ErrorResponse> handleS3ServiceException(S3ServiceException exception) {
-        return toErrorResponse(exception.getErrorCode());
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         return toErrorResponse(EtcErrorCode.INTERNAL_SERVER_ERROR);
