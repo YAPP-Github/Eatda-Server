@@ -1,4 +1,4 @@
-package eatda.service.service;
+package eatda.service.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

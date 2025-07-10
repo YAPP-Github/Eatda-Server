@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.DatabaseCleaner;
+import eatda.client.map.MapClient;
+import eatda.client.map.StoreSearchResult;
 import eatda.client.oauth.OauthClient;
 import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
@@ -36,17 +38,24 @@ public class BaseControllerTest {
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
             new OauthMemberInformation(314159248183772L, "nickname");
+
     @Autowired
     protected MemberGenerator memberGenerator;
+
     @Autowired
     protected MemberRepository memberRepository;
-    @LocalServerPort
-    private int port;
+
     @Autowired
     private JwtManager jwtManager;
 
     @MockitoBean
     private OauthClient oauthClient;
+
+    @MockitoBean
+    private MapClient mapClient;
+
+    @LocalServerPort
+    private int port;
 
     private RequestSpecification spec;
 
@@ -63,6 +72,14 @@ public class BaseControllerTest {
         doReturn(new URI("http://localhost:8080/login/callback")).when(oauthClient).getOauthLoginUrl(anyString());
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString(), anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
+
+        List<StoreSearchResult> searchResults = List.of(
+                new StoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점", "https://yapp.co.kr",
+                        "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
+                new StoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점", "http://yapp.kr",
+                        "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
+        );
+        doReturn(searchResults).when(mapClient).searchShops(anyString());
     }
 
     protected final RequestSpecification given() {

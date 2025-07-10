@@ -45,3 +45,6 @@ oauth:
   redirect-path: /callback
   allowed-origins:
     - "https://example.eat-da.com"
+
+kakao:
+  api-key: ablselfsgbwrlgrwrlhknwnkefknkwelfk
