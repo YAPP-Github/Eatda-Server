@@ -52,7 +52,7 @@ jobs:
       - name: Run Flyway migrations
         run: |
           flyway -url="jdbc:mysql://127.0.0.1:3306/testdb?allowPublicKeyRetrieval=true&useSSL=false" -user=${{ secrets.TEST_DB_USER }} -password=${{ secrets.TEST_DB_PASSWORD }} -locations=filesystem:src/main/resources/db/migration migrate
-              shell: bash
+        shell: bash
 
       - name: Dump database schema
         run: |
