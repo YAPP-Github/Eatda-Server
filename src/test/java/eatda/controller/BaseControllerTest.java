@@ -46,7 +46,7 @@ public class BaseControllerTest {
     protected MemberRepository memberRepository;
 
     @Autowired
-    private JwtManager jwtManager;
+    protected JwtManager jwtManager;
 
     @MockitoBean
     private OauthClient oauthClient;

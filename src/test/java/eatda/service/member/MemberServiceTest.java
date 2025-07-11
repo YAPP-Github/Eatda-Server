@@ -21,6 +21,35 @@ class MemberServiceTest extends BaseServiceTest {
     private MemberService memberService;
 
     @Nested
+    class GetMember {
+
+        @Test
+        void 회원_정보를_조회할_수_있다() {
+            Member member = memberGenerator.generateRegisteredMember("123", "abc@kakao.com", "nickname", "01012345678");
+
+            MemberResponse response = memberService.getMember(member.getId());
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(member.getId()),
+                    () -> assertThat(response.nickname()).isEqualTo(member.getNickname()),
+                    () -> assertThat(response.phoneNumber()).isEqualTo(member.getPhoneNumber()),
+                    () -> assertThat(response.optInMarketing()).isEqualTo(member.isOptInMarketing()),
+                    () -> assertThat(response.isSignUp()).isFalse()
+            );
+        }
+
+        @Test
+        void 존재하지_않는_회원의_정보를_조회하면_예외가_발생한다() {
+            long nonExistentMemberId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> memberService.getMember(nonExistentMemberId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MEMBER_ID);
+        }
+    }
+
+    @Nested
     class ValidateNickname {
 
         @Test
@@ -45,7 +74,7 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 중복된_닉네임이_있으면_예외가_발생한다() {
             memberGenerator.generate("123", "abc@kakao.com", "duplicate-nickname");
-            Member member = memberGenerator.generate("456", "def@kakao.com","another-nickname");
+            Member member = memberGenerator.generate("456", "def@kakao.com", "another-nickname");
             String newNickname = "duplicate-nickname";
 
             BusinessException exception = assertThrows(BusinessException.class,
@@ -60,8 +89,8 @@ class MemberServiceTest extends BaseServiceTest {
 
         @Test
         void 중복되지_않은_전화번호이면_예외가_발생하지_않는다() {
-            memberGenerator.generate("123", "abc@kakao.com","nickname");
-            Member member = memberGenerator.generate("456", "def@kakao.com","unique-nickname");
+            memberGenerator.generate("123", "abc@kakao.com", "nickname");
+            Member member = memberGenerator.generate("456", "def@kakao.com", "unique-nickname");
             String newPhoneNumber = "01012345678";
 
             assertThatCode(() -> memberService.validatePhoneNumber(newPhoneNumber, member.getId()))
@@ -80,7 +109,8 @@ class MemberServiceTest extends BaseServiceTest {
         @Test
         void 중복된_전화번호가_있으면_예외가_발생한다() {
             memberGenerator.generateRegisteredMember("nickname1", "abc@kakao.com", "123", "01012345678");
-            Member member = memberGenerator.generateRegisteredMember("nickname2", "def@kakao.com", "456", "01087654321");
+            Member member = memberGenerator.generateRegisteredMember("nickname2", "def@kakao.com", "456",
+                    "01087654321");
             String newPhoneNumber = "01012345678";
 
             BusinessException exception = assertThrows(BusinessException.class,

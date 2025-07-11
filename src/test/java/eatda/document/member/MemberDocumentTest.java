@@ -31,6 +31,62 @@ import org.springframework.http.HttpHeaders;
 public class MemberDocumentTest extends BaseDocumentTest {
 
     @Nested
+    class GetMember {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.MEMBER_API)
+                .summary("회원 정보 조회")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("id").type(NUMBER).description("회원 식별자"),
+                        fieldWithPath("email").type(STRING).description("회원 이메일"),
+                        fieldWithPath("isSignUp").type(BOOLEAN).description("회원 가입 요청 여부 (false 고정)"),
+                        fieldWithPath("nickname").type(STRING).description("회원 닉네임").optional(),
+                        fieldWithPath("phoneNumber").type(STRING).description("회원 전화번호 ex) 01012345678").optional(),
+                        fieldWithPath("optInMarketing").type(BOOLEAN).description("마케팅 동의 여부").optional()
+                );
+
+        @Test
+        void 회원_정보_조회_성공() {
+            MemberResponse response = new MemberResponse(1L, "abc@kakao.com", false, "test-nickname", "01012345678", true);
+            doReturn(response).when(memberService).getMember(anyLong());
+
+            var document = document("member/get", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/member")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class,
+                names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "INVALID_MEMBER_ID"})
+        @ParameterizedTest
+        void 회원_정보_조회_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(memberService).getMember(anyLong());
+
+            var document = document("member/get", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/member")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
+
+    @Nested
     class CheckNickname {
 
         RestDocsRequest requestDocument = request()

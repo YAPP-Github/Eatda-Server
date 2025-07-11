@@ -17,6 +17,12 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @GetMapping("/api/member")
+    public ResponseEntity<MemberResponse> getMember(LoginMember member) {
+        MemberResponse response = memberService.getMember(member.id());
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/api/member/nickname/check")
     public ResponseEntity<Void> checkNickname(LoginMember member, @RequestParam String nickname) {
         memberService.validateNickname(nickname, member.id());
