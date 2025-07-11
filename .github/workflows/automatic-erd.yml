@@ -66,7 +66,7 @@ jobs:
 
       - name: Install dbml-cli and renderer
         run: |
-          npm install -g @dbml/cli @dbml/renderer
+          npm install -g @dbml/cli
 
       - name: Convert SQL to DBML
         run: |
