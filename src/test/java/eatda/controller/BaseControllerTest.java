@@ -37,7 +37,7 @@ public class BaseControllerTest {
 
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
-            new OauthMemberInformation(314159248183772L, "nickname");
+            new OauthMemberInformation(314159248183772L, "constant@kakao.com", "nickname");
 
     @Autowired
     protected MemberGenerator memberGenerator;
