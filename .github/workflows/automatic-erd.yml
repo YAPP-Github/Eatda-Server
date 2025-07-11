@@ -2,9 +2,8 @@ name: ERD to GitHub Pages
 
 on:
   pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'src/main/resources/db/migration/**'
+    branches: [ "**" ]
+    paths: [ "**" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
