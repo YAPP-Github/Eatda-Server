@@ -21,6 +21,35 @@ class MemberServiceTest extends BaseServiceTest {
     private MemberService memberService;
 
     @Nested
+    class GetMember {
+
+        @Test
+        void 회원_정보를_조회할_수_있다() {
+            Member member = memberGenerator.generateRegisteredMember("123", "nickname", "01012345678");
+
+            MemberResponse response = memberService.getMember(member.getId());
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(member.getId()),
+                    () -> assertThat(response.nickname()).isEqualTo(member.getNickname()),
+                    () -> assertThat(response.phoneNumber()).isEqualTo(member.getPhoneNumber()),
+                    () -> assertThat(response.optInMarketing()).isEqualTo(member.isOptInMarketing()),
+                    () -> assertThat(response.isSignUp()).isFalse()
+            );
+        }
+
+        @Test
+        void 존재하지_않는_회원의_정보를_조회하면_예외가_발생한다() {
+            long nonExistentMemberId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> memberService.getMember(nonExistentMemberId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_MEMBER_ID);
+        }
+    }
+
+    @Nested
     class ValidateNickname {
 
         @Test

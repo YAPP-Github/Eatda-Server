@@ -17,6 +17,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
+    public MemberResponse getMember(long memberId) {
+        Member member = memberRepository.getById(memberId);
+        return new MemberResponse(member);
+    }
+
+    @Transactional(readOnly = true)
     public void validateNickname(String nickname, long memberId) {
         Member member = memberRepository.getById(memberId);
         validateNicknameNotDuplicate(member, nickname);
