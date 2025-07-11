@@ -64,21 +64,20 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dbml-cli and renderer
-        run: |
-          npm install -g @dbml/cli
+      - name: Install DBML Tools
+        run: npm install -g @dbml/cli @softwaretechnik/dbml-renderer
 
       - name: Convert SQL to DBML
         run: |
-          sql2dbml erd/schema.sql --mysql -o erd/schema.dbml
+          npx sql2dbml erd/schema.sql --mysql -o erd/schema.dbml
 
-      - name: Render ERD to PNG
+      - name: Render ERD to SVG
         run: |
-          dbml-render -i erd/schema.dbml -o erd/erd.png
+          npx dbml-renderer -i erd/schema.dbml -o erd/erd.svg
 
       - name: Generate HTML wrapper
         run: |
-          echo "<html><head><title>ERD Preview</title></head><body><h2>ERD Preview for PR #${{ github.event.pull_request.number }}</h2><img src='erd.png' style='max-width:100%;'/></body></html>" > erd/index.html
+          echo "<html><head><title>ERD Preview</title></head><body><h2>ERD Preview for PR #${{ github.event.pull_request.number }}</h2><img src='erd.svg' style='max-width:100%;'/></body></html>" > erd/index.html
 
       - name: Deploy ERD to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
