@@ -9,7 +9,7 @@ import eatda.domain.member.Member;
 public record OauthMemberInformation(long socialId, String email, String nickname) {
 
     public Member toMember() {
-        return new Member(Long.toString(socialId), nickname);
+        return new Member(Long.toString(socialId), email, nickname);
     }
 }
 

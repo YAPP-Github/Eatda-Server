@@ -27,7 +27,7 @@ class MemberControllerTest extends BaseControllerTest {
         @Test
         void 중복된_닉네임을_확인할_수_있다() {
             String existingNickname = "existing-nickname";
-            memberGenerator.generateRegisteredMember("123", existingNickname, "01012345678");
+            memberGenerator.generateRegisteredMember(existingNickname, "hij@kakao.com", "123", "01012345678");
 
             given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
@@ -54,7 +54,7 @@ class MemberControllerTest extends BaseControllerTest {
         @Test
         void 중복된_전화번호를_확인할_수_있다() {
             String existingPhoneNumber = "01012345678";
-            memberGenerator.generateRegisteredMember("123", "nickname", existingPhoneNumber);
+            memberGenerator.generateRegisteredMember("nickname", "hij@kakao.com", "123", existingPhoneNumber);
             given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .queryParam("phoneNumber", existingPhoneNumber)

@@ -87,12 +87,14 @@ public class BaseControllerTest {
     }
 
     protected final String accessToken() {
-        Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
+        Member member = memberGenerator.generateByEmail(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()),
+                "authAccessToken@example.com");
         return jwtManager.issueAccessToken(member.getId());
     }
 
     protected final String refreshToken() {
-        Member member = memberGenerator.generate(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()));
+        Member member = memberGenerator.generateByEmail(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()),
+                "authRefreshToken@example.com");
         return jwtManager.issueRefreshToken(member.getId());
     }
 
