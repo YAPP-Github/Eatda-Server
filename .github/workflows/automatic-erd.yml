@@ -64,8 +64,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dbml-cli
-        run: npm install -g @dbml/cli
+      - name: Install dbml-cli and renderer
+        run: |
+          npm install -g @dbml/cli @dbml/renderer
 
       - name: Convert SQL to DBML
         run: |
@@ -73,7 +74,7 @@ jobs:
 
       - name: Render ERD to PNG
         run: |
-          render -i erd/schema.dbml -o erd/erd.png
+          dbml-render -i erd/schema.dbml -o erd/erd.png
 
       - name: Generate HTML wrapper
         run: |
