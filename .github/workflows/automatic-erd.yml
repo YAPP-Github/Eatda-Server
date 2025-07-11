@@ -43,9 +43,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Download Flyway Command-line
+      - name: Download Flyway
         run: |
-          wget -qO- "https://download.red-gate.com/maven/release/org/flywaydb/flyway-commandline/10.13.0/flyway-commandline-10.13.0-linux-x64.tar.gz" | tar -xvz
+          curl -sSL "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.13.0/flyway-commandline-10.13.0-linux-x64.tar.gz" -o flyway.tar.gz
+          tar -xzf flyway.tar.gz
           echo "$(pwd)/flyway-10.13.0" >> $GITHUB_PATH
 
       - name: Run Flyway migrations
