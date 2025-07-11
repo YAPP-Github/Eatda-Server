@@ -73,7 +73,7 @@ jobs:
 
       - name: Render ERD to PNG
         run: |
-          dbml-renderer -i erd/schema.dbml -o erd/erd.png
+          run: render -i erd/schema.dbml -o erd/erd.png
 
       - name: Generate HTML wrapper
         run: |
