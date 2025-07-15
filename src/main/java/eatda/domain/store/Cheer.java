@@ -38,7 +38,7 @@ public class Cheer {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "image_key", nullable = false, length = 511)
+    @Column(name = "image_key", length = 511)
     private String imageKey;
 
     @Column(name = "is_admin", nullable = false)
