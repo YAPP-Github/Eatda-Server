@@ -24,3 +24,8 @@ VALUES (1, 1, 1, '정말 맛있어요! 강추합니다!', 'default.jpg', true),
        (5, 5, 5, '디저트가 정말 맛있어요!', 'default.jpg', true),
        (6, 6, 6, '커피가 정말 맛있어요!', 'default.jpg', false),
        (7, 7, 7, '패스트푸드가 빠르고 맛있어요!', 'default.jpg', false);
+
+INSERT INTO article (id, title, subtitle, article_url, image_key)
+VALUES (1, '첫 번째 기사', '서브타이틀 1', 'https://example.com/article1', 'default.jpg'),
+       (2, '두 번째 기사', '서브타이틀 2', 'https://example.com/article2', 'default.jpg'),
+       (3, '세 번째 기사', '서브타이틀 3', 'https://example.com/article3', 'default.jpg');
