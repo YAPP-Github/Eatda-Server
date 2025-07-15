@@ -22,6 +22,10 @@ public enum BusinessErrorCode {
     OUT_OF_SEOUL_LATITUDE_RANGE("STO010", "서비스 지역(서울)을 벗어난 위도 값입니다."),
     OUT_OF_SEOUL_LONGITUDE_RANGE("STO011", "서비스 지역(서울)을 벗어난 경도 값입니다."),
 
+    // Cheer
+    INVALID_CHEER_DESCRIPTION("CHE001", "응원 메시지는 필수입니다."),
+    INVALID_CHEER_IMAGE_KEY("CHE002", "응원 이미지 키가 비어 있습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // Map
     MAP_SERVER_ERROR("MAP001", "지도 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
