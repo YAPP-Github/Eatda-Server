@@ -47,10 +47,9 @@ public class Cheer {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public Cheer(Long id, Member member, Store store, String description, String imageKey) {
+    public Cheer(Member member, Store store, String description, String imageKey) {
         validateDescription(description);
         validateImageKey(imageKey);
-        this.id = id;
         this.member = member;
         this.store = store;
         this.description = description;

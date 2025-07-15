@@ -35,7 +35,7 @@ class CheerTest {
         @NullAndEmptySource
         void 설명이_비어있으면_안된다(String description) {
             BusinessException exception = assertThrows(BusinessException.class, () -> {
-                new Cheer(1L, DEFAULT_MEMBER, DEFAULT_STORE, description, "imageKey");
+                new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, description, "imageKey");
             });
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_CHEER_DESCRIPTION);
@@ -43,7 +43,7 @@ class CheerTest {
 
         @Test
         void 이미지_키는_null이_가능하다() {
-            assertThatCode(() -> new Cheer(1L, DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", null))
+            assertThatCode(() -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", null))
                     .doesNotThrowAnyException();
         }
 
@@ -51,7 +51,7 @@ class CheerTest {
         @ValueSource(strings = {"", " ", "\t\n"})
         void 이미지_키는_비어있으면_안된다(String imageKey) {
             BusinessException exception = assertThrows(BusinessException.class, () -> {
-                new Cheer(1L, DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", "");
+                new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", imageKey);
             });
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_CHEER_IMAGE_KEY);
