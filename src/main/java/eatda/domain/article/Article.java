@@ -1,12 +1,12 @@
 package eatda.domain.article;
 
+import eatda.domain.AuditingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Article {
+public class Article extends AuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,14 +33,10 @@ public class Article {
     @Column(name = "image_key", nullable = false, length = 511)
     private String imageKey;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     public Article(String title, String subtitle, String articleUrl, String imageKey) {
         this.title = title;
         this.subtitle = subtitle;
         this.articleUrl = articleUrl;
         this.imageKey = imageKey;
-        this.createdAt = LocalDateTime.now();
     }
 }

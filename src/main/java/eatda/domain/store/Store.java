@@ -1,5 +1,6 @@
 package eatda.domain.store;
 
+import eatda.domain.AuditingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Store {
+public class Store extends AuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,9 +51,6 @@ public class Store {
     @Embedded
     private Coordinates coordinates;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @Builder
     private Store(String kakaoId,
                   StoreCategory category,
@@ -71,6 +69,5 @@ public class Store {
         this.roadAddress = roadAddress;
         this.lotNumberAddress = lotNumberAddress;
         this.coordinates = new Coordinates(latitude, longitude);
-        this.createdAt = LocalDateTime.now();
     }
 }

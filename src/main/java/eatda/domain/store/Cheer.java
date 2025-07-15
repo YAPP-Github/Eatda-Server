@@ -1,5 +1,6 @@
 package eatda.domain.store;
 
+import eatda.domain.AuditingEntity;
 import eatda.domain.member.Member;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cheer {
+public class Cheer extends AuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,9 +45,6 @@ public class Cheer {
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     public Cheer(Member member, Store store, String description, String imageKey) {
         validateDescription(description);
         validateImageKey(imageKey);
@@ -56,7 +54,6 @@ public class Cheer {
         this.imageKey = imageKey;
 
         this.isAdmin = false;
-        this.createdAt = LocalDateTime.now();
     }
 
     private void validateDescription(String description) {

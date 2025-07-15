@@ -1,5 +1,6 @@
 package eatda.domain.member;
 
+import eatda.domain.AuditingEntity;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.annotation.Nullable;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends AuditingEntity {
 
     private static final String EMAIL_REGEX = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
 
@@ -42,16 +43,12 @@ public class Member {
     @Column(name = "opt_in_marketing")
     private Boolean optInMarketing;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     public Member(String socialId, String email, String nickname) {
         validateSocialId(socialId);
         validateEmail(email);
         this.socialId = socialId;
         this.email = email;
         this.nickname = nickname;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Member(
