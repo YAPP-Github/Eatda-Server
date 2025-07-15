@@ -1,51 +1,52 @@
-CREATE TABLE `store`
-(
-    `id`            BIGINT       NOT NULL AUTO_INCREMENT,
-    `name`          VARCHAR(255) NOT NULL,
-    `category`      VARCHAR(255) NOT NULL,
-    `introduction`  TEXT         NOT NULL,
-    `phone_number`  VARCHAR(255) NOT NULL COMMENT '(`-` 없이)',
-    `interest_area` VARCHAR(50)  NOT NULL COMMENT '(서울시 25개 구, Java Enum 이름으로 저장: ex, GANGNAM)',
-    `address`       VARCHAR(255) NOT NULL COMMENT '(전체주소)',
-    `latitude`      DOUBLE       NOT NULL,
-    `longitude`     DOUBLE       NOT NULL,
-    `open_time`     TIME         NOT NULL,
-    `close_time`    TIME         NOT NULL,
-    `image_url`     VARCHAR(511) NULL,
-    PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `member`
 (
     `id`               BIGINT       NOT NULL AUTO_INCREMENT,
-    `email`            VARCHAR(255) NOT NULL,
-    `social_id`        VARCHAR(255) NOT NULL,
+    `email`            VARCHAR(255) NOT NULL UNIQUE,
+    `social_id`        VARCHAR(255) NOT NULL UNIQUE,
     `nickname`         VARCHAR(255) NULL,
-    `phone_number`     VARCHAR(255) NULL COMMENT '(`-` 없이))',
-    `opt_in_marketing` BOOLEAN      NULL DEFAULT true,
+    `phone_number`     VARCHAR(255) NULL,
+    `opt_in_marketing` BOOLEAN      NULL,
+    `created_at`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `bookmark`
+CREATE TABLE `store`
 (
-    `id`        BIGINT NOT NULL AUTO_INCREMENT,
-    `member_id` BIGINT NOT NULL,
-    `store_id`  BIGINT NOT NULL,
+    `id`                 BIGINT       NOT NULL AUTO_INCREMENT,
+    `kakao_id`           VARCHAR(255) NOT NULL UNIQUE,
+    `category`           VARCHAR(50)  NOT NULL,
+    `phone_number`       VARCHAR(255) NOT NULL,
+    `name`               VARCHAR(255) NOT NULL,
+    `place_url`          VARCHAR(255) NOT NULL,
+    `road_address`       VARCHAR(255) NOT NULL,
+    `lot_number_address` VARCHAR(255) NOT NULL,
+    `latitude` DOUBLE NOT NULL,
+    `longitude` DOUBLE NOT NULL,
+    `created_at`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `cheer`
+(
+    `id`          BIGINT    NOT NULL AUTO_INCREMENT,
+    `member_id`   BIGINT    NOT NULL,
+    `store_id`    BIGINT    NOT NULL,
+    `description` TEXT      NOT NULL,
+    `image_key`   VARCHAR(511) NULL,
+    `is_admin`    BOOLEAN   NOT NULL DEFAULT FALSE,
+    `created_at`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_member_store` (`member_id`, `store_id`)
+    FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`store_id`) REFERENCES `store` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE `menu`
+CREATE TABLE `article`
 (
-    `id`             BIGINT       NOT NULL AUTO_INCREMENT,
-    `store_id`       BIGINT       NOT NULL,
-    `name`           VARCHAR(255) NOT NULL,
-    `description`    VARCHAR(255) NULL,
-    `price`          INTEGER      NOT NULL,
-    `discount_price` INTEGER      NULL,
-    `start_time`     DATETIME     NULL,
-    `end_time`       DATETIME     NULL,
-    `image_url`      VARCHAR(511) NULL,
+    `id`          BIGINT       NOT NULL AUTO_INCREMENT,
+    `title`       VARCHAR(255) NOT NULL,
+    `subtitle`    VARCHAR(255) NOT NULL,
+    `article_url` VARCHAR(511) NOT NULL,
+    `image_key`   VARCHAR(511) NOT NULL,
+    `created_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 );
-
