@@ -1,4 +1,4 @@
-package eatda.enums;
+package eatda.domain.store;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;

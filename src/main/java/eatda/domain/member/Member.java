@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,12 +42,16 @@ public class Member {
     @Column(name = "opt_in_marketing")
     private Boolean optInMarketing;
 
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     public Member(String socialId, String email, String nickname) {
         validateSocialId(socialId);
         validateEmail(email);
         this.socialId = socialId;
         this.email = email;
         this.nickname = nickname;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Member(

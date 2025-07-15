@@ -1,9 +1,5 @@
 package eatda.domain.store;
 
-import eatda.enums.InterestArea;
-import eatda.enums.StoreCategory;
-import eatda.exception.BusinessErrorCode;
-import eatda.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -13,8 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,75 +25,52 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "kakao_id", unique = true, nullable = false)
+    private String kakaoId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     private StoreCategory category;
 
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "place_url", nullable = false)
+    private String placeUrl;
+
+    @Column(name = "road_address", nullable = false)
+    private String roadAddress;
+
+    @Column(name = "lot_number_address", nullable = false)
+    private String lotNumberAddress;
+
     @Embedded
     private Coordinates coordinates;
 
-    @Column(name = "address", nullable = false)
-    private String address;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Embedded
-    private StorePhoneNumber storePhoneNumber;
-
-    @Column(name = "image_url")
-    private String imageUrl;
-
-    @Embedded
-    private StoreHours storeHours;
-
-    @Column(name = "introduction")
-    private String introduction;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "interest_area", nullable = false)
-    private InterestArea interestArea;
-
-    //TODO 빌더 패턴으로 변경 합의, 다음 도메인 수정시 반영 필요
-
-    public Store(
-            String name,
-            String category,
-            String address,
-            Double latitude,
-            Double longitude,
-            String phoneNumber,
-            String imageUrl,
-            LocalTime openTime,
-            LocalTime closeTime,
-            String introduction,
-            String interestArea
-    ) {
-
-        validateName(name);
-        validateAddress(address);
-
+    @Builder
+    private Store(String kakaoId,
+                  StoreCategory category,
+                  String phoneNumber,
+                  String name,
+                  String placeUrl,
+                  String roadAddress,
+                  String lotNumberAddress,
+                  Double latitude,
+                  Double longitude) {
+        this.kakaoId = kakaoId;
+        this.category = category;
+        this.phoneNumber = phoneNumber;
         this.name = name;
-        this.address = address;
-        this.imageUrl = imageUrl;
-        this.introduction = introduction;
-
-        this.category = StoreCategory.from(category);
-        this.interestArea = InterestArea.from(interestArea);
+        this.placeUrl = placeUrl;
+        this.roadAddress = roadAddress;
+        this.lotNumberAddress = lotNumberAddress;
         this.coordinates = new Coordinates(latitude, longitude);
-        this.storePhoneNumber = new StorePhoneNumber(phoneNumber);
-        this.storeHours = new StoreHours(openTime, closeTime);
-    }
-
-    private void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_NAME);
-        }
-    }
-
-    private void validateAddress(String address) {
-        if (address == null || address.trim().isEmpty()) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORE_ADDRESS);
-        }
+        this.createdAt = LocalDateTime.now();
     }
 }
