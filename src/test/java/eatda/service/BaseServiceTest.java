@@ -5,6 +5,9 @@ import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
 import eatda.fixture.MemberGenerator;
 import eatda.repository.member.MemberRepository;
+import eatda.repository.story.StoryRepository;
+import eatda.service.common.ImageService;
+import eatda.service.store.StoreService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,4 +28,13 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected MemberRepository memberRepository;
+
+    @MockitoBean
+    protected StoreService storeService;
+
+    @MockitoBean
+    protected ImageService imageService;
+
+    @MockitoBean
+    protected StoryRepository storyRepository;
 }
