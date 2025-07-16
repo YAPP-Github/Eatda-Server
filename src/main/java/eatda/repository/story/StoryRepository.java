@@ -14,6 +14,6 @@ public interface StoryRepository extends Repository<Story, Long> {
 
     default Story getById(Long id) {
         return findById(id)
-                .orElseThrow(() -> new BusinessException(BusinessErrorCode.INVALID_STORE_ID));
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORY_NOT_FOUND));
     }
 }
