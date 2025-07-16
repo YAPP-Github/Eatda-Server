@@ -81,7 +81,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
             byte[] imageBytes = "dummy image content".getBytes(StandardCharsets.UTF_8);
 
-            doThrow(new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE))
+            doThrow(new BusinessException(BusinessErrorCode.INVALID_STORY_DESCRIPTION))
                     .when(storyService)
                     .registerStory(any(), any(), any());
 

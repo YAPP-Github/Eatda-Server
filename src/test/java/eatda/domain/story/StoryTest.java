@@ -154,7 +154,7 @@ class StoryTest {
                             .imageKey(" ")
                             .build()
             ).isInstanceOf(BusinessException.class)
-                    .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_URL.getMessage());
+                    .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_KEY.getMessage());
         }
     }
 }
