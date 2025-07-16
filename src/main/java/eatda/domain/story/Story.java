@@ -123,7 +123,7 @@ public class Story extends AuditingEntity {
 
     private void validateImage(String imageKey) {
         if (imageKey == null || imageKey.isBlank()) {
-            throw new BusinessException(BusinessErrorCode.INVALID_STORY_IMAGE_URL);
+            throw new BusinessException(BusinessErrorCode.INVALID_STORY_IMAGE_KEY);
         }
     }
 }
