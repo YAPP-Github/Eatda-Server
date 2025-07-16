@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,11 +20,11 @@ public class StoryController {
 
     @PostMapping("/api/stories")
     public ResponseEntity<Void> registerStory(
-            @ModelAttribute StoryRegisterRequest request,
-            @RequestPart MultipartFile image,
+            @RequestPart("request") StoryRegisterRequest request,
+            @RequestPart("image") MultipartFile image,
             LoginMember member
     ) {
-
+        storyService.registerStory(request, image, member.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
