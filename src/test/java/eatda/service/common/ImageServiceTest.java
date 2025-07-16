@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class ImageServiceTest {
 
         @ParameterizedTest
         @EnumSource(ImageDomain.class)
-        void 허용된_이미지_타입이면_정상적으로_업로드되고_생성된_Key를_반환한다(ImageDomain imageDomain) throws IOException { // imageDomain 파라미터 추가
+        void 허용된_이미지_타입이면_정상적으로_업로드되고_생성된_Key를_반환한다(ImageDomain imageDomain) {
             String originalFilename = "test-image.jpg";
             String contentType = "image/jpeg";
 
