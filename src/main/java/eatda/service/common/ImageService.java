@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 public class ImageService {
 
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpg", "image/jpeg", "image/png");
+    private static final String DEFAULT_CONTENT_TYPE = "bin";
     private static final String PATH_DELIMITER = "/";
     private static final String EXTENSION_DELIMITER = ".";
     private static final Duration PRESIGNED_URL_DURATION = Duration.ofMinutes(30);
@@ -66,7 +67,7 @@ public class ImageService {
 
     private String getExtension(String filename) {
         if (filename == null || filename.lastIndexOf(EXTENSION_DELIMITER) == -1 || filename.startsWith(EXTENSION_DELIMITER)) {
-            return "bin";
+            return DEFAULT_CONTENT_TYPE;
         }
         return filename.substring(filename.lastIndexOf(EXTENSION_DELIMITER) + 1);
     }
