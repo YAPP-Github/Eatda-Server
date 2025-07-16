@@ -38,11 +38,11 @@ public class ImageService {
         this.s3Presigner = s3Presigner;
     }
 
-    public String upload(MultipartFile file, String domain) {
+    public String upload(MultipartFile file, ImageDomain domain) {
         validateContentType(file);
         String extension = getExtension(file.getOriginalFilename());
         String uuid = UUID.randomUUID().toString();
-        String key = domain + PATH_DELIMITER + uuid + EXTENSION_DELIMITER + extension;
+        String key = domain.getName() + PATH_DELIMITER + uuid + EXTENSION_DELIMITER + extension;
 
         try {
             PutObjectRequest request = PutObjectRequest.builder()
