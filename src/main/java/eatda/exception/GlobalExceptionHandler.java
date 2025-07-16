@@ -79,6 +79,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
+        log.error("[BusinessException] handled: {}", exception.getErrorCode());
         ErrorResponse response = new ErrorResponse(exception.getErrorCode());
         return ResponseEntity.status(exception.getStatus())
                 .body(response);
