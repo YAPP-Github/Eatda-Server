@@ -4,7 +4,8 @@ public enum Tag {
 
     AUTH_API("Auth API"),
     MEMBER_API("Member API"),
-    STORE_API("Store API"),;
+    STORE_API("Store API"),
+    STORY_API("Story API");
 
     private final String displayName;
 
