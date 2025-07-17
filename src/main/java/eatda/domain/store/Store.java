@@ -72,10 +72,18 @@ public class Store extends AuditingEntity {
     }
 
     public String getAddressDistrict() {
-        return lotNumberAddress.split(" ")[1];
+        String[] addressParts = lotNumberAddress.split(" ");
+        if (addressParts.length < 2) {
+            return "";
+        }
+        return addressParts[1];
     }
 
     public String getAddressNeighborhood() {
-        return lotNumberAddress.split(" ")[2];
+        String[] addressParts = lotNumberAddress.split(" ");
+        if (addressParts.length < 3) {
+            return "";
+        }
+        return addressParts[2];
     }
 }

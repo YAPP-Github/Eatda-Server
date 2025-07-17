@@ -25,7 +25,7 @@ class StoreTest {
         void 주소_구_정보를_지번_주소에서_반환한다() {
             Store store = DEFAULT_BUILDER
                     .lotNumberAddress("서울특별시 성북구 석관동 123-45")
-                    .build();;
+                    .build();
 
             String actual = store.getAddressDistrict();
 
