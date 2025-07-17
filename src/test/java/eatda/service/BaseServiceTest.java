@@ -35,6 +35,6 @@ public abstract class BaseServiceTest {
     @MockitoBean
     protected ImageService imageService;
 
-    @MockitoBean
+    @Autowired
     protected StoryRepository storyRepository;
 }
