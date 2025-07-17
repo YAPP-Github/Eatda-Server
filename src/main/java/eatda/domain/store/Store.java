@@ -70,4 +70,12 @@ public class Store extends AuditingEntity {
         this.lotNumberAddress = lotNumberAddress;
         this.coordinates = new Coordinates(latitude, longitude);
     }
+
+    public String getAddressDistrict() {
+        return lotNumberAddress.split(" ")[1];
+    }
+
+    public String getAddressNeighborhood() {
+        return lotNumberAddress.split(" ")[2];
+    }
 }
