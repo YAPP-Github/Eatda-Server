@@ -11,7 +11,7 @@ public class StoreGenerator {
     private static final StoreCategory DEFAULT_CATEGORY = StoreCategory.OTHER;
     private static final String DEFAULT_PHONE_NUMBER = "010-1234-5678";
     private static final String DEFAULT_NAME = "가게 이름";
-    private static final String DEFAULT_PALCE_URL = "https://place.kakao.com/123456789";
+    private static final String DEFAULT_PLACE_URL = "https://place.kakao.com/123456789";
     private static final String DEFAULT_ROAD_ADDRESS = "";
 
     private static final double DEFAULT_LATITUDE = 37.5665; // Default latitude for Seoul
@@ -29,7 +29,7 @@ public class StoreGenerator {
                 .category(DEFAULT_CATEGORY)
                 .phoneNumber(DEFAULT_PHONE_NUMBER)
                 .name(DEFAULT_NAME)
-                .placeUrl(DEFAULT_PALCE_URL)
+                .placeUrl(DEFAULT_PLACE_URL)
                 .roadAddress(DEFAULT_ROAD_ADDRESS)
                 .lotNumberAddress(lotNumberAddress)
                 .latitude(DEFAULT_LATITUDE)
