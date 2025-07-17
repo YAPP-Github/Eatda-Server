@@ -1,5 +1,6 @@
 package eatda.service.story;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doReturn;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.domain.member.Member;
+import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
@@ -56,6 +58,57 @@ public class StoryServiceTest extends BaseServiceTest {
             assertThatThrownBy(() -> storyService.registerStory(request, image, member.getId()))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining(BusinessErrorCode.STORE_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class GetPagedStoryPreviews extends BaseServiceTest {
+
+        private StoryService storyService;
+
+        @BeforeEach
+        void setUp() {
+            storyService = new StoryService(storeService, imageService, storyRepository, memberRepository);
+        }
+
+        @Test
+        void 스토리_목록을_조회할_수_있다() {
+            Member member = memberGenerator.generate("12345");
+
+            Story story1 = Story.builder()
+                    .member(member)
+                    .storeKakaoId("1")
+                    .storeName("곱창집")
+                    .storeAddress("서울시")
+                    .storeCategory("한식")
+                    .description("미쳤다 진짜")
+                    .imageKey("image-key-1")
+                    .build();
+
+            Story story2 = Story.builder()
+                    .member(member)
+                    .storeKakaoId("2")
+                    .storeName("순대국밥집")
+                    .storeAddress("부산시")
+                    .storeCategory("한식")
+                    .description("뜨끈한 국밥 최고")
+                    .imageKey("image-key-2")
+                    .build();
+
+            storyRepository.saveAll(List.of(story1, story2));
+
+            when(imageService.getPresignedUrl("image-key-1")).thenReturn("https://s3.com/story1.jpg");
+            when(imageService.getPresignedUrl("image-key-2")).thenReturn("https://s3.com/story2.jpg");
+
+            var response = storyService.getPagedStoryPreviews();
+
+            assertThat(response.stories()).hasSize(2);
+            assertThat(response.stories())
+                    .extracting("imageUrl")
+                    .containsExactly(
+                            "https://s3.com/story2.jpg",
+                            "https://s3.com/story1.jpg"
+                    );
         }
     }
 }

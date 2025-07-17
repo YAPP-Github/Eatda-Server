@@ -5,7 +5,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
+import eatda.controller.story.StoriesResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -16,6 +18,7 @@ import eatda.exception.EtcErrorCode;
 import eatda.service.common.ImageDomain;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -127,10 +130,49 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .multiPart("image", "image.txt", invalidImage, "text/plain")
                     .when().post("/api/stories");
 
-            System.out.println("응답 상태코드 >>> " + response.statusCode());
-            System.out.println("응답 바디 >>> " + response.asString());
-
             response.then().statusCode(BusinessErrorCode.INVALID_IMAGE_TYPE.getStatus().value());
+        }
+    }
+
+    @Nested
+    class GetStories {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORY_API)
+                .summary("스토리 목록 조회")
+                .description("스토리 목록을 페이지네이션하여 조회합니다.")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("stories").description("스토리 프리뷰 리스트"),
+                        fieldWithPath("stories[].storyId").description("스토리 ID"),
+                        fieldWithPath("stories[].imageUrl").description("스토리 이미지 URL")
+                );
+
+        @Test
+        void 스토리_목록_조회_성공() {
+            StoriesResponse mockResponse = new StoriesResponse(List.of(
+                    new StoriesResponse.StoryPreview(1L, "https://dummy-s3.com/story1.png"),
+                    new StoriesResponse.StoryPreview(2L, "https://dummy-s3.com/story2.png")
+            ));
+
+            doReturn(mockResponse)
+                    .when(storyService)
+                    .getPagedStoryPreviews();
+
+            RestDocumentationFilter document = document("story/get-stories", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            Response response = given(document)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/stories");
+
+            response.then().statusCode(200);
         }
     }
 }
