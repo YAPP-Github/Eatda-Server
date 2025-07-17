@@ -51,7 +51,7 @@ public class Story extends AuditingEntity {
     private String imageKey;
 
     @Builder
-    public Story(
+    private Story(
             Member member,
             String storeKakaoId,
             String storeName,
