@@ -10,13 +10,14 @@ import static org.mockito.Mockito.when;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,23 +50,26 @@ class ImageServiceTest {
     @Nested
     class FileUpload {
 
-        @Test
-        void 허용된_이미지_타입이면_정상적으로_업로드되고_생성된_Key를_반환한다() throws IOException {
+        @ParameterizedTest
+        @EnumSource(ImageDomain.class)
+        void 허용된_이미지_타입이면_정상적으로_업로드되고_생성된_Key를_반환한다(ImageDomain imageDomain) {
             String originalFilename = "test-image.jpg";
             String contentType = "image/jpeg";
-            String domain = "stores";
+
             MockMultipartFile file = new MockMultipartFile(
                     "image", originalFilename, contentType, "image-content".getBytes()
             );
 
-            String key = imageService.upload(file, domain);
+            String key = imageService.upload(file, imageDomain);
 
             ArgumentCaptor<PutObjectRequest> putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(putObjectRequestCaptor.capture(), any(RequestBody.class));
             PutObjectRequest capturedRequest = putObjectRequestCaptor.getValue();
 
+            String expectedPattern = imageDomain.getName() + "/[a-f0-9\\-]{36}\\.jpg";
+
             assertAll(
-                    () -> assertThat(key).matches(domain + "/[a-f0-9\\-]{36}\\.jpg"),
+                    () -> assertThat(key).matches(expectedPattern),
                     () -> assertThat(capturedRequest.key()).isEqualTo(key),
                     () -> assertThat(capturedRequest.bucket()).isEqualTo(TEST_BUCKET),
                     () -> assertThat(capturedRequest.contentType()).isEqualTo(contentType)
@@ -79,7 +83,7 @@ class ImageServiceTest {
             );
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> imageService.upload(file, "etc"));
+                    () -> imageService.upload(file, ImageDomain.STORY));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_IMAGE_TYPE);
         }

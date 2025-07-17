@@ -13,6 +13,8 @@ import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.member.Member;
 import eatda.fixture.MemberGenerator;
 import eatda.repository.member.MemberRepository;
+import eatda.service.common.ImageService;
+import eatda.service.story.StoryService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
@@ -53,6 +55,12 @@ public class BaseControllerTest {
 
     @MockitoBean
     private MapClient mapClient;
+
+    @MockitoBean
+    protected StoryService storyService;
+
+    @MockitoBean
+    protected ImageService imageService;
 
     @LocalServerPort
     private int port;

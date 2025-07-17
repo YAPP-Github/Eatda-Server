@@ -19,4 +19,9 @@ public class StoreService {
         List<StoreSearchResult> filteredResults = storeSearchFilter.filterSearchedStores(searchResults);
         return StoreSearchResponses.from(filteredResults);
     }
+
+    public List<StoreSearchResult> searchStoreResults(String query) {
+        List<StoreSearchResult> searchResults = mapClient.searchShops(query);
+        return storeSearchFilter.filterSearchedStores(searchResults);
+    }
 }
