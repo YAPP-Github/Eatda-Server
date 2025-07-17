@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,6 +53,11 @@ public class Cheer extends AuditingEntity {
         this.imageKey = imageKey;
 
         this.isAdmin = false;
+    }
+
+    public Cheer(Member member, Store store, String description, String imageKey, boolean isAdmin) {
+        this(member, store, description, imageKey);
+        this.isAdmin = isAdmin;
     }
 
     private void validateDescription(String description) {
