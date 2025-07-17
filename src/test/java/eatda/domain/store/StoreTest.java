@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 class StoreTest {
 
-    private static Store.StoreBuilder DEFAULT_BUILDER = Store.builder()
+    private static final Store.StoreBuilder DEFAULT_BUILDER = Store.builder()
             .kakaoId("123456789")
             .category(StoreCategory.OTHER)
             .phoneNumber("010-1234-5678")
