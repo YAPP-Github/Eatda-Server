@@ -33,7 +33,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .tag(Tag.STORE_API)
                 .summary("최신 응원 검색")
                 .queryParameter(
-                        parameterWithName("size").description("조회 개수")
+                        parameterWithName("size").description("조회 개수 (최소 1, 최대 50)")
                 );
 
         RestDocsResponse responseDocument = response()
