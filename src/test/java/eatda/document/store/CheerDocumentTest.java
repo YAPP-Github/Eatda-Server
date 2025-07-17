@@ -78,7 +78,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
             int size = 2;
             doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(anyInt());
 
-            var document = document("cheer/get-many", 200)
+            var document = document("cheer/get-many", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
