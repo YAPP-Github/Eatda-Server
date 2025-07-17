@@ -5,7 +5,7 @@ import eatda.domain.store.Store;
 
 public record CheerPreviewResponse(
         long storeId,
-        String storeImageUrl,
+        String imageUrl,
         String storeName,
         String storeDistrict,
         String storeNeighborhood,
@@ -14,10 +14,10 @@ public record CheerPreviewResponse(
         String cheerDescription
 ) {
 
-    public CheerPreviewResponse(Cheer cheer, Store store, String storeImageUrl) {
+    public CheerPreviewResponse(Cheer cheer, Store store, String imageUrl) {
         this(
                 store.getId(),
-                storeImageUrl,
+                imageUrl,
                 store.getName(),
                 store.getAddressDistrict(),
                 store.getAddressNeighborhood(),

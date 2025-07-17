@@ -8,6 +8,7 @@ import eatda.controller.web.jwt.JwtManager;
 import eatda.exception.BusinessErrorCode;
 import eatda.service.auth.AuthService;
 import eatda.service.member.MemberService;
+import eatda.service.store.CheerService;
 import eatda.service.store.StoreService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -42,6 +43,8 @@ public abstract class BaseDocumentTest {
     protected MemberService memberService;
     @MockitoBean
     protected StoreService storeService;
+    @MockitoBean
+    protected CheerService cheerService;
     @MockitoBean
     protected JwtManager jwtManager;
     @LocalServerPort

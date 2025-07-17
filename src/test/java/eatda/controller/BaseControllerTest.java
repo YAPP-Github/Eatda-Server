@@ -1,5 +1,6 @@
 package eatda.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
@@ -11,8 +12,13 @@ import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.member.Member;
+import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
+import eatda.fixture.StoreGenerator;
 import eatda.repository.member.MemberRepository;
+import eatda.repository.store.CheerRepository;
+import eatda.repository.store.StoreRepository;
+import eatda.service.common.ImageService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
@@ -38,12 +44,27 @@ public class BaseControllerTest {
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
             new OauthMemberInformation(314159248183772L, "constant@kakao.com", "nickname");
+    private static final String MOCKED_IMAGE_KEY = "mocked-image-path";
+    private static final String MOCKED_IMAGE_URL = "https://example.com/image.jpg";
+
 
     @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
+    protected StoreGenerator storeGenerator;
+
+    @Autowired
+    protected CheerGenerator cheerGenerator;
+
+    @Autowired
     protected MemberRepository memberRepository;
+
+    @Autowired
+    protected StoreRepository storeRepository;
+
+    @Autowired
+    protected CheerRepository cheerRepository;
 
     @Autowired
     protected JwtManager jwtManager;
@@ -53,6 +74,9 @@ public class BaseControllerTest {
 
     @MockitoBean
     private MapClient mapClient;
+
+    @MockitoBean
+    private ImageService imageService;
 
     @LocalServerPort
     private int port;
@@ -80,6 +104,9 @@ public class BaseControllerTest {
                         "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
         );
         doReturn(searchResults).when(mapClient).searchShops(anyString());
+
+        doReturn(MOCKED_IMAGE_URL).when(imageService).getPresignedUrl(anyString());
+        doReturn(MOCKED_IMAGE_KEY).when(imageService).upload(any(), any());
     }
 
     protected final RequestSpecification given() {

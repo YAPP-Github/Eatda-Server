@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -65,13 +66,20 @@ public class ImageService {
     }
 
     private String getExtension(String filename) {
-        if (filename == null || filename.lastIndexOf(EXTENSION_DELIMITER) == -1 || filename.startsWith(EXTENSION_DELIMITER)) {
+        if (filename == null
+                || filename.lastIndexOf(EXTENSION_DELIMITER) == -1
+                || filename.startsWith(EXTENSION_DELIMITER)) {
             return "bin";
         }
         return filename.substring(filename.lastIndexOf(EXTENSION_DELIMITER) + 1);
     }
 
-    public String getPresignedUrl(String key) {
+    @Nullable
+    public String getPresignedUrl(@Nullable String key) {
+        if (key == null) {
+            return null;
+        }
+
         try {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
