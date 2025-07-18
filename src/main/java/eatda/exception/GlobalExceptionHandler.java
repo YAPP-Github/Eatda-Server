@@ -86,6 +86,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
+        log.error("[BusinessException] handled: {}", exception.getErrorCode());
         ErrorResponse response = new ErrorResponse(exception.getErrorCode());
         return ResponseEntity.status(exception.getStatus())
                 .body(response);
@@ -93,7 +94,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-        log.error("Unhandled exception occurred: {}", exception.getMessage(), exception);
+        log.error("[Unhandled Exception] {}: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
         return toErrorResponse(EtcErrorCode.INTERNAL_SERVER_ERROR);
     }
 

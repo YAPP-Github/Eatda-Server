@@ -15,6 +15,9 @@ import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.service.common.ImageService;
 import org.junit.jupiter.api.BeforeEach;
+import eatda.repository.story.StoryRepository;
+import eatda.service.common.ImageService;
+import eatda.service.store.StoreService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,10 +34,10 @@ public abstract class BaseServiceTest {
     protected OauthClient oauthClient;
 
     @MockitoBean
-    protected ImageService imageService;
+    protected MapClient mapClient;
 
     @MockitoBean
-    protected MapClient mapClient;
+    protected ImageService imageService;
 
     @Autowired
     protected MemberGenerator memberGenerator;

@@ -6,10 +6,13 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 
 import eatda.controller.web.jwt.JwtManager;
 import eatda.exception.BusinessErrorCode;
+import eatda.exception.EtcErrorCode;
 import eatda.service.auth.AuthService;
+import eatda.service.common.ImageService;
 import eatda.service.member.MemberService;
 import eatda.service.store.CheerService;
 import eatda.service.store.StoreService;
+import eatda.service.story.StoryService;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -39,14 +42,24 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected AuthService authService;
+
     @MockitoBean
     protected MemberService memberService;
+
     @MockitoBean
     protected StoreService storeService;
+
+    @MockitoBean
+    protected StoryService storyService;
+
+    @MockitoBean
+    protected ImageService imageService;
+
     @MockitoBean
     protected CheerService cheerService;
     @MockitoBean
     protected JwtManager jwtManager;
+
     @LocalServerPort
     private int port;
 
@@ -89,6 +102,10 @@ public abstract class BaseDocumentTest {
     protected final RequestSpecification given(RestDocumentationFilter documentationFilter) {
         return RestAssured.given(spec)
                 .filter(documentationFilter);
+    }
+
+    protected final RestDocsFilterBuilder document(String identifierPrefix, EtcErrorCode errorCode) {
+        return new RestDocsFilterBuilder(identifierPrefix, errorCode.name());
     }
 
     protected final String accessToken() {

@@ -21,6 +21,7 @@ public enum BusinessErrorCode {
     INVALID_STORE_COORDINATES_NULL("STO007", "좌표 값은 필수입니다."),
     OUT_OF_SEOUL_LATITUDE_RANGE("STO010", "서비스 지역(서울)을 벗어난 위도 값입니다."),
     OUT_OF_SEOUL_LONGITUDE_RANGE("STO011", "서비스 지역(서울)을 벗어난 경도 값입니다."),
+    STORE_NOT_FOUND("ST0012", "해당 가게 정보를 찾을수 없습니다."),
 
     // Cheer
     INVALID_CHEER_DESCRIPTION("CHE001", "응원 메시지는 필수입니다."),
@@ -40,7 +41,17 @@ public enum BusinessErrorCode {
     FILE_UPLOAD_FAILED("SERVER002", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_URL_GENERATION_FAILED("SERVER003", "파일 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     PRESIGNED_URL_GENERATION_FAILED("SERVER004", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    ;
+
+    //story
+    INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 필수입니다."),
+    INVALID_STORY_IMAGE_KEY("STY002", "스토리 이미지 Key는 필수입니다."),
+    STORY_MEMBER_REQUIRED("STY003", "스토리 작성 시 회원 정보는 필수입니다."),
+    STORY_STORE_REQUIRED("STY004", "스토리 작성 시 가게 정보는 필수입니다."),
+    STORY_NOT_FOUND("STY005", "스토리를 찾을 수 없습니다."),
+    INVALID_STORE_ID("STY006", "유효하지 않은 가게 ID입니다."),
+    INVALID_STORE_KAKAO_ID("STY007", "스토어 Kakao ID는 필수입니다."),
+    INVALID_STORE_NAME("STY008", "스토어 이름은 필수입니다."),
+    INVALID_STORE_ADDRESS("STY009", "스토어 주소는 필수입니다.");
 
     private final String code;
     private final String message;
