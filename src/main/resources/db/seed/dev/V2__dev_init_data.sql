@@ -1,11 +1,11 @@
 INSERT INTO member (id, social_id, email, nickname, phone_number, opt_in_marketing)
-VALUES (1, 123456789, 'story/dummy/5.jpg1@kakao.com', '이승로', '01012345678', true),
-       (2, 987654321, 'story/dummy/5.jpg2@kakao.com', '이충안', '01087654321', false),
-       (3, 456789123, 'story/dummy/5.jpg3@kakao.com', '장수빈', '01045678912', true),
-       (4, 789123456, 'story/dummy/5.jpg4@kakao.com', '서준환', '01078912345', true),
-       (5, 321251287, 'story/dummy/5.jpg5@kakao.com', '신민선', '01034574568', false),
-       (6, 324569987, 'story/dummy/5.jpg6@kakao.com', '박희수', '01043609998', false),
-       (7, 323487985, 'story/dummy/5.jpg7@kakao.com', '하아얀', '01065083298', false);
+VALUES (1, 123456789, 'default1@kakao.com', '이승로', '01012345678', true),
+       (2, 987654321, 'default2@kakao.com', '이충안', '01087654321', false),
+       (3, 456789123, 'default3@kakao.com', '장수빈', '01045678912', true),
+       (4, 789123456, 'default4@kakao.com', '서준환', '01078912345', true),
+       (5, 321251287, 'default5@kakao.com', '신민선', '01034574568', false),
+       (6, 324569987, 'default6@kakao.com', '박희수', '01043609998', false),
+       (7, 323487985, 'default7@kakao.com', '하아얀', '01065083298', false);
 
 INSERT INTO store (id, kakao_id, category, phone_number, name, place_url, road_address, lot_number_address, latitude,
                    longitude)
