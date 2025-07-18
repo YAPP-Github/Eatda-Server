@@ -2,6 +2,7 @@ package eatda.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -75,6 +78,12 @@ public class GlobalExceptionHandler {
         return toErrorResponse(EtcErrorCode.NO_PARAMETER_FOUND);
     }
 
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(
+            HandlerMethodValidationException exception) {
+        return toErrorResponse(EtcErrorCode.VALIDATION_ERROR);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException exception) {
         ErrorResponse response = new ErrorResponse(exception.getErrorCode());
@@ -84,6 +93,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+        log.error("Unhandled exception occurred: {}", exception.getMessage(), exception);
         return toErrorResponse(EtcErrorCode.INTERNAL_SERVER_ERROR);
     }
 
