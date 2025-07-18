@@ -4,8 +4,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 import eatda.controller.BaseControllerTest;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -23,7 +26,7 @@ public class StoryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class SearchStores {
+    class RegisterStory {
 
         @Test
         void 스토리를_등록할_수_있다() {
@@ -49,26 +52,80 @@ public class StoryControllerTest extends BaseControllerTest {
         }
     }
 
-    @Test
-    void 스토리_목록을_조회할_수_있다() {
-        StoriesResponse mockResponse = new StoriesResponse(List.of(
-                new StoriesResponse.StoryPreview(1L, "https://dummy-s3.com/story1.png"),
-                new StoriesResponse.StoryPreview(2L, "https://dummy-s3.com/story2.png")
-        ));
+    @Nested
+    class GetStories {
 
-        doReturn(mockResponse)
-                .when(storyService)
-                .getPagedStoryPreviews(5);
+        @Test
+        void 스토리_목록을_조회할_수_있다() {
+            StoriesResponse mockResponse = new StoriesResponse(List.of(
+                    new StoriesResponse.StoryPreview(1L, "https://s3.bucket.com/story/dummy/1.jpg"),
+                    new StoriesResponse.StoryPreview(2L, "https://s3.bucket.com/story/dummy/2.jpg")
+            ));
 
-        Response response = given()
-                .queryParam("size", 5)
-                .when()
-                .get("/api/stories");
+            doReturn(mockResponse)
+                    .when(storyService)
+                    .getPagedStoryPreviews(5);
 
-        response.then()
-                .statusCode(200)
-                .body("stories.size()", equalTo(2))
-                .body("stories[0].storyId", equalTo(1))
-                .body("stories[0].imageUrl", equalTo("https://dummy-s3.com/story1.png"));
+            Response response = given()
+                    .queryParam("size", 5)
+                    .when()
+                    .get("/api/stories");
+
+            response.then()
+                    .statusCode(200)
+                    .body("stories.size()", equalTo(2))
+                    .body("stories[0].storyId", equalTo(1))
+                    .body("stories[0].imageUrl", equalTo("https://s3.bucket.com/story/dummy/1.jpg"));
+        }
+    }
+
+    @Nested
+    class GetStory {
+
+        @Test
+        void 해당_스토리를_상세_조회할_수_있다() {
+            long storyId = 1L;
+
+            doReturn(new StoryResponse(
+                    "123456",
+                    "한식",
+                    "진또곱창집",
+                    "서울특별시 성동구 성수동1가",
+                    "곱창은 여기",
+                    "https://s3.bucket.com/story1.jpg"
+            )).when(storyService).getStory(storyId);
+
+            Response response = given()
+                    .pathParam("storyId", storyId)
+                    .when()
+                    .get("/api/stories/{storyId}");
+
+            response.then()
+                    .statusCode(200)
+                    .body("storeKakaoId", equalTo("123456"))
+                    .body("category", equalTo("한식"))
+                    .body("storeName", equalTo("진또곱창집"))
+                    .body("storeAddress", equalTo("서울특별시 성동구 성수동1가"))
+                    .body("description", equalTo("곱창은 여기"))
+                    .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
+        }
+
+        @Test
+        void 존재하지_않는_스토리를_조회하면_404_응답한다() {
+            long nonexistentId = 999L;
+
+            doThrow(new BusinessException(BusinessErrorCode.STORY_NOT_FOUND))
+                    .when(storyService).getStory(nonexistentId);
+
+            Response response = given()
+                    .pathParam("storyId", nonexistentId)
+                    .when()
+                    .get("/api/stories/{storyId}");
+
+            response.then()
+                    .statusCode(404)
+                    .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
+                    .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
+        }
     }
 }
