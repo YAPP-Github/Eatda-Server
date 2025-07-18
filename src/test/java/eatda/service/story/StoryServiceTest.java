@@ -107,7 +107,7 @@ public class StoryServiceTest extends BaseServiceTest {
             when(imageService.getPresignedUrl("image-key-1")).thenReturn("https://s3.com/story1.jpg");
             when(imageService.getPresignedUrl("image-key-2")).thenReturn("https://s3.com/story2.jpg");
 
-            var response = storyService.getPagedStoryPreviews();
+            var response = storyService.getPagedStoryPreviews(5);
 
             assertThat(response.stories()).hasSize(2);
             assertThat(response.stories())

@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class StoryService {
     private static final int PAGE_START_NUMBER = 0;
-    private static final int PAGE_SIZE = 5;
 
     private final StoreService storeService;
     private final ImageService imageService;
@@ -67,8 +66,8 @@ public class StoryService {
     }
 
     @Transactional(readOnly = true)
-    public StoriesResponse getPagedStoryPreviews() {
-        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, PAGE_SIZE);
+    public StoriesResponse getPagedStoryPreviews(int size) {
+        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, size);
         Page<Story> orderByPage = storyRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         return new StoriesResponse(

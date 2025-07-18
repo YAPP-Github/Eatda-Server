@@ -158,7 +158,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
             doReturn(mockResponse)
                     .when(storyService)
-                    .getPagedStoryPreviews();
+                    .getPagedStoryPreviews(5);
 
             RestDocumentationFilter document = document("story/get-stories", 200)
                     .request(requestDocument)
@@ -166,6 +166,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .build();
 
             Response response = given(document)
+                    .queryParam("size", 5)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .when().get("/api/stories");
 

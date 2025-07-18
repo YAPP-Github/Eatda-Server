@@ -2,12 +2,10 @@ package eatda.controller.story;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.controller.BaseControllerTest;
-import eatda.service.common.ImageDomain;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -60,9 +58,10 @@ public class StoryControllerTest extends BaseControllerTest {
 
         doReturn(mockResponse)
                 .when(storyService)
-                .getPagedStoryPreviews();
+                .getPagedStoryPreviews(5);
 
         Response response = given()
+                .queryParam("size", 5)
                 .when()
                 .get("/api/stories");
 
