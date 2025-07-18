@@ -214,7 +214,6 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
             Response response = given(document)
                     .pathParam("storyId", storyId)
-                    .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .when()
                     .get("/api/stories/{storyId}");
 
