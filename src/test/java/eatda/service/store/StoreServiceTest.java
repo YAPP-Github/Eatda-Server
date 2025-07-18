@@ -11,8 +11,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class StoreServiceTest extends BaseServiceTest {
+
+    @Autowired
+    private StoreService storeService;
 
     @BeforeEach
     void mockingClient() {
@@ -31,7 +35,6 @@ class StoreServiceTest extends BaseServiceTest {
 
         @Test
         void 음식점_검색_결과를_반환한다() {
-            StoreService storeService = new StoreService(mapClient, new StoreSearchFilter());
             String query = "농민백암순대";
 
             var response = storeService.searchStores(query);
