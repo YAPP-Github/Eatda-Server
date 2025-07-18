@@ -19,12 +19,16 @@ public class CheerGenerator {
     }
 
     public Cheer generateAdmin(Member member, Store store) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_IMAGE_KEY, DEFAULT_DESCRIPTION, true);
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, DEFAULT_IMAGE_KEY, true);
         return cheerRepository.save(cheer);
     }
 
     public Cheer generateCommon(Member member, Store store) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_IMAGE_KEY, DEFAULT_DESCRIPTION, false);
+        return generateCommon(member, store, DEFAULT_IMAGE_KEY);
+    }
+
+    public Cheer generateCommon(Member member, Store store, String imageKey) {
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, imageKey, false);
         return cheerRepository.save(cheer);
     }
 }
