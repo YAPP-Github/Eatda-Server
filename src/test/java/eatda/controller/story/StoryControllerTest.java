@@ -63,7 +63,6 @@ public class StoryControllerTest extends BaseControllerTest {
                 .getPagedStoryPreviews();
 
         Response response = given()
-                .header("Authorization", accessToken())
                 .when()
                 .get("/api/stories");
 

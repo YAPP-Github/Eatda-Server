@@ -140,10 +140,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORY_API)
                 .summary("스토리 목록 조회")
-                .description("스토리 목록을 페이지네이션하여 조회합니다.")
-                .requestHeader(
-                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
-                );
+                .description("스토리 목록을 페이지네이션하여 조회합니다.");
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
