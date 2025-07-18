@@ -2,9 +2,8 @@ name: Terraform Plan on PR
 
 on:
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ "main", "develop" ]
+    paths: [ "terraform/**", "terraform-bootstrap/**" ]
 
 permissions:
   contents: read
