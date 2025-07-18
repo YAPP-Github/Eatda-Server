@@ -1,8 +1,9 @@
 package eatda.repository.store;
 
 import eatda.domain.store.Store;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.Repository;
 
-public interface StoreRepository extends JpaRepository<Store, Long> {
+public interface StoreRepository extends Repository<Store, Long> {
 
+    Store save(Store store);
 }
