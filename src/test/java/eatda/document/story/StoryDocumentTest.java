@@ -1,5 +1,6 @@
 package eatda.document.story;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -8,6 +9,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -158,7 +160,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
             doReturn(mockResponse)
                     .when(storyService)
-                    .getPagedStoryPreviews();
+                    .getPagedStoryPreviews(5);
 
             RestDocumentationFilter document = document("story/get-stories", 200)
                     .request(requestDocument)
@@ -166,10 +168,89 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .build();
 
             Response response = given(document)
+                    .queryParam("size", 5)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .when().get("/api/stories");
 
             response.then().statusCode(200);
+        }
+    }
+
+    @Nested
+    class GetStory {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORY_API)
+                .summary("스토리 상세 조회")
+                .description("스토리 ID를 기반으로 상세 정보를 조회합니다.");
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
+                        fieldWithPath("category").description("가게 카테고리"),
+                        fieldWithPath("storeName").description("가게 이름"),
+                        fieldWithPath("storeDistrict").description("가게 주소의 구"),
+                        fieldWithPath("storeNeighborhood").description("가게 주소의 동"),
+                        fieldWithPath("description").description("스토리 내용"),
+                        fieldWithPath("imageUrl").description("스토리 이미지 URL")
+                );
+
+        @Test
+        void 스토리_상세_조회_성공() {
+            long storyId = 1L;
+
+            doReturn(new StoryResponse(
+                    "123456",
+                    "한식",
+                    "진또곱창집",
+                    "성동구",
+                    "성수동",
+                    "곱창은 여기",
+                    "https://s3.bucket.com/story1.jpg"
+            )).when(storyService).getStory(storyId);
+
+            RestDocumentationFilter document = document("story/get-story", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            Response response = given(document)
+                    .pathParam("storyId", storyId)
+                    .when()
+                    .get("/api/stories/{storyId}");
+
+            response.then()
+                    .statusCode(200)
+                    .body("storeKakaoId", equalTo("123456"))
+                    .body("category", equalTo("한식"))
+                    .body("storeName", equalTo("진또곱창집"))
+                    .body("storeDistrict", equalTo("성동구"))
+                    .body("storeNeighborhood", equalTo("성수동"))
+                    .body("description", equalTo("곱창은 여기"))
+                    .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
+        }
+
+        @Test
+        void 스토리_상세_조회_실패_존재하지_않는_스토리() {
+            long nonexistentId = 999L;
+
+            doThrow(new BusinessException(BusinessErrorCode.STORY_NOT_FOUND))
+                    .when(storyService).getStory(nonexistentId);
+
+            RestDocumentationFilter document = document("story/get-story", BusinessErrorCode.STORY_NOT_FOUND)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            Response response = given(document)
+                    .pathParam("storyId", nonexistentId)
+                    .when()
+                    .get("/api/stories/{storyId}");
+
+            response.then()
+                    .statusCode(BusinessErrorCode.STORY_NOT_FOUND.getStatus().value())
+                    .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
+                    .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
         }
     }
 }

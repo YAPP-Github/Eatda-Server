@@ -38,8 +38,11 @@ public class Story extends AuditingEntity {
     @Column(name = "store_name", nullable = false)
     private String storeName;
 
-    @Column(name = "store_address", nullable = false)
-    private String storeAddress;
+    @Column(name = "store_road_address", nullable = false)
+    private String storeRoadAddress;
+
+    @Column(name = "store_lot_number_address", nullable = false)
+    private String storeLotNumberAddress;
 
     @Column(name = "store_category", nullable = false)
     private String storeCategory;
@@ -54,21 +57,23 @@ public class Story extends AuditingEntity {
     private Story(
             Member member,
             String storeKakaoId,
-            String storeName,
-            String storeAddress,
             String storeCategory,
+            String storeName,
+            String storeRoadAddress,
+            String storeLotNumberAddress,
             String description,
             String imageKey
     ) {
         validateMember(member);
-        validateStore(storeKakaoId, storeName, storeAddress, storeCategory);
+        validateStore(storeKakaoId, storeCategory, storeName, storeRoadAddress, storeLotNumberAddress);
         validateStory(description, imageKey);
 
         this.member = member;
         this.storeKakaoId = storeKakaoId;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
         this.storeCategory = storeCategory;
+        this.storeName = storeName;
+        this.storeRoadAddress = storeRoadAddress;
+        this.storeLotNumberAddress = storeLotNumberAddress;
         this.description = description;
         this.imageKey = imageKey;
     }
@@ -79,11 +84,18 @@ public class Story extends AuditingEntity {
         }
     }
 
-    private void validateStore(String storeKakaoId, String storeName, String storeAddress, String storeCategory) {
+    private void validateStore(
+            String storeKakaoId,
+            String storeCategory,
+            String storeName,
+            String roadAddress,
+            String lotNumberAddress
+    ) {
         validateStoreKakaoId(storeKakaoId);
-        validateStoreName(storeName);
-        validateStoreAddress(storeAddress);
         validateStoreCategory(storeCategory);
+        validateStoreName(storeName);
+        validateStoreRoadAddress(roadAddress);
+        validateStoreLotNumberAddress(lotNumberAddress);
     }
 
     private void validateStory(String description, String imageKey) {
@@ -103,8 +115,14 @@ public class Story extends AuditingEntity {
         }
     }
 
-    private void validateStoreAddress(String storeAddress) {
-        if (storeAddress == null || storeAddress.isBlank()) {
+    private void validateStoreRoadAddress(String roadAddress) {
+        if (roadAddress == null || roadAddress.isBlank()) {
+            throw new BusinessException(BusinessErrorCode.INVALID_STORE_ADDRESS);
+        }
+    }
+
+    private void validateStoreLotNumberAddress(String lotNumberAddress) {
+        if (lotNumberAddress == null || lotNumberAddress.isBlank()) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORE_ADDRESS);
         }
     }
@@ -125,5 +143,21 @@ public class Story extends AuditingEntity {
         if (imageKey == null || imageKey.isBlank()) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORY_IMAGE_KEY);
         }
+    }
+
+    public String getAddressDistrict() {
+        String[] addressParts = storeLotNumberAddress.split(" ");
+        if (addressParts.length < 2) {
+            return "";
+        }
+        return addressParts[1];
+    }
+
+    public String getAddressNeighborhood() {
+        String[] addressParts = storeLotNumberAddress.split(" ");
+        if (addressParts.length < 3) {
+            return "";
+        }
+        return addressParts[2];
     }
 }

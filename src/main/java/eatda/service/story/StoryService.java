@@ -4,6 +4,7 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
@@ -26,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class StoryService {
     private static final int PAGE_START_NUMBER = 0;
-    private static final int PAGE_SIZE = 5;
 
     private final StoreService storeService;
     private final ImageService imageService;
@@ -44,7 +44,8 @@ public class StoryService {
                 .member(member)
                 .storeKakaoId(matchedStore.kakaoId())
                 .storeName(matchedStore.name())
-                .storeAddress(matchedStore.address())
+                .storeRoadAddress(matchedStore.roadAddress())
+                .storeLotNumberAddress(matchedStore.lotNumberAddress())
                 .storeCategory(matchedStore.category())
                 .description(request.description())
                 .imageKey(imageKey)
@@ -61,14 +62,15 @@ public class StoryService {
                         store.kakaoId(),
                         store.name(),
                         store.roadAddress(),
+                        store.lotNumberAddress(),
                         store.categoryName()
                 ))
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public StoriesResponse getPagedStoryPreviews() {
-        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, PAGE_SIZE);
+    public StoriesResponse getPagedStoryPreviews(int size) {
+        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, size);
         Page<Story> orderByPage = storyRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         return new StoriesResponse(
@@ -78,6 +80,22 @@ public class StoryService {
                                 imageService.getPresignedUrl(story.getImageKey())
                         ))
                         .toList()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public StoryResponse getStory(long storyId) {
+        Story story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORY_NOT_FOUND));
+
+        return new StoryResponse(
+                story.getStoreKakaoId(),
+                story.getStoreCategory(),
+                story.getStoreName(),
+                story.getAddressDistrict(),
+                story.getAddressNeighborhood(),
+                story.getDescription(),
+                imageService.getPresignedUrl(story.getImageKey())
         );
     }
 }

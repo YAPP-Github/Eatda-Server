@@ -25,15 +25,15 @@ VALUES (1, '99999999999', 'KOREAN', '01012345678', '맛있는 한식집', 'https
         '서울시 강남구 역삼동 222-324', 37.5036675804016, 127.05305858911);
 
 INSERT INTO cheer (id, member_id, store_id, description, image_key, is_admin)
-VALUES (1, 1, 1, '정말 맛있어요! 강추합니다!', 'default.jpg', true),
-       (2, 2, 2, '서비스가 훌륭해요!', 'default.jpg', true),
-       (3, 3, 3, '여기 음식이 정말 맛있어요!', 'default.jpg', true),
-       (4, 4, 4, '분위기가 너무 좋아요!', 'default.jpg', true),
-       (5, 5, 5, '디저트가 정말 맛있어요!', 'default.jpg', true),
-       (6, 6, 6, '커피가 정말 맛있어요!', 'default.jpg', false),
-       (7, 7, 7, '패스트푸드가 빠르고 맛있어요!', 'default.jpg', false);
+VALUES (1, 1, 1, '정말 맛있어요! 강추합니다!', 'cheer/dummy/1.jpg', true),
+       (2, 2, 2, '서비스가 훌륭해요!', 'cheer/dummy/2.jpg', true),
+       (3, 3, 3, '여기 음식이 정말 맛있어요!', 'cheer/dummy/3.jpg', true),
+       (4, 4, 4, '분위기가 너무 좋아요!', 'cheer/dummy/4.jpg', true),
+       (5, 5, 5, '디저트가 정말 맛있어요!', 'cheer/dummy/5.jpg', true),
+       (6, 6, 6, '커피가 정말 맛있어요!', 'cheer/dummy/6.jpg', false),
+       (7, 7, 7, '패스트푸드가 빠르고 맛있어요!', 'cheer/dummy/7.jpg', false);
 
 INSERT INTO article (id, title, subtitle, article_url, image_key)
-VALUES (1, '첫 번째 기사', '서브타이틀 1', 'https://example.com/article1', 'default.jpg'),
-       (2, '두 번째 기사', '서브타이틀 2', 'https://example.com/article2', 'default.jpg'),
-       (3, '세 번째 기사', '서브타이틀 3', 'https://example.com/article3', 'default.jpg');
+VALUES (1, '첫 번째 기사', '서브타이틀 1', 'https://example.com/article1', 'article/dummy/1.jpg'),
+       (2, '두 번째 기사', '서브타이틀 2', 'https://example.com/article2', 'article/dummy/2.jpg'),
+       (3, '세 번째 기사', '서브타이틀 3', 'https://example.com/article3', 'article/dummy/3.jpg');
