@@ -13,10 +13,13 @@ import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.repository.story.StoryRepository;
 import eatda.service.BaseServiceTest;
 import eatda.service.common.ImageDomain;
+import eatda.service.store.StoreService;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,10 @@ public class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryService storyService;
+    @Autowired
+    private StoryRepository storyRepository;
+    @Autowired
+    private StoreService storeService;
 
     @Nested
     class RegisterStory {
