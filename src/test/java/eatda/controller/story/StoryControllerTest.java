@@ -17,10 +17,6 @@ public class StoryControllerTest extends BaseControllerTest {
 
     @BeforeEach
     void setUpMock() {
-        doReturn("https://dummy-s3.com/story.png")
-                .when(imageService)
-                .upload(any(), eq(ImageDomain.STORY));
-
         doNothing()
                 .when(storyService)
                 .registerStory(any(), any(), any());
