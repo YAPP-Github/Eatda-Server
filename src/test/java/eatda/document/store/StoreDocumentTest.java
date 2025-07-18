@@ -1,17 +1,21 @@
 package eatda.document.store;
 
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
+import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreSearchResponse;
 import eatda.controller.store.StoreSearchResponses;
+import eatda.controller.store.StoresResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -27,6 +31,67 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 
 public class StoreDocumentTest extends BaseDocumentTest {
+
+    @Nested
+    class GetStores {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("음식점 목록 조회")
+                .queryParameter(
+                        parameterWithName("size").description("조회할 음식점 개수 (최소 1, 최대 50)")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("stores").type(ARRAY).description("음식점 목록"),
+                        fieldWithPath("stores[].id").type(NUMBER).description("음식점 ID"),
+                        fieldWithPath("stores[].imageUrl").type(STRING).description("음식점 대표 이미지 URL"),
+                        fieldWithPath("stores[].name").type(STRING).description("음식점 이름"),
+                        fieldWithPath("stores[].district").type(STRING).description("음식점 주소 (구)"),
+                        fieldWithPath("stores[].neighborhood").type(STRING).description("음식점 주소 (동)"),
+                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리")
+                );
+
+        @Test
+        void 음식점_목록_최신순으로_조회() {
+            StoresResponse response = new StoresResponse(List.of(
+                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
+                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
+            ));
+            doReturn(response).when(storeService).getStores(anyInt());
+
+            int size = 2;
+            var document = document("store/get", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .queryParam("size", size)
+                    .when().get("/api/shops")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
+        @ParameterizedTest
+        void 음식점_목록_조회_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(storeService).getStores(anyInt());
+
+            int size = 2;
+            var document = document("store/get", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .queryParam("size", size)
+                    .when().get("/api/shops")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
 
     @Nested
     class SearchStores {

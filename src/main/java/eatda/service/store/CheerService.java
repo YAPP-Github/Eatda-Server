@@ -7,7 +7,7 @@ import eatda.repository.store.CheerRepository;
 import eatda.service.common.ImageService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +20,7 @@ public class CheerService {
 
     @Transactional(readOnly = true)
     public CheersResponse getCheers(int size) {
-        PageRequest pageRequest = PageRequest.of(0, size);
-        List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(pageRequest);
+        List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(Pageable.ofSize(size));
         return toCheersResponse(cheers);
     }
 
