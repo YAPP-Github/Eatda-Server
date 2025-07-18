@@ -76,7 +76,8 @@ public class StoryServiceTest extends BaseServiceTest {
                     .member(member)
                     .storeKakaoId("1")
                     .storeName("곱창집")
-                    .storeAddress("서울시")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory("한식")
                     .description("미쳤다 진짜")
                     .imageKey("image-key-1")
@@ -86,7 +87,8 @@ public class StoryServiceTest extends BaseServiceTest {
                     .member(member)
                     .storeKakaoId("2")
                     .storeName("순대국밥집")
-                    .storeAddress("부산시")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory("한식")
                     .description("뜨끈한 국밥 최고")
                     .imageKey("image-key-2")
@@ -120,7 +122,8 @@ public class StoryServiceTest extends BaseServiceTest {
                     .member(member)
                     .storeKakaoId("123456")
                     .storeName("진또곱창집")
-                    .storeAddress("서울특별시 성동구 성수동1가")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory("한식")
                     .description("곱창은 여기")
                     .imageKey("story-image-key")
@@ -136,7 +139,8 @@ public class StoryServiceTest extends BaseServiceTest {
             assertThat(response.storeKakaoId()).isEqualTo("123456");
             assertThat(response.category()).isEqualTo("한식");
             assertThat(response.storeName()).isEqualTo("진또곱창집");
-            assertThat(response.storeAddress()).isEqualTo("서울특별시 성동구 성수동1가");
+            assertThat(response.storeDistrict()).isEqualTo("성동구");
+            assertThat(response.storeNeighborhood()).isEqualTo("성수동1가");
             assertThat(response.description()).isEqualTo("곱창은 여기");
             assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg");
         }

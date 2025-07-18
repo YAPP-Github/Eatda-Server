@@ -44,7 +44,8 @@ public class StoryService {
                 .member(member)
                 .storeKakaoId(matchedStore.kakaoId())
                 .storeName(matchedStore.name())
-                .storeAddress(matchedStore.address())
+                .storeRoadAddress(matchedStore.roadAddress())
+                .storeLotNumberAddress(matchedStore.lotNumberAddress())
                 .storeCategory(matchedStore.category())
                 .description(request.description())
                 .imageKey(imageKey)
@@ -61,6 +62,7 @@ public class StoryService {
                         store.kakaoId(),
                         store.name(),
                         store.roadAddress(),
+                        store.lotNumberAddress(),
                         store.categoryName()
                 ))
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
@@ -90,7 +92,8 @@ public class StoryService {
                 story.getStoreKakaoId(),
                 story.getStoreCategory(),
                 story.getStoreName(),
-                story.getStoreAddress(),
+                story.getAddressDistrict(),
+                story.getAddressNeighborhood(),
                 story.getDescription(),
                 imageService.getPresignedUrl(story.getImageKey())
         );

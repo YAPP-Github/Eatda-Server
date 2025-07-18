@@ -1,6 +1,8 @@
 package eatda.controller.story;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -66,16 +68,18 @@ public class StoryControllerTest extends BaseControllerTest {
                     .when(storyService)
                     .getPagedStoryPreviews(5);
 
-            Response response = given()
+            StoriesResponse response = given()
                     .queryParam("size", 5)
                     .when()
-                    .get("/api/stories");
+                    .get("/api/stories")
+                    .then().statusCode(200)
+                    .extract().as(StoriesResponse.class);
 
-            response.then()
-                    .statusCode(200)
-                    .body("stories.size()", equalTo(2))
-                    .body("stories[0].storyId", equalTo(1))
-                    .body("stories[0].imageUrl", equalTo("https://s3.bucket.com/story/dummy/1.jpg"));
+            assertAll(
+                    () -> assertThat(response.stories()).hasSize(2),
+                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(1L),
+                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg")
+            );
         }
     }
 
@@ -90,7 +94,8 @@ public class StoryControllerTest extends BaseControllerTest {
                     "123456",
                     "한식",
                     "진또곱창집",
-                    "서울특별시 성동구 성수동1가",
+                    "성동구",
+                    "성수동",
                     "곱창은 여기",
                     "https://s3.bucket.com/story1.jpg"
             )).when(storyService).getStory(storyId);
@@ -105,7 +110,8 @@ public class StoryControllerTest extends BaseControllerTest {
                     .body("storeKakaoId", equalTo("123456"))
                     .body("category", equalTo("한식"))
                     .body("storeName", equalTo("진또곱창집"))
-                    .body("storeAddress", equalTo("서울특별시 성동구 성수동1가"))
+                    .body("storeDistrict", equalTo("성동구"))
+                    .body("storeNeighborhood", equalTo("성수동"))
                     .body("description", equalTo("곱창은 여기"))
                     .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
         }

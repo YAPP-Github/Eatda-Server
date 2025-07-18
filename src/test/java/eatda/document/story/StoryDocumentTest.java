@@ -189,7 +189,8 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
                         fieldWithPath("category").description("가게 카테고리"),
                         fieldWithPath("storeName").description("가게 이름"),
-                        fieldWithPath("storeAddress").description("가게 주소"),
+                        fieldWithPath("storeDistrict").description("가게 주소의 구"),
+                        fieldWithPath("storeNeighborhood").description("가게 주소의 동"),
                         fieldWithPath("description").description("스토리 내용"),
                         fieldWithPath("imageUrl").description("스토리 이미지 URL")
                 );
@@ -202,7 +203,8 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     "123456",
                     "한식",
                     "진또곱창집",
-                    "서울특별시 성동구 성수동1가",
+                    "성동구",
+                    "성수동",
                     "곱창은 여기",
                     "https://s3.bucket.com/story1.jpg"
             )).when(storyService).getStory(storyId);
@@ -222,7 +224,8 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .body("storeKakaoId", equalTo("123456"))
                     .body("category", equalTo("한식"))
                     .body("storeName", equalTo("진또곱창집"))
-                    .body("storeAddress", equalTo("서울특별시 성동구 성수동1가"))
+                    .body("storeDistrict", equalTo("성동구"))
+                    .body("storeNeighborhood", equalTo("성수동"))
                     .body("description", equalTo("곱창은 여기"))
                     .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
         }

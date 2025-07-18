@@ -4,7 +4,8 @@ public record StoryResponse(
         String storeKakaoId,
         String category,
         String storeName,
-        String storeAddress,
+        String storeDistrict,
+        String storeNeighborhood,
         String description,
         String imageUrl
 ) {
