@@ -4,6 +4,7 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
@@ -77,6 +78,21 @@ public class StoryService {
                                 imageService.getPresignedUrl(story.getImageKey())
                         ))
                         .toList()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public StoryResponse getStory(long storyId) {
+        Story story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORY_NOT_FOUND));
+
+        return new StoryResponse(
+                story.getStoreKakaoId(),
+                story.getStoreCategory(),
+                story.getStoreName(),
+                story.getStoreAddress(),
+                story.getDescription(),
+                imageService.getPresignedUrl(story.getImageKey())
         );
     }
 }
