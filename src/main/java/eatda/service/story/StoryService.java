@@ -2,6 +2,7 @@ package eatda.service.story;
 
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
+import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
@@ -14,6 +15,9 @@ import eatda.service.common.ImageService;
 import eatda.service.store.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class StoryService {
+    private static final int PAGE_START_NUMBER = 0;
+    private static final int PAGE_SIZE = 5;
 
     private final StoreService storeService;
     private final ImageService imageService;
@@ -58,5 +64,20 @@ public class StoryService {
                         store.categoryName()
                 ))
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public StoriesResponse getPagedStoryPreviews() {
+        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, PAGE_SIZE);
+        Page<Story> orderByPage = storyRepository.findAllByOrderByCreatedAtDesc(pageable);
+
+        return new StoriesResponse(
+                orderByPage.getContent().stream()
+                        .map(story -> new StoriesResponse.StoryPreview(
+                                story.getId(),
+                                imageService.getPresignedUrl(story.getImageKey())
+                        ))
+                        .toList()
+        );
     }
 }

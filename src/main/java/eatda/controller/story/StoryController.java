@@ -5,6 +5,7 @@ import eatda.service.story.StoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,5 +25,11 @@ public class StoryController {
     ) {
         storyService.registerStory(request, image, member.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("api/stories")
+    public ResponseEntity<StoriesResponse> getStories() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(storyService.getPagedStoryPreviews());
     }
 }

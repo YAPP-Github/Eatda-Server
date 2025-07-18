@@ -1,5 +1,6 @@
 package eatda.controller.story;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -9,6 +10,7 @@ import eatda.controller.BaseControllerTest;
 import eatda.service.common.ImageDomain;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,5 +49,27 @@ public class StoryControllerTest extends BaseControllerTest {
 
             response.then().statusCode(201);
         }
+    }
+
+    @Test
+    void 스토리_목록을_조회할_수_있다() {
+        StoriesResponse mockResponse = new StoriesResponse(List.of(
+                new StoriesResponse.StoryPreview(1L, "https://dummy-s3.com/story1.png"),
+                new StoriesResponse.StoryPreview(2L, "https://dummy-s3.com/story2.png")
+        ));
+
+        doReturn(mockResponse)
+                .when(storyService)
+                .getPagedStoryPreviews();
+
+        Response response = given()
+                .when()
+                .get("/api/stories");
+
+        response.then()
+                .statusCode(200)
+                .body("stories.size()", equalTo(2))
+                .body("stories[0].storyId", equalTo(1))
+                .body("stories[0].imageUrl", equalTo("https://dummy-s3.com/story1.png"));
     }
 }

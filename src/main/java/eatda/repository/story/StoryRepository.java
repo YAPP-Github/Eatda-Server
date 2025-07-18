@@ -1,19 +1,11 @@
 package eatda.repository.story;
 
 import eatda.domain.story.Story;
-import eatda.exception.BusinessErrorCode;
-import eatda.exception.BusinessException;
-import java.util.Optional;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StoryRepository extends Repository<Story, Long> {
+public interface StoryRepository extends JpaRepository<Story, Long> {
 
-    Story save(Story story);
-
-    Optional<Story> findById(Long id);
-
-    default Story getById(Long id) {
-        return findById(id)
-                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORY_NOT_FOUND));
-    }
+    Page<Story> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
