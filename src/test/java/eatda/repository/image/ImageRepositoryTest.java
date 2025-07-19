@@ -2,8 +2,11 @@ package eatda.repository.image;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import eatda.repository.BaseCacheRepositoryTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +76,10 @@ class ImageRepositoryTest extends BaseCacheRepositoryTest {
 
             String preSignedUrl = imageRepository.getPresignedUrl(imageKey);
 
-            assertThat(preSignedUrl).isEqualTo("https://example.url.com");
+            assertAll(
+                    () -> assertThat(preSignedUrl).isEqualTo("https://example.url.com"),
+                    () -> verify(s3ImageRepository, never()).getPresignedUrl(anyString())
+            );
         }
 
         @Test
