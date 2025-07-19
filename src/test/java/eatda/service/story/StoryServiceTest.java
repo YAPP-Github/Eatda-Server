@@ -13,13 +13,10 @@ import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.story.StoryRepository;
 import eatda.service.BaseServiceTest;
 import eatda.service.common.ImageDomain;
-import eatda.service.store.StoreService;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +26,6 @@ public class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryService storyService;
-    @Autowired
-    private StoryRepository storyRepository;
-    @Autowired
-    private StoreService storeService;
 
     @Nested
     class RegisterStory {
@@ -49,7 +42,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
-            when(imageService.upload(image, ImageDomain.STORY)).thenReturn("image-key");
+            when(imageRepository.upload(image, ImageDomain.STORY)).thenReturn("image-key");
 
             assertDoesNotThrow(() -> storyService.registerStory(request, image, member.getId()));
         }
@@ -70,13 +63,6 @@ public class StoryServiceTest extends BaseServiceTest {
 
     @Nested
     class GetPagedStoryPreviews extends BaseServiceTest {
-
-        private StoryService storyService;
-
-        @BeforeEach
-        void setUp() {
-            storyService = new StoryService(storeService, imageService, storyRepository, memberRepository);
-        }
 
         @Test
         void 스토리_목록을_조회할_수_있다() {
@@ -104,8 +90,8 @@ public class StoryServiceTest extends BaseServiceTest {
 
             storyRepository.saveAll(List.of(story1, story2));
 
-            when(imageService.getPresignedUrl("image-key-1")).thenReturn("https://s3.com/story1.jpg");
-            when(imageService.getPresignedUrl("image-key-2")).thenReturn("https://s3.com/story2.jpg");
+            when(imageRepository.getPresignedUrl("image-key-1")).thenReturn("https://s3.com/story1.jpg");
+            when(imageRepository.getPresignedUrl("image-key-2")).thenReturn("https://s3.com/story2.jpg");
 
             var response = storyService.getPagedStoryPreviews();
 
