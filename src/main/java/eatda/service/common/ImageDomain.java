@@ -9,7 +9,9 @@ public enum ImageDomain {
     ARTICLE("article"),
     STORE("store"),
     MEMBER("member"),
-    STORY("story");
+    STORY("story"),
+    CHEER("cheer"),
+    ;
 
     private final String name;
 }

@@ -2,6 +2,7 @@ package eatda.client.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import java.util.Map;
 
@@ -48,5 +49,19 @@ public record StoreSearchResult(
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElse(StoreCategory.OTHER);
+    }
+
+    public Store toStore() {
+        return Store.builder()
+                .kakaoId(kakaoId)
+                .category(getStoreCategory())
+                .phoneNumber(phoneNumber)
+                .name(name)
+                .placeUrl(placeUrl)
+                .roadAddress(roadAddress)
+                .lotNumberAddress(lotNumberAddress)
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 }
