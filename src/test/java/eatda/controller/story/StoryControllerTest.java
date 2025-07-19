@@ -2,12 +2,10 @@ package eatda.controller.story;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.controller.BaseControllerTest;
-import eatda.service.common.ImageDomain;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -42,7 +40,8 @@ public class StoryControllerTest extends BaseControllerTest {
             Response response = given()
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
-                    .multiPart("request", "request.json", requestJson.getBytes(StandardCharsets.UTF_8), "application/json")
+                    .multiPart("request", "request.json", requestJson.getBytes(StandardCharsets.UTF_8),
+                            "application/json")
                     .multiPart("image", "image.png", imageBytes, "image/png")
                     .when()
                     .post("/api/stories");

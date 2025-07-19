@@ -8,10 +8,10 @@ import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.repository.image.ImageDomain;
 import eatda.repository.image.ImageRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.story.StoryRepository;
-import eatda.service.common.ImageDomain;
 import eatda.service.store.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class StoryService {
+
     private static final int PAGE_START_NUMBER = 0;
     private static final int PAGE_SIZE = 5;
 

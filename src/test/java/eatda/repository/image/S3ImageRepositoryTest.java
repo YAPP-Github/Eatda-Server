@@ -10,8 +10,6 @@ import static org.mockito.Mockito.when;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.service.common.ImageDomain;
-import eatda.service.common.ImageService;
 import java.net.URL;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,13 +33,13 @@ class S3ImageRepositoryTest {
 
     private S3Client s3Client;
     private S3Presigner s3Presigner;
-    private ImageService imageService;
+    private S3ImageRepository s3ImageRepository;
 
     @BeforeEach
     void setUp() {
         s3Client = mock(S3Client.class);
         s3Presigner = mock(S3Presigner.class);
-        imageService = new ImageService(s3Client, TEST_BUCKET, s3Presigner);
+        s3ImageRepository = new S3ImageRepository(s3Client, TEST_BUCKET, s3Presigner);
     }
 
     @Nested
@@ -57,7 +55,7 @@ class S3ImageRepositoryTest {
                     "image", originalFilename, contentType, "image-content".getBytes()
             );
 
-            String key = imageService.upload(file, imageDomain);
+            String key = s3ImageRepository.upload(file, imageDomain);
 
             ArgumentCaptor<PutObjectRequest> putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(putObjectRequestCaptor.capture(), any(RequestBody.class));
@@ -80,7 +78,7 @@ class S3ImageRepositoryTest {
             );
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> imageService.upload(file, ImageDomain.STORY));
+                    () -> s3ImageRepository.upload(file, ImageDomain.STORY));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_IMAGE_TYPE);
         }
@@ -101,7 +99,7 @@ class S3ImageRepositoryTest {
             when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
                     .thenReturn(presignedRequestResult);
 
-            String presignedUrl = imageService.getPresignedUrl(key);
+            String presignedUrl = s3ImageRepository.getPresignedUrl(key);
 
             ArgumentCaptor<GetObjectPresignRequest> presignRequestCaptor =
                     ArgumentCaptor.forClass(GetObjectPresignRequest.class);
@@ -124,7 +122,7 @@ class S3ImageRepositoryTest {
                     .thenThrow(SdkClientException.create("AWS SDK 통신 실패"));
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> imageService.getPresignedUrl(key));
+                    () -> s3ImageRepository.getPresignedUrl(key));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.PRESIGNED_URL_GENERATION_FAILED);
         }

@@ -1,6 +1,5 @@
 package eatda.repository.image;
 
-import eatda.service.common.ImageDomain;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;

@@ -3,7 +3,6 @@ package eatda.repository.image;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.CacheSetting;
-import eatda.service.common.ImageDomain;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Set;
