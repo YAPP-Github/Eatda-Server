@@ -47,7 +47,7 @@ public enum BusinessErrorCode {
     INVALID_STORY_IMAGE_KEY("STY002", "스토리 이미지 Key는 필수입니다."),
     STORY_MEMBER_REQUIRED("STY003", "스토리 작성 시 회원 정보는 필수입니다."),
     STORY_STORE_REQUIRED("STY004", "스토리 작성 시 가게 정보는 필수입니다."),
-    STORY_NOT_FOUND("STY005", "스토리를 찾을 수 없습니다."),
+    STORY_NOT_FOUND("STY005", "스토리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     INVALID_STORE_ID("STY006", "유효하지 않은 가게 ID입니다."),
     INVALID_STORE_KAKAO_ID("STY007", "스토어 Kakao ID는 필수입니다."),
     INVALID_STORE_NAME("STY008", "스토어 이름은 필수입니다."),

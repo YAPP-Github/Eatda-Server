@@ -10,7 +10,7 @@ import eatda.client.oauth.OauthClient;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
-import eatda.repository.image.ImageRepository;
+import eatda.repository.image.S3ImageRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
@@ -35,7 +35,7 @@ public abstract class BaseServiceTest {
     protected MapClient mapClient;
 
     @MockitoBean
-    protected ImageRepository imageRepository;
+    protected S3ImageRepository imageRepository;
 
     @Autowired
     protected MemberGenerator memberGenerator;
