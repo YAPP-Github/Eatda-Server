@@ -1,5 +1,6 @@
 package eatda.service.story;
 
+import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesResponse;
@@ -13,7 +14,6 @@ import eatda.repository.member.MemberRepository;
 import eatda.repository.story.StoryRepository;
 import eatda.service.common.ImageDomain;
 import eatda.service.common.ImageService;
-import eatda.service.store.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class StoryService {
     private static final int PAGE_START_NUMBER = 0;
 
-    private final StoreService storeService;
+    private final MapClient mapClient;
     private final ImageService imageService;
     private final StoryRepository storyRepository;
     private final MemberRepository memberRepository;
@@ -36,7 +36,7 @@ public class StoryService {
     @Transactional
     public void registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<StoreSearchResult> searchResponses = storeService.searchStoreResults(request.query());
+        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
         String imageKey = imageService.upload(image, ImageDomain.STORY);
 
