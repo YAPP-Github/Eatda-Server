@@ -2,6 +2,8 @@ package eatda.client.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eatda.domain.store.StoreCategory;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record StoreSearchResult(
@@ -17,6 +19,17 @@ public record StoreSearchResult(
         @JsonProperty("x") double longitude
 ) {
 
+    private static final Map<String, StoreCategory> PREFIX_TO_CATEGORY = Map.of(
+            "음식점 > 한식", StoreCategory.KOREAN,
+            "음식점 > 중식", StoreCategory.CHINESE,
+            "음식점 > 일식", StoreCategory.JAPANESE,
+            "음식점 > 양식", StoreCategory.WESTERN,
+            "음식점 > 카페", StoreCategory.CAFE,
+            "음식점 > 간식 > 제과,베이커리", StoreCategory.BAKERY,
+            "음식점 > 술집", StoreCategory.PUB,
+            "음식점 > 패스트푸드", StoreCategory.FAST_FOOD
+    );
+
     public boolean isFoodStore() {
         return "FD6".equals(categoryGroupCode);
     }
@@ -26,5 +39,14 @@ public record StoreSearchResult(
             return false;
         }
         return lotNumberAddress.trim().startsWith("서울");
+    }
+
+    public StoreCategory getStoreCategory() {
+        return PREFIX_TO_CATEGORY.entrySet()
+                .stream()
+                .filter(entry -> categoryName.startsWith(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(StoreCategory.OTHER);
     }
 }
