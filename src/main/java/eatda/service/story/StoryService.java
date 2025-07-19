@@ -63,7 +63,7 @@ public class StoryService {
                         store.name(),
                         store.roadAddress(),
                         store.lotNumberAddress(),
-                        store.categoryName()
+                        store.getStoreCategory()
                 ))
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
     }
@@ -90,7 +90,7 @@ public class StoryService {
 
         return new StoryResponse(
                 story.getStoreKakaoId(),
-                story.getStoreCategory(),
+                story.getStoreCategory().getCategoryName(),
                 story.getStoreName(),
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),

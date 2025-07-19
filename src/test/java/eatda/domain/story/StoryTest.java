@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import eatda.domain.member.Member;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +26,7 @@ class StoryTest {
                     .storeName("곱창집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("정말 맛있어요")
                     .imageKey("story/image.jpg")
                     .build();
@@ -47,7 +48,7 @@ class StoryTest {
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .description("정말 맛있어요")
                             .imageKey("story/image.jpg")
                             .build()
@@ -68,7 +69,7 @@ class StoryTest {
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .description("맛있음")
                             .imageKey("story/image.jpg")
                             .build()
@@ -82,7 +83,7 @@ class StoryTest {
                     Story.builder()
                             .member(MEMBER)
                             .storeKakaoId("123")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .storeName(" ")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
@@ -99,7 +100,7 @@ class StoryTest {
                     Story.builder()
                             .member(MEMBER)
                             .storeKakaoId("123")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .storeName("곱창집")
                             .storeRoadAddress(" ")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
@@ -116,7 +117,7 @@ class StoryTest {
                     Story.builder()
                             .member(MEMBER)
                             .storeKakaoId("123")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress(" ")
@@ -133,7 +134,7 @@ class StoryTest {
                     Story.builder()
                             .member(MEMBER)
                             .storeKakaoId("123")
-                            .storeCategory(" ")
+                            .storeCategory(null)
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
@@ -157,7 +158,7 @@ class StoryTest {
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .description(" ")
                             .imageKey("story/image.jpg")
                             .build()
@@ -174,7 +175,7 @@ class StoryTest {
                             .storeName("곱창집")
                             .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                             .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                            .storeCategory("한식")
+                            .storeCategory(StoreCategory.KOREAN)
                             .description("맛있음")
                             .imageKey(" ")
                             .build()

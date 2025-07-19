@@ -11,6 +11,7 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
+import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
@@ -78,7 +79,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("곱창집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("미쳤다 진짜")
                     .imageKey("image-key-1")
                     .build();
@@ -89,7 +90,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("순대국밥집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("뜨끈한 국밥 최고")
                     .imageKey("image-key-2")
                     .build();
@@ -124,7 +125,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("진또곱창집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("곱창은 여기")
                     .imageKey("story-image-key")
                     .build();
