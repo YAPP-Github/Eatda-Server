@@ -35,7 +35,7 @@ public class CheerService {
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request, MultipartFile image, long memberId) {
         List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
-        StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.kakaoId());
+        StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
         String imageKey = imageService.upload(image, ImageDomain.CHEER);
 
         Member member = memberRepository.getById(memberId);

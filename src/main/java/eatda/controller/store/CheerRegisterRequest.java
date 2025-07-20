@@ -1,7 +1,7 @@
 package eatda.controller.store;
 
 public record CheerRegisterRequest(
-        String kakaoId,
+        String storeKakaoId,
         String storeName,
         String description
 ) {

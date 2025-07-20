@@ -22,7 +22,7 @@ public class CheerController {
 
     @PostMapping("/api/cheer")
     public ResponseEntity<CheerResponse> registerCheer(@RequestPart("request") CheerRegisterRequest request,
-                                                       @RequestPart("image") MultipartFile image,
+                                                       @RequestPart(value = "image", required = false) MultipartFile image,
                                                        LoginMember member) {
         CheerResponse response = cheerService.registerCheer(request, image, member.id());
         return ResponseEntity.status(HttpStatus.CREATED)

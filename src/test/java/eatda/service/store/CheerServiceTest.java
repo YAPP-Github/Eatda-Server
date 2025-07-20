@@ -75,6 +75,21 @@ class CheerServiceTest extends BaseServiceTest {
                     () -> assertThat(response.imageUrl()).isNotNull()
             );
         }
+
+        @Test
+        void 해당_응원의_이미지가_비어있어도_응원을_저장할_수_있다() {
+            Member member = memberGenerator.generate("123");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+
+            CheerResponse response = cheerService.registerCheer(request, null, member.getId());
+
+            Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
+                    () -> assertThat(response.imageUrl()).isNotNull()
+            );
+        }
     }
 
     @Nested
