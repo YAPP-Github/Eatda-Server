@@ -7,12 +7,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.BaseControllerTest;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.util.MappingUtils;
 import io.restassured.response.Response;
-import java.nio.charset.StandardCharsets;
+import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,22 +33,14 @@ public class StoryControllerTest extends BaseControllerTest {
     class RegisterStory {
 
         @Test
-        void 스토리를_등록할_수_있다() {
-            String requestJson = """
-                        {
-                          "query": "농민백암순대",
-                          "storeKakaoId": "123",
-                          "description": "여기 진짜 맛있어요!"
-                        }
-                    """;
-
-            byte[] imageBytes = "dummy image content".getBytes(StandardCharsets.UTF_8);
+        void 스토리를_등록할_수_있다() throws FileNotFoundException {
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
 
             Response response = given()
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
-                    .multiPart("request", "request.json", requestJson.getBytes(StandardCharsets.UTF_8), "application/json")
-                    .multiPart("image", "image.png", imageBytes, "image/png")
+                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .multiPart("image", getFile("classpath:test/test-image.png"))
                     .when()
                     .post("/api/stories");
 
@@ -78,7 +72,8 @@ public class StoryControllerTest extends BaseControllerTest {
             assertAll(
                     () -> assertThat(response.stories()).hasSize(2),
                     () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(1L),
-                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg")
+                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo(
+                            "https://s3.bucket.com/story/dummy/1.jpg")
             );
         }
     }
@@ -100,20 +95,23 @@ public class StoryControllerTest extends BaseControllerTest {
                     "https://s3.bucket.com/story1.jpg"
             )).when(storyService).getStory(storyId);
 
-            Response response = given()
+            StoryResponse response = given()
                     .pathParam("storyId", storyId)
                     .when()
-                    .get("/api/stories/{storyId}");
-
-            response.then()
+                    .get("/api/stories/{storyId}")
+                    .then()
                     .statusCode(200)
-                    .body("storeKakaoId", equalTo("123456"))
-                    .body("category", equalTo("한식"))
-                    .body("storeName", equalTo("진또곱창집"))
-                    .body("storeDistrict", equalTo("성동구"))
-                    .body("storeNeighborhood", equalTo("성수동"))
-                    .body("description", equalTo("곱창은 여기"))
-                    .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
+                    .extract().as(StoryResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.storeKakaoId()).isEqualTo("123456"),
+                    () -> assertThat(response.category()).isEqualTo("한식"),
+                    () -> assertThat(response.storeName()).isEqualTo("진또곱창집"),
+                    () -> assertThat(response.storeDistrict()).isEqualTo("성동구"),
+                    () -> assertThat(response.storeNeighborhood()).isEqualTo("성수동"),
+                    () -> assertThat(response.description()).isEqualTo("곱창은 여기"),
+                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story1.jpg")
+            );
         }
 
         @Test
@@ -123,12 +121,9 @@ public class StoryControllerTest extends BaseControllerTest {
             doThrow(new BusinessException(BusinessErrorCode.STORY_NOT_FOUND))
                     .when(storyService).getStory(nonexistentId);
 
-            Response response = given()
-                    .pathParam("storyId", nonexistentId)
-                    .when()
-                    .get("/api/stories/{storyId}");
-
-            response.then()
+            given().pathParam("storyId", nonexistentId)
+                    .when().get("/api/stories/{storyId}")
+                    .then()
                     .statusCode(404)
                     .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
                     .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
