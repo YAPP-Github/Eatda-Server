@@ -2,6 +2,7 @@ package eatda.service.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
@@ -12,6 +13,8 @@ import eatda.controller.store.CheersResponse;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +43,37 @@ class CheerServiceTest extends BaseServiceTest {
                             "서울 중구 북창동 19-4", null, 37.5d, 127.0d)
             );
             doReturn(searchResults).when(mapClient).searchShops(anyString());
+        }
+
+        @Test
+        void 응원_개수가_최대_개수를_초과하면_예외가_발생한다() {
+            Member member = memberGenerator.generate("123");
+            Store store1 = storeGenerator.generate("124", "서울시 강남구 역삼동 123-45");
+            Store store2 = storeGenerator.generate("125", "서울시 강남구 역삼동 123-45");
+            Store store3 = storeGenerator.generate("126", "서울시 강남구 역삼동 123-45");
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> cheerService.registerCheer(request, null, member.getId()));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER);
+        }
+
+        @Test
+        void 이미_응원한_가게에_대해_응원하면_예외가_발생한다() {
+            Member member = memberGenerator.generate("123");
+            Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+            cheerGenerator.generateCommon(member, store);
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> cheerService.registerCheer(request, null, member.getId()));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.ALREADY_CHEERED);
         }
 
         @Test

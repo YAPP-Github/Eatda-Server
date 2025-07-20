@@ -85,6 +85,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {
                 "UNAUTHORIZED_MEMBER",
                 "EXPIRED_TOKEN",
+                "FULL_CHEER_SIZE_PER_MEMBER",
                 "MAP_SERVER_ERROR",
                 "STORE_NOT_FOUND",
                 "FILE_UPLOAD_FAILED",

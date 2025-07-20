@@ -9,6 +9,8 @@ import eatda.controller.store.CheersResponse;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
@@ -25,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CheerService {
 
+    private static final int MAX_CHEER_SIZE = 3;
+
     private final MapClient mapClient;
     private final StoreSearchFilter storeSearchFilter;
     private final MemberRepository memberRepository;
@@ -34,11 +38,18 @@ public class CheerService {
 
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request, MultipartFile image, long memberId) {
+        Member member = memberRepository.getById(memberId);
+        if (cheerRepository.countByMember(member) >= MAX_CHEER_SIZE) {
+            throw new BusinessException(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER);
+        }
+        if (cheerRepository.existsByMemberAndStoreKakaoId(member, request.storeKakaoId())) {
+            throw new BusinessException(BusinessErrorCode.ALREADY_CHEERED);
+        }
+
         List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
         StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
         String imageKey = imageService.upload(image, ImageDomain.CHEER);
 
-        Member member = memberRepository.getById(memberId);
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore()));
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
