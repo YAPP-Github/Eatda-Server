@@ -43,6 +43,10 @@ public record StoreSearchResult(
     }
 
     public StoreCategory getStoreCategory() {
+        if (categoryName == null) {
+            return StoreCategory.OTHER;
+        }
+
         return PREFIX_TO_CATEGORY.entrySet()
                 .stream()
                 .filter(entry -> categoryName.startsWith(entry.getKey()))
