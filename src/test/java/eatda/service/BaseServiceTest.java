@@ -7,9 +7,11 @@ import static org.mockito.Mockito.doReturn;
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
+import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
+import eatda.repository.article.ArticleRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
@@ -46,6 +48,9 @@ public abstract class BaseServiceTest {
     protected CheerGenerator cheerGenerator;
 
     @Autowired
+    protected ArticleGenerator articleGenerator;
+
+    @Autowired
     protected MemberRepository memberRepository;
 
     @Autowired
@@ -53,6 +58,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
+
+    @Autowired
+    protected ArticleRepository articleRepository;
 
     @BeforeEach
     void mockingImageService() {

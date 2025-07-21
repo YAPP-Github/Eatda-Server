@@ -12,13 +12,13 @@ import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.member.Member;
+import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.service.common.ImageService;
 import eatda.service.common.ImageService;
 import eatda.service.story.StoryService;
 import io.restassured.RestAssured;
@@ -58,6 +58,9 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
+
+    @Autowired
+    protected ArticleGenerator articleGenerator;
 
     @Autowired
     protected MemberRepository memberRepository;
