@@ -2,13 +2,13 @@ package eatda.document.story;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
@@ -39,7 +39,10 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 );
 
-        RestDocsResponse responseDocument = response();
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("storyId").description("등록된 스토리의 ID")
+                );
 
         @Test
         void 스토리_등록_성공() {
@@ -47,7 +50,8 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .when(imageService)
                     .upload(any(), org.mockito.ArgumentMatchers.eq(ImageDomain.STORY));
 
-            doNothing().when(storyService)
+            doReturn(new StoryRegisterResponse(123L))
+                    .when(storyService)
                     .registerStory(any(), any(), any());
 
             String requestJson = """
@@ -72,7 +76,9 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .multiPart("image", "image.png", imageBytes, "image/png")
                     .when().post("/api/stories");
 
-            response.then().statusCode(201);
+            response.then()
+                    .statusCode(201)
+                    .body("storyId", equalTo(123));
         }
 
         @Test
