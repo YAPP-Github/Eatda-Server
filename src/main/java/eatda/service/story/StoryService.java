@@ -4,6 +4,7 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
@@ -34,7 +35,7 @@ public class StoryService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
+    public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
         Member member = memberRepository.getById(memberId);
         List<StoreSearchResult> searchResponses = storeService.searchStoreResults(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
@@ -52,6 +53,8 @@ public class StoryService {
                 .build();
 
         storyRepository.save(story);
+
+        return new StoryRegisterResponse(story.getId());
     }
 
     private FilteredSearchResult filteredSearchResponse(List<StoreSearchResult> responses, String storeKakaoId) {
