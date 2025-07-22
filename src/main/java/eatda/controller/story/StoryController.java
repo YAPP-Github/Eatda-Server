@@ -22,13 +22,13 @@ public class StoryController {
     private final StoryService storyService;
 
     @PostMapping("/api/stories")
-    public ResponseEntity<Void> registerStory(
+    public ResponseEntity<StoryRegisterResponse> registerStory(
             @RequestPart("request") StoryRegisterRequest request,
             @RequestPart("image") MultipartFile image,
             LoginMember member
     ) {
-        storyService.registerStory(request, image, member.id());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(storyService.registerStory(request, image, member.id()));
     }
 
     @GetMapping("api/stories")
