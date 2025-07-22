@@ -2,13 +2,13 @@ package eatda.service.story;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import eatda.client.map.StoreSearchResult;
+import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
@@ -93,7 +93,10 @@ public class StoryServiceTest extends BaseServiceTest {
 
             var response = storyService.getPagedStoryPreviews(5);
 
-            assertThat(response.stories()).hasSize(2);
+            assertThat(response.stories())
+                    .hasSize(2)
+                    .extracting(StoryPreview::storyId)
+                    .containsExactlyInAnyOrder(story2.getId(), story1.getId());
         }
     }
 
