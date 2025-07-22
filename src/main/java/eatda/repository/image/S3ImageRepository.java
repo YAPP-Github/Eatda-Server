@@ -2,7 +2,6 @@ package eatda.repository.image;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.CacheSetting;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Set;
@@ -24,8 +23,7 @@ public class S3ImageRepository {
     private static final String DEFAULT_CONTENT_TYPE = "bin";
     private static final String PATH_DELIMITER = "/";
     private static final String EXTENSION_DELIMITER = ".";
-    private static final Duration PRESIGNED_URL_DURATION = CacheSetting.IMAGE.getTimeToLive()
-            .plus(Duration.ofMinutes(5));
+    private static final Duration PRESIGNED_URL_DURATION = Duration.ofMinutes(30);
 
     private final S3Client s3Client;
     private final String bucket;
