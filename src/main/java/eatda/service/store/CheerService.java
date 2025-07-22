@@ -39,21 +39,25 @@ public class CheerService {
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request, MultipartFile image, long memberId) {
         Member member = memberRepository.getById(memberId);
-        if (cheerRepository.countByMember(member) >= MAX_CHEER_SIZE) {
-            throw new BusinessException(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER);
-        }
-        if (cheerRepository.existsByMemberAndStoreKakaoId(member, request.storeKakaoId())) {
-            throw new BusinessException(BusinessErrorCode.ALREADY_CHEERED);
-        }
+        validateRegisterCheer(member, request.storeKakaoId());
 
         List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
         StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
         String imageKey = imageService.upload(image, ImageDomain.CHEER);
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
-                .orElseGet(() -> storeRepository.save(result.toStore()));
+                .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
         return new CheerResponse(cheer, imageService.getPresignedUrl(imageKey), store);
+    }
+
+    private void validateRegisterCheer(Member member, String storeKakaoId) {
+        if (cheerRepository.countByMember(member) >= MAX_CHEER_SIZE) {
+            throw new BusinessException(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER);
+        }
+        if (cheerRepository.existsByMemberAndStoreKakaoId(member, storeKakaoId)) {
+            throw new BusinessException(BusinessErrorCode.ALREADY_CHEERED);
+        }
     }
 
     @Transactional(readOnly = true)
