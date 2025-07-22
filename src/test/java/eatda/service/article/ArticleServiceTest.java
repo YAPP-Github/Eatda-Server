@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import eatda.controller.article.ArticleResponse;
 import eatda.service.BaseServiceTest;
-import java.util.List;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,15 +24,9 @@ public class ArticleServiceTest extends BaseServiceTest {
 
             var response = articleService.getAllArticles(3);
 
-            assertThat(response.articles()).hasSize(3);
-            List<String> titles = response.articles().stream()
-                    .map(ArticleResponse::title)
-                    .toList();
-            assertThat(titles).containsExactly(
-                    "아티클 제목 5",
-                    "아티클 제목 4",
-                    "아티클 제목 3"
-            );
+            assertThat(response.articles()).hasSize(3)
+                    .extracting(ArticleResponse::title)
+                    .containsExactly("아티클 제목 5", "아티클 제목 4", "아티클 제목 3");
         }
     }
 }
