@@ -21,12 +21,10 @@ public class ArticleService {
         List<ArticleResponse> articles = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest)
                 .stream()
                 .map(article -> new ArticleResponse(
-                        article.getId(),
                         article.getTitle(),
                         article.getSubtitle(),
                         article.getArticleUrl(),
-                        imageService.getPresignedUrl(article.getImageKey()),
-                        article.getCreatedAt()
+                        imageService.getPresignedUrl(article.getImageKey())
                 ))
                 .toList();
 

@@ -42,12 +42,10 @@ public class ArticleGenerator {
 
     public ArticleResponse toResponse(Article article) {
         return new ArticleResponse(
-                article.getId(),
                 article.getTitle(),
                 article.getSubtitle(),
                 article.getArticleUrl(),
-                "https://s3.bucket.com/" + article.getImageKey(),
-                article.getCreatedAt()
+                "https://s3.bucket.com/" + article.getImageKey()
         );
     }
 }

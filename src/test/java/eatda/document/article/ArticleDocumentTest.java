@@ -11,7 +11,6 @@ import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import io.restassured.response.Response;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,32 +30,26 @@ public class ArticleDocumentTest extends BaseDocumentTest {
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
                         fieldWithPath("articles").description("게시글 응답 리스트"),
-                        fieldWithPath("articles[].id").description("게시글 ID"),
                         fieldWithPath("articles[].title").description("게시글 제목"),
                         fieldWithPath("articles[].subtitle").description("게시글 소제목"),
                         fieldWithPath("articles[].articleUrl").description("게시글 링크 URL"),
-                        fieldWithPath("articles[].imageUrl").description("게시글 이미지 URL"),
-                        fieldWithPath("articles[].createdAt").description("작성 시각")
+                        fieldWithPath("articles[].imageUrl").description("게시글 이미지 URL")
                 );
 
         @Test
         void 가게의_담긴_이야기_목록_조회_성공() {
             ArticlesResponse mockResponse = new ArticlesResponse(List.of(
                     new ArticleResponse(
-                            1L,
                             "국밥의 모든 것",
                             "뜨끈한 국물의 세계",
                             "https://eatda.com/article/1",
-                            "https://s3.bucket.com/article/1.jpg",
-                            LocalDateTime.now()
+                            "https://s3.bucket.com/article/1.jpg"
                     ),
                     new ArticleResponse(
-                            2L,
                             "순대국의 진실",
                             "돼지부속의 미학",
                             "https://eatda.com/article/2",
-                            "https://s3.bucket.com/article/2.jpg",
-                            LocalDateTime.now()
+                            "https://s3.bucket.com/article/2.jpg"
                     )
             ));
 
