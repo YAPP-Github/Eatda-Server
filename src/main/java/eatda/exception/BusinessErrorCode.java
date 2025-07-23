@@ -26,6 +26,8 @@ public enum BusinessErrorCode {
     // Cheer
     INVALID_CHEER_DESCRIPTION("CHE001", "응원 메시지는 필수입니다."),
     INVALID_CHEER_IMAGE_KEY("CHE002", "응원 이미지 키가 비어 있습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FULL_CHEER_SIZE_PER_MEMBER("CHE003", "회원당 응원 한도가 넘었습니다."),
+    ALREADY_CHEERED("CHE004", "이미 응원한 가게입니다."),
 
     // Map
     MAP_SERVER_ERROR("MAP001", "지도 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),

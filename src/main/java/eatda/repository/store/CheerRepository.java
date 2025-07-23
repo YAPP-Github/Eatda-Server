@@ -1,5 +1,6 @@
 package eatda.repository.store;
 
+import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
 import java.util.List;
@@ -15,9 +16,13 @@ public interface CheerRepository extends Repository<Cheer, Long> {
     List<Cheer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     @Query("""
-    SELECT c.imageKey FROM Cheer c
-        WHERE c.store = :store AND c.imageKey IS NOT NULL
-        ORDER BY c.createdAt DESC
-        LIMIT 1""")
+            SELECT c.imageKey FROM Cheer c
+                WHERE c.store = :store AND c.imageKey IS NOT NULL
+                ORDER BY c.createdAt DESC
+                LIMIT 1""")
     Optional<String> findRecentImageKey(Store store);
+
+    int countByMember(Member member);
+
+    boolean existsByMemberAndStoreKakaoId(Member member, String storeKakaoId);
 }

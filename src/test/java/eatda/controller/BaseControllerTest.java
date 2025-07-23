@@ -12,6 +12,7 @@ import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.member.Member;
+import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
@@ -57,6 +58,9 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
+
+    @Autowired
+    protected ArticleGenerator articleGenerator;
 
     @Autowired
     protected MemberRepository memberRepository;

@@ -1,10 +1,12 @@
 package eatda.controller.story;
 
+import eatda.domain.store.StoreCategory;
+
 public record FilteredSearchResult(
         String kakaoId,
         String name,
         String roadAddress,
         String lotNumberAddress,
-        String category
+        StoreCategory category
 ) {
 }

@@ -1,9 +1,11 @@
 package eatda.service.story;
 
+import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
@@ -13,7 +15,6 @@ import eatda.repository.image.ImageDomain;
 import eatda.repository.image.ImageRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.story.StoryRepository;
-import eatda.service.store.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,15 +30,15 @@ public class StoryService {
 
     private static final int PAGE_START_NUMBER = 0;
 
-    private final StoreService storeService;
     private final ImageRepository imageRepository;
+    private final MapClient mapClient;
     private final StoryRepository storyRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
+    public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<StoreSearchResult> searchResponses = storeService.searchStoreResults(request.query());
+        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
         String imageKey = imageRepository.upload(image, ImageDomain.STORY);
 
@@ -53,6 +54,8 @@ public class StoryService {
                 .build();
 
         storyRepository.save(story);
+
+        return new StoryRegisterResponse(story.getId());
     }
 
     private FilteredSearchResult filteredSearchResponse(List<StoreSearchResult> responses, String storeKakaoId) {
@@ -64,7 +67,7 @@ public class StoryService {
                         store.name(),
                         store.roadAddress(),
                         store.lotNumberAddress(),
-                        store.categoryName()
+                        store.getStoreCategory()
                 ))
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
     }
@@ -91,7 +94,7 @@ public class StoryService {
 
         return new StoryResponse(
                 story.getStoreKakaoId(),
-                story.getStoreCategory(),
+                story.getStoreCategory().getCategoryName(),
                 story.getStoreName(),
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),

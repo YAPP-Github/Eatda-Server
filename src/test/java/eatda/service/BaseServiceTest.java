@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
+import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
@@ -45,6 +46,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
+
+    @Autowired
+    protected ArticleGenerator articleGenerator;
 
     @Autowired
     protected MemberRepository memberRepository;

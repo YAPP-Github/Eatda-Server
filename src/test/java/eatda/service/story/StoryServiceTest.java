@@ -2,7 +2,6 @@ package eatda.service.story;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +11,7 @@ import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.member.Member;
+import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
@@ -46,7 +46,9 @@ public class StoryServiceTest extends BaseServiceTest {
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
             when(imageRepository.upload(image, ImageDomain.STORY)).thenReturn("image-key");
 
-            assertDoesNotThrow(() -> storyService.registerStory(request, image, member.getId()));
+            var response = storyService.registerStory(request, image, member.getId());
+
+            assertThat(storyRepository.existsById(response.storyId())).isTrue();
         }
 
         @Test
@@ -75,7 +77,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("곱창집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("미쳤다 진짜")
                     .imageKey("image-key-1")
                     .build();
@@ -85,7 +87,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("순대국밥집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("뜨끈한 국밥 최고")
                     .imageKey("image-key-2")
                     .build();
@@ -113,7 +115,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeName("진또곱창집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
-                    .storeCategory("한식")
+                    .storeCategory(StoreCategory.KOREAN)
                     .description("곱창은 여기")
                     .imageKey("story-image-key")
                     .build();

@@ -7,6 +7,7 @@ public enum Tag {
     STORE_API("Store API"),
     STORY_API("Story API"),
     CHEER_API("Cheer API"),
+    ARTICLE_API("Article API"),
     ;
 
     private final String displayName;

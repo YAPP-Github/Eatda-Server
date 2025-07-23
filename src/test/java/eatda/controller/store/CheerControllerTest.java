@@ -7,10 +7,54 @@ import eatda.controller.BaseControllerTest;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
+import eatda.util.ImageUtils;
+import eatda.util.MappingUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 
 class CheerControllerTest extends BaseControllerTest {
+
+    @Nested
+    class RegisterCheer {
+
+        @Test
+        void 응원을_등록한다() {
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+
+            CheerResponse response = given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .contentType("multipart/form-data")
+                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .multiPart("image", ImageUtils.getTestImage())
+                    .when()
+                    .post("/api/cheer")
+                    .then()
+                    .statusCode(201)
+                    .extract().as(CheerResponse.class);
+
+            assertThat(response.storeId()).isEqualTo(store.getId());
+        }
+
+        @Test
+        void 이미지가_비어있을_경우에도_응원을_등록한다() {
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+
+            CheerResponse response = given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .contentType("multipart/form-data")
+                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .when()
+                    .post("/api/cheer")
+                    .then()
+                    .statusCode(201)
+                    .extract().as(CheerResponse.class);
+
+            assertThat(response.storeId()).isEqualTo(store.getId());
+        }
+    }
 
     @Nested
     class GetCheers {

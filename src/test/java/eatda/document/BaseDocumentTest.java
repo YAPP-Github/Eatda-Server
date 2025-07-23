@@ -7,6 +7,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import eatda.controller.web.jwt.JwtManager;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.EtcErrorCode;
+import eatda.service.article.ArticleService;
 import eatda.service.auth.AuthService;
 import eatda.service.member.MemberService;
 import eatda.service.store.CheerService;
@@ -53,6 +54,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected CheerService cheerService;
+
+    @MockitoBean
+    protected ArticleService articleService;
 
     @MockitoBean
     protected JwtManager jwtManager;
