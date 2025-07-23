@@ -7,14 +7,14 @@ import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.image.ImageDomain;
-import eatda.repository.image.ImageRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.story.StoryRepository;
+import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,7 @@ public class StoryService {
 
     private static final int PAGE_START_NUMBER = 0;
 
-    private final ImageRepository imageRepository;
+    private final ImageStorage imageStorage;
     private final MapClient mapClient;
     private final StoryRepository storyRepository;
     private final MemberRepository memberRepository;
@@ -40,7 +40,7 @@ public class StoryService {
         Member member = memberRepository.getById(memberId);
         List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
-        String imageKey = imageRepository.upload(image, ImageDomain.STORY);
+        String imageKey = imageStorage.upload(image, ImageDomain.STORY);
 
         Story story = Story.builder()
                 .member(member)
@@ -81,7 +81,7 @@ public class StoryService {
                 orderByPage.getContent().stream()
                         .map(story -> new StoriesResponse.StoryPreview(
                                 story.getId(),
-                                imageRepository.getPresignedUrl(story.getImageKey())
+                                imageStorage.getPresignedUrl(story.getImageKey())
                         ))
                         .toList()
         );
@@ -99,7 +99,7 @@ public class StoryService {
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),
                 story.getDescription(),
-                imageRepository.getPresignedUrl(story.getImageKey())
+                imageStorage.getPresignedUrl(story.getImageKey())
         );
     }
 }

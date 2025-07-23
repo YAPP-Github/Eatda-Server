@@ -1,4 +1,4 @@
-package eatda.repository.image;
+package eatda.storage.image;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import eatda.domain.ImageDomain;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.net.URL;
@@ -27,19 +28,19 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-class S3ImageRepositoryTest {
+class ExternalImageStorageTest {
 
     private static final String TEST_BUCKET = "test-bucket";
 
     private S3Client s3Client;
     private S3Presigner s3Presigner;
-    private S3ImageRepository s3ImageRepository;
+    private ExternalImageStorage externalImageStorage;
 
     @BeforeEach
     void setUp() {
         s3Client = mock(S3Client.class);
         s3Presigner = mock(S3Presigner.class);
-        s3ImageRepository = new S3ImageRepository(s3Client, TEST_BUCKET, s3Presigner);
+        externalImageStorage = new ExternalImageStorage(s3Client, TEST_BUCKET, s3Presigner);
     }
 
     @Nested
@@ -55,7 +56,7 @@ class S3ImageRepositoryTest {
                     "image", originalFilename, contentType, "image-content".getBytes()
             );
 
-            String key = s3ImageRepository.upload(file, imageDomain);
+            String key = externalImageStorage.upload(file, imageDomain);
 
             ArgumentCaptor<PutObjectRequest> putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
             verify(s3Client).putObject(putObjectRequestCaptor.capture(), any(RequestBody.class));
@@ -78,7 +79,7 @@ class S3ImageRepositoryTest {
             );
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> s3ImageRepository.upload(file, ImageDomain.STORY));
+                    () -> externalImageStorage.upload(file, ImageDomain.STORY));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_IMAGE_TYPE);
         }
@@ -99,7 +100,7 @@ class S3ImageRepositoryTest {
             when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
                     .thenReturn(presignedRequestResult);
 
-            String presignedUrl = s3ImageRepository.getPresignedUrl(key);
+            String presignedUrl = externalImageStorage.getPresignedUrl(key);
 
             ArgumentCaptor<GetObjectPresignRequest> presignRequestCaptor =
                     ArgumentCaptor.forClass(GetObjectPresignRequest.class);
@@ -122,7 +123,7 @@ class S3ImageRepositoryTest {
                     .thenThrow(SdkClientException.create("AWS SDK 통신 실패"));
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> s3ImageRepository.getPresignedUrl(key));
+                    () -> externalImageStorage.getPresignedUrl(key));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.PRESIGNED_URL_GENERATION_FAILED);
         }

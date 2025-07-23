@@ -16,11 +16,11 @@ import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
-import eatda.repository.image.ImageRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.service.story.StoryService;
+import eatda.storage.image.ImageStorage;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
@@ -81,7 +81,7 @@ public class BaseControllerTest {
     private MapClient mapClient;
 
     @MockitoBean
-    private ImageRepository imageRepository;
+    private ImageStorage imageStorage;
 
     @MockitoBean
     protected StoryService storyService; // TODO 실 객체로 변환
@@ -113,8 +113,8 @@ public class BaseControllerTest {
         );
         doReturn(searchResults).when(mapClient).searchShops(anyString());
 
-        doReturn(MOCKED_IMAGE_URL).when(imageRepository).getPresignedUrl(anyString());
-        doReturn(MOCKED_IMAGE_KEY).when(imageRepository).upload(any(), any());
+        doReturn(MOCKED_IMAGE_URL).when(imageStorage).getPresignedUrl(anyString());
+        doReturn(MOCKED_IMAGE_KEY).when(imageStorage).upload(any(), any());
     }
 
     protected final RequestSpecification given() {

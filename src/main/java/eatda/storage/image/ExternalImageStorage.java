@@ -1,5 +1,6 @@
-package eatda.repository.image;
+package eatda.storage.image;
 
+import eatda.domain.ImageDomain;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @Component
-public class S3ImageRepository {
+public class ExternalImageStorage {
 
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpg", "image/jpeg", "image/png");
     private static final String DEFAULT_CONTENT_TYPE = "bin";
@@ -29,7 +30,7 @@ public class S3ImageRepository {
     private final String bucket;
     private final S3Presigner s3Presigner;
 
-    public S3ImageRepository(
+    public ExternalImageStorage(
             S3Client s3Client,
             @Value("${spring.cloud.aws.s3.bucket}") String bucket,
             S3Presigner s3Presigner) {

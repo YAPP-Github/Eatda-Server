@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
-import eatda.repository.BaseJpaRepositoryTest;
+import eatda.repository.BaseRepositoryTest;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class CheerRepositoryTest extends BaseJpaRepositoryTest {
+class CheerRepositoryTest extends BaseRepositoryTest {
 
     @Nested
     class FindRecentImageKey {

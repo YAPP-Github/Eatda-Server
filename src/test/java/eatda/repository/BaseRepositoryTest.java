@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 @Import({MemberGenerator.class, StoreGenerator.class, CheerGenerator.class})
 @DataJpaTest
-public abstract class BaseJpaRepositoryTest {
+public abstract class BaseRepositoryTest {
 
     @Autowired
     protected MemberGenerator memberGenerator;

@@ -1,4 +1,4 @@
-package eatda.repository.image;
+package eatda.storage.image;
 
 import eatda.repository.CacheSetting;
 import java.util.Optional;
@@ -7,13 +7,13 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CachePreSignedUrlRepository {
+public class CachePreSignedUrlStorage {
 
     private static final String CACHE_NAME = CacheSetting.IMAGE.getName();
 
     private final Cache cache;
 
-    public CachePreSignedUrlRepository(CacheManager cacheManager) {
+    public CachePreSignedUrlStorage(CacheManager cacheManager) {
         this.cache = cacheManager.getCache(CACHE_NAME);
     }
 

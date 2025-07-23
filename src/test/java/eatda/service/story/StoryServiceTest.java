@@ -10,12 +10,12 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.image.ImageDomain;
 import eatda.service.BaseServiceTest;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +44,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
-            when(imageRepository.upload(image, ImageDomain.STORY)).thenReturn("image-key");
+            when(externalImageStorage.upload(image, ImageDomain.STORY)).thenReturn("image-key");
 
             var response = storyService.registerStory(request, image, member.getId());
 
@@ -122,7 +122,7 @@ public class StoryServiceTest extends BaseServiceTest {
 
             storyRepository.save(story);
 
-            when(imageRepository.getPresignedUrl("story-image-key"))
+            when(externalImageStorage.getPresignedUrl("story-image-key"))
                     .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
 
             StoryResponse response = storyService.getStory(story.getId());
