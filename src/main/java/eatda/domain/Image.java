@@ -3,8 +3,10 @@ package eatda.domain;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.util.Set;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
+@Getter
 public class Image {
 
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpg", "image/jpeg", "image/png");
@@ -22,6 +24,7 @@ public class Image {
 
     private void validateContentType(MultipartFile file) {
         if (!ALLOWED_CONTENT_TYPES.contains(file.getContentType())) {
+            System.out.println("Invalid content type: " + file.getContentType());
             throw new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE);
         }
     }

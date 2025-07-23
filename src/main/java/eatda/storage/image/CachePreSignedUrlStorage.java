@@ -1,5 +1,6 @@
 package eatda.storage.image;
 
+import eatda.domain.ImageKey;
 import eatda.repository.CacheSetting;
 import java.util.Optional;
 import org.springframework.cache.Cache;
@@ -17,11 +18,11 @@ public class CachePreSignedUrlStorage {
         this.cache = cacheManager.getCache(CACHE_NAME);
     }
 
-    public void put(String imageKey, String preSignedUrl) {
-        cache.put(imageKey, preSignedUrl);
+    public void put(ImageKey imageKey, String preSignedUrl) {
+        cache.put(imageKey.getValue(), preSignedUrl);
     }
 
-    public Optional<String> get(String imageKey) {
-        return Optional.ofNullable(cache.get(imageKey, String.class));
+    public Optional<String> get(ImageKey imageKey) {
+        return Optional.ofNullable(cache.get(imageKey.getValue(), String.class));
     }
 }

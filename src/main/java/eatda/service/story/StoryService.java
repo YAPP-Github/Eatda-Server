@@ -7,7 +7,9 @@ import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.Image;
 import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
@@ -36,11 +38,11 @@ public class StoryService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile image, Long memberId) {
+    public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile imageFile, Long memberId) {
         Member member = memberRepository.getById(memberId);
         List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
-        String imageKey = imageStorage.upload(image, ImageDomain.STORY);
+        String imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile)).getValue();
 
         Story story = Story.builder()
                 .member(member)
@@ -81,7 +83,7 @@ public class StoryService {
                 orderByPage.getContent().stream()
                         .map(story -> new StoriesResponse.StoryPreview(
                                 story.getId(),
-                                imageStorage.getPresignedUrl(story.getImageKey())
+                                imageStorage.getPreSignedUrl(new ImageKey(story.getImageKey()))
                         ))
                         .toList()
         );
@@ -99,7 +101,7 @@ public class StoryService {
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),
                 story.getDescription(),
-                imageStorage.getPresignedUrl(story.getImageKey())
+                imageStorage.getPreSignedUrl(new ImageKey(story.getImageKey()))
         );
     }
 }

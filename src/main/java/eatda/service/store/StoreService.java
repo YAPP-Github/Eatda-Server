@@ -8,6 +8,7 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
+import eatda.domain.ImageKey;
 import eatda.domain.store.Store;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
@@ -38,7 +39,7 @@ public class StoreService {
 
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerRepository.findRecentImageKey(store)
-                .map(imageStorage::getPresignedUrl);
+                .map(key -> imageStorage.getPreSignedUrl(new ImageKey(key)));
     }
 
     public StoreSearchResponses searchStores(String query) {

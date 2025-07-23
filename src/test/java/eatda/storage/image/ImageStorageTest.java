@@ -2,29 +2,31 @@ package eatda.storage.image;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import eatda.client.file.FileClient;
+import eatda.domain.Image;
 import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.storage.BaseStorageTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.mock.web.MockMultipartFile;
 
 class ImageStorageTest extends BaseStorageTest {
 
+    private FileClient fileClient;
     private ExternalImageStorage externalImageStorage;
     private CachePreSignedUrlStorage cachePreSignedUrlStorage;
     private ImageStorage imageStorage;
 
     @BeforeEach
     void setUp() {
+        fileClient = mock(FileClient.class);
         externalImageStorage = mock(ExternalImageStorage.class);
         cachePreSignedUrlStorage = new CachePreSignedUrlStorage(getCacheManager());
         imageStorage = new ImageStorage(externalImageStorage, cachePreSignedUrlStorage);
@@ -38,11 +40,13 @@ class ImageStorageTest extends BaseStorageTest {
             MockMultipartFile file = new MockMultipartFile(
                     "image", "test-image.jpg", "image/jpeg", "image-content".getBytes()
             );
-            doReturn("test-image-key").when(externalImageStorage).upload(file, ImageDomain.MEMBER);
+            Image image = new Image(ImageDomain.MEMBER, file);
+            ImageKey expectedImageKey = new ImageKey("test-image-key");
+            doReturn(expectedImageKey).when(externalImageStorage).upload(image);
 
-            String imageKey = imageStorage.upload(file, ImageDomain.MEMBER);
+            ImageKey actualImageKey = imageStorage.upload(image);
 
-            assertThat(imageKey).isEqualTo("test-image-key");
+            assertThat(actualImageKey).isEqualTo(expectedImageKey);
         }
 
         @Test
@@ -50,45 +54,49 @@ class ImageStorageTest extends BaseStorageTest {
             MockMultipartFile file = new MockMultipartFile(
                     "image", "test-image.jpg", "image/jpeg", "image-content".getBytes()
             );
-            doReturn("test-image-key").when(externalImageStorage).upload(file, ImageDomain.MEMBER);
-            doReturn("https://example.url.com").when(externalImageStorage).getPresignedUrl("test-image-key");
+            Image image = new Image(ImageDomain.MEMBER, file);
+            ImageKey imageKey = new ImageKey("test-image-key");
+            doReturn(imageKey).when(externalImageStorage).upload(image);
+            doReturn("https://example.url.com").when(externalImageStorage).getPreSignedUrl(imageKey);
 
-            imageStorage.upload(file, ImageDomain.MEMBER);
+            imageStorage.upload(image);
 
-            assertThat(cachePreSignedUrlStorage.get("test-image-key")).contains("https://example.url.com");
+            assertThat(cachePreSignedUrlStorage.get(new ImageKey("test-image-key"))).contains(
+                    "https://example.url.com");
         }
     }
 
     @Nested
-    class GetPresignedUrl {
+    class GetPreSignedUrl {
 
-        @ParameterizedTest
-        @NullAndEmptySource
-        void 이미지_키가_null이면__null을_반환한다(String imageKey) {
-            String actual = imageStorage.getPresignedUrl(imageKey);
+        @Test
+        void 이미지_키가_null이면__null을_반환한다() {
+            ImageKey imageKey = null;
+
+            String actual = imageStorage.getPreSignedUrl(imageKey);
 
             assertThat(actual).isNull();
         }
 
         @Test
         void 이미지_키가_캐시에_존재하면_s3에_요청하지_않고_PreSignedUrl을_반환한다() {
-            String imageKey = "test-image-key";
+            ImageKey imageKey = new ImageKey("test-image-key");
             cachePreSignedUrlStorage.put(imageKey, "https://example.url.com");
 
-            String preSignedUrl = imageStorage.getPresignedUrl(imageKey);
+            String preSignedUrl = imageStorage.getPreSignedUrl(imageKey);
 
             assertAll(
                     () -> assertThat(preSignedUrl).isEqualTo("https://example.url.com"),
-                    () -> verify(externalImageStorage, never()).getPresignedUrl(anyString())
+                    () -> verify(externalImageStorage, never()).getPreSignedUrl(imageKey)
             );
         }
 
         @Test
         void 이미지_키가_캐시에_존재하지_않으면_S3에서_PreSignedUrl을_조회하고_캐시에_저장한다() {
-            String imageKey = "test-image-key";
-            doReturn("https://example.url.com").when(externalImageStorage).getPresignedUrl(imageKey);
+            ImageKey imageKey = new ImageKey("test-image-key");
+            doReturn("https://example.url.com").when(externalImageStorage).getPreSignedUrl(imageKey);
 
-            String preSignedUrl = imageStorage.getPresignedUrl(imageKey);
+            String preSignedUrl = imageStorage.getPreSignedUrl(imageKey);
 
             assertAll(
                     () -> assertThat(preSignedUrl).isEqualTo("https://example.url.com"),

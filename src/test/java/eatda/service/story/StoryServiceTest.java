@@ -10,7 +10,9 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.Image;
 import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
@@ -36,7 +38,8 @@ public class StoryServiceTest extends BaseServiceTest {
         void 스토리_등록에_성공한다() {
             Member member = memberGenerator.generate("12345");
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "123", "미쳤다 여기");
-            MultipartFile image = mock(MultipartFile.class);
+            MultipartFile imageFile = mock(MultipartFile.class);
+            Image image = new Image(ImageDomain.STORY, imageFile);
 
             StoreSearchResult store = new StoreSearchResult(
                     "123", "FD6", "음식점 > 한식", "010-1234-5678",
@@ -44,9 +47,9 @@ public class StoryServiceTest extends BaseServiceTest {
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
-            when(externalImageStorage.upload(image, ImageDomain.STORY)).thenReturn("image-key");
+            when(externalImageStorage.upload(image)).thenReturn(new ImageKey("image-key"));
 
-            var response = storyService.registerStory(request, image, member.getId());
+            var response = storyService.registerStory(request, imageFile, member.getId());
 
             assertThat(storyRepository.existsById(response.storyId())).isTrue();
         }
@@ -122,7 +125,7 @@ public class StoryServiceTest extends BaseServiceTest {
 
             storyRepository.save(story);
 
-            when(externalImageStorage.getPresignedUrl("story-image-key"))
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("story-image-key")))
                     .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
 
             StoryResponse response = storyService.getStory(story.getId());
