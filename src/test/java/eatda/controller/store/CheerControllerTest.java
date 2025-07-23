@@ -2,14 +2,13 @@ package eatda.controller.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.BaseControllerTest;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
+import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
-import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,7 @@ class CheerControllerTest extends BaseControllerTest {
     class RegisterCheer {
 
         @Test
-        void 응원을_등록한다() throws FileNotFoundException {
+        void 응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
             CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
 
@@ -28,7 +27,7 @@ class CheerControllerTest extends BaseControllerTest {
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .contentType("multipart/form-data")
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", getFile("classpath:test/test-image.png"))
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when()
                     .post("/api/cheer")
                     .then()

@@ -13,7 +13,6 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.store.CheerPreviewResponse;
 import eatda.controller.store.CheerRegisterRequest;
@@ -25,9 +24,9 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
 import io.restassured.http.ContentType;
-import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 응원_등록_성공() throws FileNotFoundException {
+        void 응원_등록_성공() {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
             CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!");
             doReturn(response).when(cheerService).registerCheer(eq(request), any(), anyLong());
@@ -77,7 +76,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .contentType("multipart/form-data")
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", getFile("classpath:test/test-image.png"))
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when().post("/api/cheer")
                     .then().statusCode(201);
         }
@@ -93,7 +92,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 "PRESIGNED_URL_GENERATION_FAILED",
                 "INVALID_CHEER_DESCRIPTION"})
         @ParameterizedTest
-        void 응원_등록_실패(BusinessErrorCode errorCode) throws FileNotFoundException {
+        void 응원_등록_실패(BusinessErrorCode errorCode) {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
             doThrow(new BusinessException(errorCode)).when(cheerService).registerCheer(eq(request), any(), anyLong());
 
@@ -106,12 +105,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .contentType(ContentType.MULTIPART)
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", getFile("classpath:test/test-image.png"))
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when().post("/api/cheer")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }
-
 
     @Nested
     class GetCheers {

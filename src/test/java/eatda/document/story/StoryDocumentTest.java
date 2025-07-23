@@ -7,7 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
@@ -19,9 +18,9 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
 import io.restassured.response.Response;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -55,7 +54,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                 );
 
         @Test
-        void 스토리_등록_성공() throws FileNotFoundException {
+        void 스토리_등록_성공() {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
             StoryRegisterResponse response = new StoryRegisterResponse(1L);
             doReturn(response).when(storyService).registerStory(any(), any(), any());
@@ -69,7 +68,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .contentType("multipart/form-data")
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", getFile("classpath:test/test-image.png"))
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when().post("/api/stories")
                     .then().statusCode(201);
         }

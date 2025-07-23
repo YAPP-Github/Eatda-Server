@@ -6,14 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.BaseControllerTest;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
 import io.restassured.response.Response;
-import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -32,7 +31,7 @@ public class StoryControllerTest extends BaseControllerTest {
     class RegisterStory {
 
         @Test
-        void 스토리를_등록할_수_있다() throws FileNotFoundException {
+        void 스토리를_등록할_수_있다() {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
 
             doReturn(new StoryRegisterResponse(123L))
@@ -43,7 +42,7 @@ public class StoryControllerTest extends BaseControllerTest {
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", getFile("classpath:test/test-image.png"))
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when()
                     .post("/api/stories");
 
