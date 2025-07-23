@@ -13,10 +13,9 @@ public enum StoreCategory {
     JAPANESE("일식"),
     WESTERN("양식"),
     CAFE("카페"),
-    DESSERT("디저트"),
+    BAKERY("베이커리"),
     PUB("술집"),
     FAST_FOOD("패스트푸드"),
-    CONVENIENCE("편의점"),
     OTHER("기타");
 
     private final String categoryName;

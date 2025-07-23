@@ -3,8 +3,11 @@ package eatda.document;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import java.util.LinkedList;
@@ -13,6 +16,7 @@ import org.springframework.restdocs.cookies.CookieDescriptor;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
+import org.springframework.restdocs.request.RequestPartDescriptor;
 import org.springframework.restdocs.snippet.Snippet;
 
 public class RestDocsRequest {
@@ -60,8 +64,19 @@ public class RestDocsRequest {
         return this;
     }
 
+    public RestDocsRequest multipartField(RequestPartDescriptor... descriptors) {
+        snippets.add(requestParts(descriptors));
+        return this;
+    }
+
     public RestDocsRequest requestBodyField(FieldDescriptor... descriptors) {
         snippets.add(requestFields(descriptors));
+        return this;
+    }
+
+    public RestDocsRequest requestBodyField(String multiFileField, FieldDescriptor... descriptors) {
+        snippets.add(requestPartBody(multiFileField));
+        snippets.add(requestPartFields(multiFileField, descriptors));
         return this;
     }
 

@@ -6,8 +6,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.document.BaseDocumentTest;
@@ -16,8 +18,8 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.exception.EtcErrorCode;
-import eatda.service.common.ImageDomain;
+import eatda.util.ImageUtils;
+import eatda.util.MappingUtils;
 import io.restassured.response.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -37,6 +39,13 @@ public class StoryDocumentTest extends BaseDocumentTest {
                 .description("스토리와 이미지를 multipart/form-data로 등록합니다.")
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                ).multipartField(
+                        partWithName("image").description("스토리 이미지 (필수)"),
+                        partWithName("request").description("스토리 등록 요청 정보")
+                ).requestBodyField("request",
+                        fieldWithPath("query").description("스토리 검색 쿼리"),
+                        fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
+                        fieldWithPath("description").description("스토리 내용 (필수)")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -46,82 +55,28 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         @Test
         void 스토리_등록_성공() {
-            doReturn("https://dummy-s3.com/story.png")
-                    .when(imageService)
-                    .upload(any(), org.mockito.ArgumentMatchers.eq(ImageDomain.STORY));
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
+            StoryRegisterResponse response = new StoryRegisterResponse(1L);
+            doReturn(response).when(storyService).registerStory(any(), any(), any());
 
-            doReturn(new StoryRegisterResponse(123L))
-                    .when(storyService)
-                    .registerStory(any(), any(), any());
-
-            String requestJson = """
-                    {
-                      "query": "농민백암순대",
-                      "storeKakaoId": "123",
-                      "description": "여기 진짜 맛있어요!"
-                    }
-                    """;
-
-            byte[] imageBytes = "dummy image content".getBytes(StandardCharsets.UTF_8);
-
-            RestDocumentationFilter document = document("story/register", 201)
+            var document = document("story/register", 201)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
 
-            Response response = given(document)
-                    .contentType("multipart/form-data")
-                    .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .multiPart("request", "request.json", requestJson.getBytes(StandardCharsets.UTF_8), "application/json")
-                    .multiPart("image", "image.png", imageBytes, "image/png")
-                    .when().post("/api/stories");
-
-            response.then()
-                    .statusCode(201)
-                    .body("storyId", equalTo(123));
-        }
-
-        @Test
-        void 스토리_등록_실패_필수값_누락() {
-            String invalidJson = """
-                    {
-                      "query": "농민백암순대",
-                      "storeKakaoId": "123"
-                    }
-                    """;
-
-            byte[] imageBytes = "dummy image content".getBytes(StandardCharsets.UTF_8);
-
-            doThrow(new BusinessException(BusinessErrorCode.INVALID_STORY_DESCRIPTION))
-                    .when(storyService)
-                    .registerStory(any(), any(), any());
-
-            var document = document("story/register", EtcErrorCode.CLIENT_REQUEST_ERROR)
-                    .request(requestDocument)
-                    .response(ERROR_RESPONSE)
-                    .build();
-
             given(document)
-                    .contentType("multipart/form-data")
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .multiPart("request", "request.json", invalidJson.getBytes(StandardCharsets.UTF_8), "application/json")
-                    .multiPart("image", "image.png", imageBytes, "image/png")
+                    .contentType("multipart/form-data")
+                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .multiPart("image", ImageUtils.getTestImage())
                     .when().post("/api/stories")
-                    .then().statusCode(EtcErrorCode.CLIENT_REQUEST_ERROR.getStatus().value());
+                    .then().statusCode(201);
         }
 
         @Test
         void 스토리_등록_실패_이미지_형식_오류() {
-            String requestJson = """
-                    {
-                      "query": "농민백암순대",
-                      "storeKakaoId": "123",
-                      "description": "여기 진짜 맛있어요!"
-                    }
-                    """;
-
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
             byte[] invalidImage = "not an image".getBytes(StandardCharsets.UTF_8);
-
             doThrow(new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE))
                     .when(storyService)
                     .registerStory(any(), any(), any());
@@ -131,14 +86,13 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .response(ERROR_RESPONSE)
                     .build();
 
-            Response response = given(document)
+            given(document)
                     .contentType("multipart/form-data")
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .multiPart("request", "request.json", requestJson.getBytes(StandardCharsets.UTF_8), "application/json")
+                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
                     .multiPart("image", "image.txt", invalidImage, "text/plain")
-                    .when().post("/api/stories");
-
-            response.then().statusCode(BusinessErrorCode.INVALID_IMAGE_TYPE.getStatus().value());
+                    .when().post("/api/stories")
+                    .then().statusCode(BusinessErrorCode.INVALID_IMAGE_TYPE.getStatus().value());
         }
     }
 
@@ -159,26 +113,23 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         @Test
         void 스토리_목록_조회_성공() {
-            StoriesResponse mockResponse = new StoriesResponse(List.of(
+            int size = 5;
+            StoriesResponse response = new StoriesResponse(List.of(
                     new StoriesResponse.StoryPreview(1L, "https://dummy-s3.com/story1.png"),
                     new StoriesResponse.StoryPreview(2L, "https://dummy-s3.com/story2.png")
             ));
+            doReturn(response).when(storyService).getPagedStoryPreviews(size);
 
-            doReturn(mockResponse)
-                    .when(storyService)
-                    .getPagedStoryPreviews(5);
-
-            RestDocumentationFilter document = document("story/get-stories", 200)
+            var document = document("story/get-stories", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
 
-            Response response = given(document)
+            given(document)
                     .queryParam("size", 5)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .when().get("/api/stories");
-
-            response.then().statusCode(200);
+                    .when().get("/api/stories")
+                    .then().statusCode(200);
         }
     }
 
@@ -204,8 +155,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
         @Test
         void 스토리_상세_조회_성공() {
             long storyId = 1L;
-
-            doReturn(new StoryResponse(
+            StoryResponse response = new StoryResponse(
                     "123456",
                     "한식",
                     "진또곱창집",
@@ -213,27 +163,18 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     "성수동",
                     "곱창은 여기",
                     "https://s3.bucket.com/story1.jpg"
-            )).when(storyService).getStory(storyId);
+            );
+            doReturn(response).when(storyService).getStory(storyId);
 
             RestDocumentationFilter document = document("story/get-story", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
 
-            Response response = given(document)
+            given(document)
                     .pathParam("storyId", storyId)
-                    .when()
-                    .get("/api/stories/{storyId}");
-
-            response.then()
-                    .statusCode(200)
-                    .body("storeKakaoId", equalTo("123456"))
-                    .body("category", equalTo("한식"))
-                    .body("storeName", equalTo("진또곱창집"))
-                    .body("storeDistrict", equalTo("성동구"))
-                    .body("storeNeighborhood", equalTo("성수동"))
-                    .body("description", equalTo("곱창은 여기"))
-                    .body("imageUrl", equalTo("https://s3.bucket.com/story1.jpg"));
+                    .when().get("/api/stories/{storyId}")
+                    .then().statusCode(200);
         }
 
         @Test

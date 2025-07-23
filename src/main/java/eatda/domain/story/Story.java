@@ -2,10 +2,13 @@ package eatda.domain.story;
 
 import eatda.domain.AuditingEntity;
 import eatda.domain.member.Member;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -44,8 +47,9 @@ public class Story extends AuditingEntity {
     @Column(name = "store_lot_number_address", nullable = false)
     private String storeLotNumberAddress;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "store_category", nullable = false)
-    private String storeCategory;
+    private StoreCategory storeCategory;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -57,7 +61,7 @@ public class Story extends AuditingEntity {
     private Story(
             Member member,
             String storeKakaoId,
-            String storeCategory,
+            StoreCategory storeCategory,
             String storeName,
             String storeRoadAddress,
             String storeLotNumberAddress,
@@ -86,7 +90,7 @@ public class Story extends AuditingEntity {
 
     private void validateStore(
             String storeKakaoId,
-            String storeCategory,
+            StoreCategory storeCategory,
             String storeName,
             String roadAddress,
             String lotNumberAddress
@@ -127,8 +131,8 @@ public class Story extends AuditingEntity {
         }
     }
 
-    private void validateStoreCategory(String storeCategory) {
-        if (storeCategory == null || storeCategory.isBlank()) {
+    private void validateStoreCategory(StoreCategory storeCategory) {
+        if (storeCategory == null) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORE_CATEGORY);
         }
     }

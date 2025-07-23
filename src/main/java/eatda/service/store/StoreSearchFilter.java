@@ -1,6 +1,8 @@
 package eatda.service.store;
 
 import eatda.client.map.StoreSearchResult;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,14 @@ public class StoreSearchFilter {
         return searchResults.stream()
                 .filter(this::isValidStore)
                 .toList();
+    }
+
+    public StoreSearchResult filterStoreByKakaoId(List<StoreSearchResult> searchResults, String kakaoId) {
+        return searchResults.stream()
+                .filter(store -> store.kakaoId().equals(kakaoId))
+                .filter(this::isValidStore)
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
     }
 
     private boolean isValidStore(StoreSearchResult store) {
