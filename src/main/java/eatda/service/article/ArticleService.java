@@ -2,8 +2,6 @@ package eatda.service.article;
 
 import eatda.controller.article.ArticleResponse;
 import eatda.controller.article.ArticlesResponse;
-import eatda.domain.Image;
-import eatda.domain.ImageKey;
 import eatda.repository.article.ArticleRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;
@@ -26,7 +24,7 @@ public class ArticleService {
                         article.getTitle(),
                         article.getSubtitle(),
                         article.getArticleUrl(),
-                        imageStorage.getPreSignedUrl(new ImageKey(article.getImageKey()))
+                        imageStorage.getPreSignedUrl(article.getImageKey())
                 ))
                 .toList();
 

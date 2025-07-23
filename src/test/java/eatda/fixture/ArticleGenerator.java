@@ -1,6 +1,6 @@
 package eatda.fixture;
 
-import eatda.controller.article.ArticleResponse;
+import eatda.domain.ImageKey;
 import eatda.domain.article.Article;
 import eatda.repository.article.ArticleRepository;
 import org.springframework.stereotype.Component;
@@ -36,16 +36,7 @@ public class ArticleGenerator {
     }
 
     public Article generate(String title, String subtitle, String articleUrl, String imageKey) {
-        Article article = new Article(title, subtitle, articleUrl, imageKey);
+        Article article = new Article(title, subtitle, articleUrl, new ImageKey(imageKey));
         return articleRepository.save(article);
-    }
-
-    public ArticleResponse toResponse(Article article) {
-        return new ArticleResponse(
-                article.getTitle(),
-                article.getSubtitle(),
-                article.getArticleUrl(),
-                "https://s3.bucket.com/" + article.getImageKey()
-        );
     }
 }
