@@ -1,11 +1,13 @@
 package eatda.domain.story;
 
 import eatda.domain.AuditingEntity;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -54,8 +56,8 @@ public class Story extends AuditingEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "image_key", nullable = false)
-    private String imageKey;
+    @Embedded
+    private ImageKey imageKey;
 
     @Builder
     private Story(
@@ -66,7 +68,7 @@ public class Story extends AuditingEntity {
             String storeRoadAddress,
             String storeLotNumberAddress,
             String description,
-            String imageKey
+            ImageKey imageKey
     ) {
         validateMember(member);
         validateStore(storeKakaoId, storeCategory, storeName, storeRoadAddress, storeLotNumberAddress);
@@ -102,7 +104,7 @@ public class Story extends AuditingEntity {
         validateStoreLotNumberAddress(lotNumberAddress);
     }
 
-    private void validateStory(String description, String imageKey) {
+    private void validateStory(String description, ImageKey imageKey) {
         validateDescription(description);
         validateImage(imageKey);
     }
@@ -120,7 +122,7 @@ public class Story extends AuditingEntity {
     }
 
     private void validateStoreRoadAddress(String roadAddress) {
-        if (roadAddress == null || roadAddress.isBlank()) {
+        if (roadAddress == null) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORE_ADDRESS);
         }
     }
@@ -143,8 +145,8 @@ public class Story extends AuditingEntity {
         }
     }
 
-    private void validateImage(String imageKey) {
-        if (imageKey == null || imageKey.isBlank()) {
+    private void validateImage(ImageKey imageKey) {
+        if (imageKey == null || imageKey.isEmpty()) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORY_IMAGE_KEY);
         }
     }

@@ -42,7 +42,7 @@ public class StoryService {
         Member member = memberRepository.getById(memberId);
         List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
-        String imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile)).getValue();
+        ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile));
 
         Story story = Story.builder()
                 .member(member)
@@ -83,7 +83,7 @@ public class StoryService {
                 orderByPage.getContent().stream()
                         .map(story -> new StoriesResponse.StoryPreview(
                                 story.getId(),
-                                imageStorage.getPreSignedUrl(new ImageKey(story.getImageKey()))
+                                imageStorage.getPreSignedUrl(story.getImageKey())
                         ))
                         .toList()
         );
@@ -101,7 +101,7 @@ public class StoryService {
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),
                 story.getDescription(),
-                imageStorage.getPreSignedUrl(new ImageKey(story.getImageKey()))
+                imageStorage.getPreSignedUrl(story.getImageKey())
         );
     }
 }

@@ -10,8 +10,6 @@ import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
-import eatda.domain.Image;
-import eatda.domain.ImageDomain;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
@@ -24,6 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 public class StoryServiceTest extends BaseServiceTest {
@@ -38,8 +37,8 @@ public class StoryServiceTest extends BaseServiceTest {
         void 스토리_등록에_성공한다() {
             Member member = memberGenerator.generate("12345");
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "123", "미쳤다 여기");
-            MultipartFile imageFile = mock(MultipartFile.class);
-            Image image = new Image(ImageDomain.STORY, imageFile);
+            MultipartFile imageFile = new MockMultipartFile(
+                    "image", "story-image.jpg", "image/jpeg", new byte[]{1, 2});
 
             StoreSearchResult store = new StoreSearchResult(
                     "123", "FD6", "음식점 > 한식", "010-1234-5678",
@@ -47,7 +46,6 @@ public class StoryServiceTest extends BaseServiceTest {
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
-            when(externalImageStorage.upload(image)).thenReturn(new ImageKey("image-key"));
 
             var response = storyService.registerStory(request, imageFile, member.getId());
 
@@ -82,7 +80,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory(StoreCategory.KOREAN)
                     .description("미쳤다 진짜")
-                    .imageKey("image-key-1")
+                    .imageKey(new ImageKey("image-key-1"))
                     .build();
             Story story2 = Story.builder()
                     .member(member)
@@ -92,7 +90,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory(StoreCategory.KOREAN)
                     .description("뜨끈한 국밥 최고")
-                    .imageKey("image-key-2")
+                    .imageKey(new ImageKey("image-key-2"))
                     .build();
             storyRepository.saveAll(List.of(story1, story2));
 
@@ -120,7 +118,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                     .storeCategory(StoreCategory.KOREAN)
                     .description("곱창은 여기")
-                    .imageKey("story-image-key")
+                    .imageKey(new ImageKey("story-image-key"))
                     .build();
 
             storyRepository.save(story);

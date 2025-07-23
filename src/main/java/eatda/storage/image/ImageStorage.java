@@ -15,6 +15,10 @@ public class ImageStorage {
     private final CachePreSignedUrlStorage cachePreSignedUrlStorage;
 
     public ImageKey upload(Image image) {
+        if (image == null || image.isEmpty()) {
+            return new ImageKey(null);
+        }
+
         ImageKey imageKey = externalImageStorage.upload(image);
 
         String preSignedUrl = externalImageStorage.getPreSignedUrl(imageKey);
@@ -24,7 +28,7 @@ public class ImageStorage {
 
     @Nullable
     public String getPreSignedUrl(@Nullable ImageKey imageKey) {
-        if (imageKey == null) {
+        if (imageKey == null || imageKey.isEmpty()) {
             return null;
         }
 

@@ -45,12 +45,12 @@ public class CheerService {
 
         List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
         StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
-        String imageKey = imageStorage.upload(new Image(ImageDomain.CHEER, imageFile)).getValue();
+        ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.CHEER, imageFile));
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
-        return new CheerResponse(cheer, imageStorage.getPreSignedUrl(new ImageKey(imageKey)), store);
+        return new CheerResponse(cheer, imageStorage.getPreSignedUrl(imageKey), store);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
@@ -71,7 +71,7 @@ public class CheerService {
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
                 .map(cheer -> new CheerPreviewResponse(cheer, cheer.getStore(),
-                        imageStorage.getPreSignedUrl(new ImageKey(cheer.getImageKey()))))
+                        imageStorage.getPreSignedUrl(cheer.getImageKey())))
                 .toList());
     }
 }

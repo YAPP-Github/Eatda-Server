@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -37,6 +38,13 @@ class ImageTest {
             BusinessException exception = assertThrows(BusinessException.class, () -> new Image(domain, file));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_IMAGE_TYPE);
+        }
+
+        @Test
+        void 파일은_비어있을_수_있다() {
+            ImageDomain domain = ImageDomain.STORY;
+
+            assertThatCode(() -> new Image(domain, null)).doesNotThrowAnyException();
         }
     }
 

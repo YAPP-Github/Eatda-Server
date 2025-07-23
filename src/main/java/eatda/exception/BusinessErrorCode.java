@@ -43,7 +43,6 @@ public enum BusinessErrorCode {
     FILE_UPLOAD_FAILED("SERVER002", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_URL_GENERATION_FAILED("SERVER003", "파일 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     PRESIGNED_URL_GENERATION_FAILED("SERVER004", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_IMAGE_KEY("IMG001", "이미지 Key 값이 비어있습니다", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //story
     INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 필수입니다."),

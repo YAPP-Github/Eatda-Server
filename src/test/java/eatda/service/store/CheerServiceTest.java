@@ -121,7 +121,7 @@ class CheerServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(response.imageUrl()).isNotNull()
+                    () -> assertThat(response.imageUrl()).isNull()
             );
         }
     }

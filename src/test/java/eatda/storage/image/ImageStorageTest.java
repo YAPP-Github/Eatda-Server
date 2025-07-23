@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import eatda.client.file.FileClient;
 import eatda.domain.Image;
 import eatda.domain.ImageDomain;
 import eatda.domain.ImageKey;
@@ -19,14 +18,12 @@ import org.springframework.mock.web.MockMultipartFile;
 
 class ImageStorageTest extends BaseStorageTest {
 
-    private FileClient fileClient;
     private ExternalImageStorage externalImageStorage;
     private CachePreSignedUrlStorage cachePreSignedUrlStorage;
     private ImageStorage imageStorage;
 
     @BeforeEach
     void setUp() {
-        fileClient = mock(FileClient.class);
         externalImageStorage = mock(ExternalImageStorage.class);
         cachePreSignedUrlStorage = new CachePreSignedUrlStorage(getCacheManager());
         imageStorage = new ImageStorage(externalImageStorage, cachePreSignedUrlStorage);
@@ -72,6 +69,15 @@ class ImageStorageTest extends BaseStorageTest {
         @Test
         void 이미지_키가_null이면__null을_반환한다() {
             ImageKey imageKey = null;
+
+            String actual = imageStorage.getPreSignedUrl(imageKey);
+
+            assertThat(actual).isNull();
+        }
+
+        @Test
+        void 이미지_키가_비어있으면_null을_반환한다() {
+            ImageKey imageKey = new ImageKey("");
 
             String actual = imageStorage.getPreSignedUrl(imageKey);
 

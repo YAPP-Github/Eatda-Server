@@ -24,6 +24,7 @@ public class CheerController {
     public ResponseEntity<CheerResponse> registerCheer(@RequestPart("request") CheerRegisterRequest request,
                                                        @RequestPart(value = "image", required = false) MultipartFile image,
                                                        LoginMember member) {
+        System.out.println("Received image: " + image);
         CheerResponse response = cheerService.registerCheer(request, image, member.id());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
