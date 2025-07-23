@@ -2,7 +2,6 @@ package eatda.service.story;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,7 +48,9 @@ public class StoryServiceTest extends BaseServiceTest {
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
             when(imageService.upload(image, ImageDomain.STORY)).thenReturn("image-key");
 
-            assertDoesNotThrow(() -> storyService.registerStory(request, image, member.getId()));
+            var response = storyService.registerStory(request, image, member.getId());
+
+            assertThat(storyRepository.existsById(response.storyId())).isTrue();
         }
 
         @Test

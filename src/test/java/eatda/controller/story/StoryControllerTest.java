@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.util.ResourceUtils.getFile;
@@ -24,7 +23,7 @@ public class StoryControllerTest extends BaseControllerTest {
 
     @BeforeEach
     void setUpMock() {
-        doNothing()
+        doReturn(new StoryRegisterResponse(1L))
                 .when(storyService)
                 .registerStory(any(), any(), any());
     }
@@ -36,6 +35,10 @@ public class StoryControllerTest extends BaseControllerTest {
         void 스토리를_등록할_수_있다() throws FileNotFoundException {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
 
+            doReturn(new StoryRegisterResponse(123L))
+                    .when(storyService)
+                    .registerStory(any(), any(), any());
+
             Response response = given()
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
@@ -44,7 +47,9 @@ public class StoryControllerTest extends BaseControllerTest {
                     .when()
                     .post("/api/stories");
 
-            response.then().statusCode(201);
+            response.then()
+                    .statusCode(201)
+                    .body("storyId", equalTo(123));
         }
     }
 

@@ -2,7 +2,6 @@ package eatda.document.story;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -12,6 +11,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
@@ -49,13 +49,20 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("description").description("스토리 내용 (필수)")
                 );
 
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("storyId").description("등록된 스토리의 ID")
+                );
+
         @Test
         void 스토리_등록_성공() throws FileNotFoundException {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
-            doNothing().when(storyService).registerStory(any(), any(), any());
+            StoryRegisterResponse response = new StoryRegisterResponse(1L);
+            doReturn(response).when(storyService).registerStory(any(), any(), any());
 
             var document = document("story/register", 201)
                     .request(requestDocument)
+                    .response(responseDocument)
                     .build();
 
             given(document)
