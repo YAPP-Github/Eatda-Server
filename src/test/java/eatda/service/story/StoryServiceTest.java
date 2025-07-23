@@ -7,16 +7,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import eatda.client.map.StoreSearchResult;
+import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.story.StoryRepository;
 import eatda.service.BaseServiceTest;
-import eatda.service.common.ImageDomain;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -28,8 +28,6 @@ public class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryService storyService;
-    @Autowired
-    private StoryRepository storyRepository;
 
     @Nested
     class RegisterStory {
@@ -46,7 +44,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
             doReturn(List.of(store)).when(mapClient).searchShops(request.query());
-            when(imageService.upload(image, ImageDomain.STORY)).thenReturn("image-key");
+            when(externalImageStorage.upload(image, ImageDomain.STORY)).thenReturn("image-key");
 
             var response = storyService.registerStory(request, image, member.getId());
 
@@ -73,7 +71,6 @@ public class StoryServiceTest extends BaseServiceTest {
         @Test
         void 스토리_목록을_조회할_수_있다() {
             Member member = memberGenerator.generate("12345");
-
             Story story1 = Story.builder()
                     .member(member)
                     .storeKakaoId("1")
@@ -84,7 +81,6 @@ public class StoryServiceTest extends BaseServiceTest {
                     .description("미쳤다 진짜")
                     .imageKey("image-key-1")
                     .build();
-
             Story story2 = Story.builder()
                     .member(member)
                     .storeKakaoId("2")
@@ -95,21 +91,14 @@ public class StoryServiceTest extends BaseServiceTest {
                     .description("뜨끈한 국밥 최고")
                     .imageKey("image-key-2")
                     .build();
-
             storyRepository.saveAll(List.of(story1, story2));
-
-            when(imageService.getPresignedUrl("image-key-1")).thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
-            when(imageService.getPresignedUrl("image-key-2")).thenReturn("https://s3.bucket.com/story/dummy/2.jpg");
 
             var response = storyService.getPagedStoryPreviews(5);
 
-            assertThat(response.stories()).hasSize(2);
             assertThat(response.stories())
-                    .extracting("imageUrl")
-                    .containsExactlyInAnyOrder(
-                            "https://s3.bucket.com/story/dummy/2.jpg",
-                            "https://s3.bucket.com/story/dummy/1.jpg"
-                    );
+                    .hasSize(2)
+                    .extracting(StoryPreview::storyId)
+                    .containsExactlyInAnyOrder(story2.getId(), story1.getId());
         }
     }
 
@@ -133,7 +122,7 @@ public class StoryServiceTest extends BaseServiceTest {
 
             storyRepository.save(story);
 
-            when(imageService.getPresignedUrl("story-image-key"))
+            when(externalImageStorage.getPresignedUrl("story-image-key"))
                     .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
 
             StoryResponse response = storyService.getStory(story.getId());

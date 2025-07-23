@@ -6,6 +6,7 @@ import eatda.controller.store.CheerPreviewResponse;
 import eatda.controller.store.CheerRegisterRequest;
 import eatda.controller.store.CheerResponse;
 import eatda.controller.store.CheersResponse;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
@@ -14,8 +15,7 @@ import eatda.exception.BusinessException;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.service.common.ImageDomain;
-import eatda.service.common.ImageService;
+import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +34,7 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
-    private final ImageService imageService;
+    private final ImageStorage imageStorage;
 
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request, MultipartFile image, long memberId) {
@@ -43,12 +43,12 @@ public class CheerService {
 
         List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
         StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
-        String imageKey = imageService.upload(image, ImageDomain.CHEER);
+        String imageKey = imageStorage.upload(image, ImageDomain.CHEER);
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
-        return new CheerResponse(cheer, imageService.getPresignedUrl(imageKey), store);
+        return new CheerResponse(cheer, imageStorage.getPresignedUrl(imageKey), store);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
@@ -69,7 +69,7 @@ public class CheerService {
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
                 .map(cheer -> new CheerPreviewResponse(cheer, cheer.getStore(),
-                        imageService.getPresignedUrl(cheer.getImageKey())))
+                        imageStorage.getPresignedUrl(cheer.getImageKey())))
                 .toList());
     }
 }

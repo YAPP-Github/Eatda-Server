@@ -11,11 +11,11 @@ import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
-import eatda.repository.article.ArticleRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.service.common.ImageService;
+import eatda.repository.story.StoryRepository;
+import eatda.storage.image.ExternalImageStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public abstract class BaseServiceTest {
     protected MapClient mapClient;
 
     @MockitoBean
-    protected ImageService imageService;
+    protected ExternalImageStorage externalImageStorage;
 
     @Autowired
     protected MemberGenerator memberGenerator;
@@ -60,11 +60,11 @@ public abstract class BaseServiceTest {
     protected CheerRepository cheerRepository;
 
     @Autowired
-    protected ArticleRepository articleRepository;
+    protected StoryRepository storyRepository;
 
     @BeforeEach
     void mockingImageService() {
-        doReturn(MOCKED_IMAGE_URL).when(imageService).getPresignedUrl(anyString());
-        doReturn(MOCKED_IMAGE_KEY).when(imageService).upload(any(), any());
+        doReturn(MOCKED_IMAGE_URL).when(externalImageStorage).getPresignedUrl(anyString());
+        doReturn(MOCKED_IMAGE_KEY).when(externalImageStorage).upload(any(), any());
     }
 }
