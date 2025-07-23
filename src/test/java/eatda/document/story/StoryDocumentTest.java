@@ -68,7 +68,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .contentType("multipart/form-data")
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage())
+                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
                     .when().post("/api/stories")
                     .then().statusCode(201);
         }
