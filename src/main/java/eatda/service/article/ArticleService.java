@@ -24,7 +24,7 @@ public class ArticleService {
                         article.getTitle(),
                         article.getSubtitle(),
                         article.getArticleUrl(),
-                        imageStorage.getPresignedUrl(article.getImageKey())
+                        imageStorage.getPreSignedUrl(article.getImageKey())
                 ))
                 .toList();
 

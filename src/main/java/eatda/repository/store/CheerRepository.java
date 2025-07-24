@@ -1,5 +1,6 @@
 package eatda.repository.store;
 
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
@@ -20,7 +21,7 @@ public interface CheerRepository extends Repository<Cheer, Long> {
                 WHERE c.store = :store AND c.imageKey IS NOT NULL
                 ORDER BY c.createdAt DESC
                 LIMIT 1""")
-    Optional<String> findRecentImageKey(Store store);
+    Optional<ImageKey> findRecentImageKey(Store store);
 
     int countByMember(Member member);
 

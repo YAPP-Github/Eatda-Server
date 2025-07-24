@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class CheerTest {
 
@@ -34,9 +34,10 @@ class CheerTest {
         @ParameterizedTest
         @NullAndEmptySource
         void 설명이_비어있으면_안된다(String description) {
-            BusinessException exception = assertThrows(BusinessException.class, () -> {
-                new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, description, "imageKey");
-            });
+            ImageKey imageKey = new ImageKey("imageKey");
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, description, imageKey));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_CHEER_DESCRIPTION);
         }
@@ -45,16 +46,6 @@ class CheerTest {
         void 이미지_키는_null이_가능하다() {
             assertThatCode(() -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", null))
                     .doesNotThrowAnyException();
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {"", " ", "\t\n"})
-        void 이미지_키는_비어있으면_안된다(String imageKey) {
-            BusinessException exception = assertThrows(BusinessException.class, () -> {
-                new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", imageKey);
-            });
-
-            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_CHEER_IMAGE_KEY);
         }
     }
 }
