@@ -156,7 +156,6 @@ class CheerServiceTest extends BaseServiceTest {
                 Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
                 Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
                 Member member3 = memberGenerator.generateRegisteredMember("125", "c@gmail.com", "1236", "01012341236");
-
                 Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
                 Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
                 Thread.sleep(5);

@@ -5,7 +5,7 @@ import eatda.domain.store.Cheer;
 public record CheerInStoreResponse(
         long id,
         long memberId,
-        String memberName,
+        String memberNickname,
         String description
 ) {
 
