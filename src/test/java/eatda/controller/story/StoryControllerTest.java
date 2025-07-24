@@ -42,7 +42,7 @@ public class StoryControllerTest extends BaseControllerTest {
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage())
+                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
                     .when()
                     .post("/api/stories");
 

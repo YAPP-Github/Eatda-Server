@@ -38,7 +38,7 @@ public class StoreService {
 
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerRepository.findRecentImageKey(store)
-                .map(imageStorage::getPresignedUrl);
+                .map(imageStorage::getPreSignedUrl);
     }
 
     public StoreSearchResponses searchStores(String query) {

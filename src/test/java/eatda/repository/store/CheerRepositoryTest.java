@@ -2,6 +2,7 @@ package eatda.repository.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.repository.BaseRepositoryTest;
@@ -23,9 +24,9 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             cheerGenerator.generateCommon(member, store, "image-key-2");
             cheerGenerator.generateCommon(member, store, null);
 
-            Optional<String> imageKey = cheerRepository.findRecentImageKey(store);
+            Optional<ImageKey> imageKey = cheerRepository.findRecentImageKey(store);
 
-            assertThat(imageKey).contains("image-key-2");
+            assertThat(imageKey).contains(new ImageKey("image-key-2"));
         }
 
         @Test
@@ -36,7 +37,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             cheerGenerator.generateCommon(member, store, null);
             cheerGenerator.generateCommon(member, store, null);
 
-            Optional<String> imageKey = cheerRepository.findRecentImageKey(store);
+            Optional<ImageKey> imageKey = cheerRepository.findRecentImageKey(store);
 
             assertThat(imageKey).isEmpty();
         }

@@ -1,5 +1,6 @@
 package eatda.fixture;
 
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CheerGenerator {
 
-    private static final String DEFAULT_IMAGE_KEY = "default-image-key";
+    private static final String DEFAULT_IMAGE_KEY = "generator-cheer-image-key";
     private static final String DEFAULT_DESCRIPTION = "응원합니다!";
 
     private final CheerRepository cheerRepository;
@@ -19,7 +20,7 @@ public class CheerGenerator {
     }
 
     public Cheer generateAdmin(Member member, Store store) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, DEFAULT_IMAGE_KEY, true);
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(DEFAULT_IMAGE_KEY), true);
         return cheerRepository.save(cheer);
     }
 
@@ -28,7 +29,7 @@ public class CheerGenerator {
     }
 
     public Cheer generateCommon(Member member, Store store, String imageKey) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, imageKey, false);
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(imageKey), false);
         return cheerRepository.save(cheer);
     }
 }
