@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.store.StorePreviewResponse;
+import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
@@ -27,6 +28,11 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
     private final ImageStorage imageStorage;
+
+    public StoreResponse getStore(long storeId) {
+        Store store = storeRepository.getById(storeId);
+        return new StoreResponse(store);
+    }
 
     // TODO : N+1 문제 해결
     public StoresResponse getStores(int size) {
