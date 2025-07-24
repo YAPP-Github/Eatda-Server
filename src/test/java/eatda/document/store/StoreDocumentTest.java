@@ -2,6 +2,7 @@ package eatda.document.store;
 
 
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -13,6 +14,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 import eatda.controller.store.StorePreviewResponse;
+import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoreSearchResponse;
 import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
@@ -31,6 +33,64 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 
 public class StoreDocumentTest extends BaseDocumentTest {
+
+    @Nested
+    class GetStore {
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("음식점 정보 조회")
+                .pathParameter(
+                        parameterWithName("storeId").description("음식점 ID")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("id").type(NUMBER).description("음식점 ID"),
+                        fieldWithPath("kakaoId").type(STRING).description("카카오 음식점 ID"),
+                        fieldWithPath("name").type(STRING).description("음식점 이름"),
+                        fieldWithPath("district").type(STRING).description("음식점 주소 (구)"),
+                        fieldWithPath("neighborhood").type(STRING).description("음식점 주소 (동)"),
+                        fieldWithPath("category").type(STRING).description("음식점 카테고리"),
+                        fieldWithPath("placeUrl").type(STRING).description("음식점 카카오맵 URL")
+                );
+
+        @Test
+        void 음식점_정보를_조회() {
+            StoreResponse response = new StoreResponse(1L, "17163273", "농민백암순대", "강남구", "대치동",
+                    "한식", "https://place.map.kakao.com/17163273");
+            doReturn(response).when(storeService).getStore(anyLong());
+
+            long storeId = 1L;
+            var document = document("store/get-store", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
+        @ParameterizedTest
+        void 음식점_정보_조회_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(storeService).getStore(anyLong());
+
+            long storeId = 1L;
+            var document = document("store/get-store", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+    }
 
     @Nested
     class GetStores {
@@ -62,7 +122,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
             doReturn(response).when(storeService).getStores(anyInt());
 
             int size = 2;
-            var document = document("store/get", 200)
+            var document = document("store/get-stores", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -80,7 +140,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
             doThrow(new BusinessException(errorCode)).when(storeService).getStores(anyInt());
 
             int size = 2;
-            var document = document("store/get", errorCode)
+            var document = document("store/get-stores", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
