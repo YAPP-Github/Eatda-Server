@@ -2,12 +2,16 @@ package eatda.service.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.client.map.StoreSearchResult;
+import eatda.controller.store.StoreResponse;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +22,36 @@ class StoreServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoreService storeService;
+
+    @Nested
+    class GetStore {
+
+        @Test
+        void 음식점_정보를_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            cheerGenerator.generateCommon(member, store, "image-key");
+
+            StoreResponse response = storeService.getStore(store.getId());
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(store.getId()),
+                    () -> assertThat(response.name()).isEqualTo(store.getName()),
+                    () -> assertThat(response.district()).isEqualTo("강남구"),
+                    () -> assertThat(response.neighborhood()).isEqualTo("대치동")
+            );
+        }
+
+        @Test
+        void 해당_음식점이_없을_경우_예외를_던진다() {
+            long nonExistentStoreId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> storeService.getStore(nonExistentStoreId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
+        }
+    }
 
     @Nested
     class GetStores {

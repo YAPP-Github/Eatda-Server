@@ -13,6 +13,32 @@ import org.springframework.http.HttpHeaders;
 class StoreControllerTest extends BaseControllerTest {
 
     @Nested
+    class GetStore {
+
+        @Test
+        void 음식점_정보를_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            cheerGenerator.generateCommon(member, store, "image-key");
+
+            StoreResponse response = given()
+                    .pathParam("storeId", store.getId())
+                    .when()
+                    .get("/api/shops/{storeId}")
+                    .then()
+                    .statusCode(200)
+                    .extract().as(StoreResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(store.getId()),
+                    () -> assertThat(response.name()).isEqualTo(store.getName()),
+                    () -> assertThat(response.district()).isEqualTo("강남구"),
+                    () -> assertThat(response.neighborhood()).isEqualTo("대치동")
+            );
+        }
+    }
+
+    @Nested
     class GetStores {
 
         @Test
