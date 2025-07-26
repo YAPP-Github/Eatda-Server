@@ -40,7 +40,7 @@ public class StoryService {
     @Transactional
     public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile imageFile, Long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.query());
+        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.storeName());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
         ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile));
 
