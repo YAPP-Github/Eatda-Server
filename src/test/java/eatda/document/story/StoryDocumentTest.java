@@ -43,7 +43,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         partWithName("image").description("스토리 이미지 (필수)"),
                         partWithName("request").description("스토리 등록 요청 정보")
                 ).requestBodyField("request",
-                        fieldWithPath("query").description("스토리 검색 쿼리"),
+                        fieldWithPath("storeName").description("스토리 검색 쿼리"),
                         fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
                         fieldWithPath("description").description("스토리 내용 (필수)")
                 );

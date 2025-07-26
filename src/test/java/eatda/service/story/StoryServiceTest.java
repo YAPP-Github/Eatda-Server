@@ -45,7 +45,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     "곱창집", "http://example.com",
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
-            doReturn(List.of(store)).when(mapClient).searchShops(request.query());
+            doReturn(List.of(store)).when(mapClient).searchShops(request.storeName());
 
             var response = storyService.registerStory(request, imageFile, member.getId());
 
@@ -58,7 +58,7 @@ public class StoryServiceTest extends BaseServiceTest {
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "999", "미쳤다 여기");
 
             MultipartFile image = mock(MultipartFile.class);
-            doReturn(Collections.emptyList()).when(mapClient).searchShops(request.query());
+            doReturn(Collections.emptyList()).when(mapClient).searchShops(request.storeName());
 
             assertThatThrownBy(() -> storyService.registerStory(request, image, member.getId()))
                     .isInstanceOf(BusinessException.class)
