@@ -39,9 +39,25 @@ public class CheerDocumentTest extends BaseDocumentTest {
     @Nested
     class RegisterCheer {
 
+        private static final String REQUEST_DESCRIPTION_MARKDOWN = """
+                - 요청 형식 : multipart/form-data
+                - 요청 field
+                  - `image` : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png
+                  - `request` : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
+                - request body 예시
+                    ```json
+                    {
+                        "storeKakaoId": "123", // 가게 카카오 ID
+                        "storeName": "농민백암순대 본점", // 가게 이름
+                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 응원 내용
+                    }
+                    ```
+                """;
+
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORE_API)
                 .summary("응원 등록")
+                .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
                         headerWithName("Authorization").description("인증 토큰")
                 ).multipartField(
