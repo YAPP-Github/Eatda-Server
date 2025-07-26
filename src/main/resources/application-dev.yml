@@ -43,7 +43,7 @@ jwt:
 cors:
   origin:
     - "http://localhost:3000"
-    - "https://api-dev.eatda.net"
+    - "https://dev.eatda.net"
 
 oauth:
   client-id: ${OAUTH_CLIENT_ID}
