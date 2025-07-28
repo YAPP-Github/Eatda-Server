@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import eatda.controller.article.ArticleResponse;
 import eatda.service.BaseServiceTest;
-import java.util.stream.LongStream;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,12 @@ public class ArticleServiceTest extends BaseServiceTest {
 
         @Test
         void 가게의_담긴_이야기를_최신순으로_조회할_수_있다() {
-            LongStream.rangeClosed(1, 5)
-                    .forEach(i -> articleGenerator.generate("아티클 제목 " + i));
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 12, 0, 0);
+            articleGenerator.generate("아티클 제목 1", startAt);
+            articleGenerator.generate("아티클 제목 2", startAt.plusHours(1));
+            articleGenerator.generate("아티클 제목 3", startAt.plusHours(2));
+            articleGenerator.generate("아티클 제목 4", startAt.plusHours(3));
+            articleGenerator.generate("아티클 제목 5", startAt.plusHours(4));
 
             var response = articleService.getAllArticles(3);
 

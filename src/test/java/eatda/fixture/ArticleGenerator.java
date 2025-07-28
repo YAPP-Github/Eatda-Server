@@ -3,6 +3,8 @@ package eatda.fixture;
 import eatda.domain.ImageKey;
 import eatda.domain.article.Article;
 import eatda.repository.article.ArticleRepository;
+import eatda.util.DomainUtils;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +27,12 @@ public class ArticleGenerator {
 
     public Article generate(String title) {
         return generate(title, DEFAULT_SUBTITLE);
+    }
+
+    public Article generate(String title, LocalDateTime createdAt) {
+        Article article = generate(title, DEFAULT_SUBTITLE);
+        DomainUtils.setCreatedAt(article, createdAt);
+        return articleRepository.save(article);
     }
 
     public Article generate(String title, String subtitle) {
