@@ -49,9 +49,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 - request body 예시
                     ```json
                     {
-                        "storeKakaoId": "123", // 가게 카카오 ID
-                        "storeName": "농민백암순대 본점", // 가게 이름
-                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 응원 내용
+                        "storeKakaoId": "123", // 가게 카카오 ID (필수)
+                        "storeName": "농민백암순대 본점", // 가게 이름 (필수)
+                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 응원 내용 (필수)
                     }
                     ```
                 """;

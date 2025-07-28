@@ -142,7 +142,7 @@ public class Story extends AuditingEntity {
     }
 
     private void validateDescription(String description) {
-        if (description == null || description.isBlank()) {
+        if (description != null && description.isBlank()) {
             throw new BusinessException(BusinessErrorCode.INVALID_STORY_DESCRIPTION);
         }
     }

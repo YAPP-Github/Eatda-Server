@@ -117,9 +117,15 @@ class StoryTest {
     @Nested
     class ValidateStory {
 
+        @Test
+        void 설명은_null_이어도_예외가_발생하지_않는다() {
+            Story story = defaultStoryBuilder.description(null).build();
+
+            assertThat(story.getDescription()).isNull();
+        }
+
         @ParameterizedTest
-        @NullAndEmptySource
-        @ValueSource(strings = {"\t", "   "})
+        @ValueSource(strings = {"\t", "   ", ""})
         void 설명이_비어있으면_예외가_발생한다(String emptyDescription) {
             assertThatThrownBy(() -> defaultStoryBuilder
                     .description(emptyDescription)
@@ -132,6 +138,17 @@ class StoryTest {
         void 이미지가_비어있으면_예외가_발생한다() {
             assertThatThrownBy(() -> defaultStoryBuilder
                     .imageKey(null)
+                    .build()
+            ).isInstanceOf(BusinessException.class)
+                    .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_KEY.getMessage());
+        }
+
+        @Test
+        void 이미지가_키가_비어있으면_예외가_발생한다() {
+            ImageKey emptyImageKey = new ImageKey(null);
+
+            assertThatThrownBy(() -> defaultStoryBuilder
+                    .imageKey(emptyImageKey)
                     .build()
             ).isInstanceOf(BusinessException.class)
                     .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_KEY.getMessage());

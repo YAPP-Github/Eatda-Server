@@ -45,7 +45,7 @@ public enum BusinessErrorCode {
     PRESIGNED_URL_GENERATION_FAILED("SERVER004", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //story
-    INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 필수입니다."),
+    INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 빈 문자열일 수 없습니다."),
     INVALID_STORY_IMAGE_KEY("STY002", "스토리 이미지 Key는 필수입니다."),
     STORY_MEMBER_REQUIRED("STY003", "스토리 작성 시 회원 정보는 필수입니다."),
     STORY_STORE_REQUIRED("STY004", "스토리 작성 시 가게 정보는 필수입니다."),
