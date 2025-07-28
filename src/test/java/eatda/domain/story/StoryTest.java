@@ -142,5 +142,16 @@ class StoryTest {
             ).isInstanceOf(BusinessException.class)
                     .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_KEY.getMessage());
         }
+
+        @Test
+        void 이미지가_키가_비어있으면_예외가_발생한다() {
+            ImageKey emptyImageKey = new ImageKey(null);
+
+            assertThatThrownBy(() -> defaultStoryBuilder
+                    .imageKey(emptyImageKey)
+                    .build()
+            ).isInstanceOf(BusinessException.class)
+                    .hasMessage(BusinessErrorCode.INVALID_STORY_IMAGE_KEY.getMessage());
+        }
     }
 }
