@@ -14,6 +14,8 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
 
     List<Cheer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
+    List<Cheer> findAllByStoreOrderByCreatedAtDesc(Store store, Pageable pageable);
+
     @Query("""
             SELECT c.imageKey FROM Cheer c
                 WHERE c.store = :store AND c.imageKey IS NOT NULL
