@@ -7,6 +7,7 @@ import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
+import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
@@ -29,13 +30,9 @@ public class StoreService {
     private final CheerRepository cheerRepository;
     private final ImageStorage imageStorage;
 
-    public ImagesResponse getStoreImages(long storeId) {
+    public StoreResponse getStore(long storeId) {
         Store store = storeRepository.getById(storeId);
-        List<String> imageUrls = cheerRepository.findAllImageKey(store)
-                .stream()
-                .map(imageStorage::getPreSignedUrl)
-                .toList();
-        return new ImagesResponse(imageUrls);
+        return new StoreResponse(store);
     }
 
     // TODO : N+1 문제 해결
@@ -44,6 +41,15 @@ public class StoreService {
                 .stream()
                 .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))
                 .collect(collectingAndThen(toList(), StoresResponse::new));
+    }
+
+    public ImagesResponse getStoreImages(long storeId) {
+        Store store = storeRepository.getById(storeId);
+        List<String> imageUrls = cheerRepository.findAllImageKey(store)
+                .stream()
+                .map(imageStorage::getPreSignedUrl)
+                .toList();
+        return new ImagesResponse(imageUrls);
     }
 
     private Optional<String> getStoreImageUrl(Store store) {

@@ -33,17 +33,32 @@ public class StoryDocumentTest extends BaseDocumentTest {
     @Nested
     class RegisterStory {
 
+        private static final String REQUEST_DESCRIPTION_MARKDOWN = """
+                - 요청 형식 : multipart/form-data
+                - 요청 field
+                  - `image` : 스토리 이미지 (필수, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png
+                  - `request` : 스토리 등록 요청 정보 (필수, 허용 타입 : application/json)
+                - request body 예시
+                    ```json
+                    {
+                        "storeKakaoId": "123", // 가게 카카오 ID
+                        "storeName": "농민백암순대 본점", // 가게 이름
+                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 스토리 내용
+                    }
+                    ```
+                """;
+
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORY_API)
                 .summary("스토리 등록")
-                .description("스토리와 이미지를 multipart/form-data로 등록합니다.")
+                .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 ).multipartField(
                         partWithName("image").description("스토리 이미지 (필수)"),
                         partWithName("request").description("스토리 등록 요청 정보")
                 ).requestBodyField("request",
-                        fieldWithPath("query").description("스토리 검색 쿼리"),
+                        fieldWithPath("storeName").description("가게 이름"),
                         fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
                         fieldWithPath("description").description("스토리 내용 (필수)")
                 );

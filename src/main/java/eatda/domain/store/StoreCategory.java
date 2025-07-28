@@ -13,9 +13,6 @@ public enum StoreCategory {
     JAPANESE("일식"),
     WESTERN("양식"),
     CAFE("카페"),
-    BAKERY("베이커리"),
-    PUB("술집"),
-    FAST_FOOD("패스트푸드"),
     OTHER("기타");
 
     private final String categoryName;
@@ -32,14 +29,5 @@ public enum StoreCategory {
                 .filter(category -> category.categoryName.equals(value))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.INVALID_STORE_CATEGORY));
-    }
-
-    public static boolean isValid(String value) {
-        try {
-            from(value);
-            return true;
-        } catch (BusinessException e) {
-            return false;
-        }
     }
 }

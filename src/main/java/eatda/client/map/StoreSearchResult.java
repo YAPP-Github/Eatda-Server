@@ -26,9 +26,7 @@ public record StoreSearchResult(
             "음식점 > 일식", StoreCategory.JAPANESE,
             "음식점 > 양식", StoreCategory.WESTERN,
             "음식점 > 카페", StoreCategory.CAFE,
-            "음식점 > 간식 > 제과,베이커리", StoreCategory.BAKERY,
-            "음식점 > 술집", StoreCategory.PUB,
-            "음식점 > 패스트푸드", StoreCategory.FAST_FOOD
+            "음식점 > 간식 > 제과,베이커리", StoreCategory.CAFE
     );
 
     public boolean isFoodStore() {

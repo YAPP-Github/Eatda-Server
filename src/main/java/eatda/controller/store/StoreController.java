@@ -27,6 +27,12 @@ public class StoreController {
         return ResponseEntity.ok(storeService.getStores(size));
     }
 
+    @GetMapping("/api/shops/{storeId}")
+    public ResponseEntity<StoreResponse> getStore(@PathVariable long storeId) {
+        StoreResponse response = storeService.getStore(storeId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/api/shop/search")
     public ResponseEntity<StoreSearchResponses> searchStore(@RequestParam String query, LoginMember member) {
         StoreSearchResponses response = storeService.searchStores(query);

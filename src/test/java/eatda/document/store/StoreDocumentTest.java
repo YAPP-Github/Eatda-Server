@@ -2,6 +2,7 @@ package eatda.document.store;
 
 
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -14,6 +15,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
+import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoreSearchResponse;
 import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
@@ -34,31 +36,34 @@ import org.springframework.http.HttpHeaders;
 public class StoreDocumentTest extends BaseDocumentTest {
 
     @Nested
-    class GetStoreImages {
+    class GetStore {
 
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORE_API)
-                .summary("가게 이미지 조회")
+                .summary("음식점 정보 조회")
                 .pathParameter(
                         parameterWithName("storeId").description("음식점 ID")
                 );
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
-                        fieldWithPath("imageUrls").type(ARRAY).description("음식점 이미지 URL 목록")
+                        fieldWithPath("id").type(NUMBER).description("음식점 ID"),
+                        fieldWithPath("kakaoId").type(STRING).description("카카오 음식점 ID"),
+                        fieldWithPath("name").type(STRING).description("음식점 이름"),
+                        fieldWithPath("district").type(STRING).description("음식점 주소 (구)"),
+                        fieldWithPath("neighborhood").type(STRING).description("음식점 주소 (동)"),
+                        fieldWithPath("category").type(STRING).description("음식점 카테고리"),
+                        fieldWithPath("placeUrl").type(STRING).description("음식점 카카오맵 URL")
                 );
 
         @Test
-        void 음식점_이미지들을_조회() {
-            long storeId = 1L;
-            ImagesResponse response = new ImagesResponse(List.of(
-                    "https://example.image/1.jpg",
-                    "https://example.image/2.jpg",
-                    "https://example.image/3.jpg"
-            ));
-            doReturn(response).when(storeService).getStoreImages(storeId);
+        void 음식점_정보를_조회() {
+            StoreResponse response = new StoreResponse(1L, "17163273", "농민백암순대", "강남구", "대치동",
+                    "한식", "https://place.map.kakao.com/17163273");
+            doReturn(response).when(storeService).getStore(anyLong());
 
-            var document = document("store/get-images", 200)
+            long storeId = 1L;
+            var document = document("store/get-store", 200)
                     .request(requestDocument)
                     .response(responseDocument)
                     .build();
@@ -66,17 +71,17 @@ public class StoreDocumentTest extends BaseDocumentTest {
             given(document)
                     .contentType(ContentType.JSON)
                     .pathParam("storeId", storeId)
-                    .when().get("/api/shops/{storeId}/images")
+                    .when().get("/api/shops/{storeId}")
                     .then().statusCode(200);
         }
 
         @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
         @ParameterizedTest
-        void 음식점_이미지_조회_실패(BusinessErrorCode errorCode) {
-            long storeId = 1L;
-            doThrow(new BusinessException(errorCode)).when(storeService).getStoreImages(storeId);
+        void 음식점_정보_조회_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(storeService).getStore(anyLong());
 
-            var document = document("get-images", errorCode)
+            long storeId = 1L;
+            var document = document("store/get-store", errorCode)
                     .request(requestDocument)
                     .response(ERROR_RESPONSE)
                     .build();
@@ -84,7 +89,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
             given(document)
                     .contentType(ContentType.JSON)
                     .pathParam("storeId", storeId)
-                    .when().get("/api/shops/{storeId}/images")
+                    .when().get("/api/shops/{storeId}")
                     .then().statusCode(errorCode.getStatus().value());
         }
     }
@@ -148,6 +153,63 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .when().get("/api/shops")
                     .then().statusCode(errorCode.getStatus().value());
         }
+    }
+
+    @Nested
+    class GetStoreImages {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("가게 이미지 조회")
+                .pathParameter(
+                        parameterWithName("storeId").description("음식점 ID")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("imageUrls").type(ARRAY).description("음식점 이미지 URL 목록")
+                );
+
+        @Test
+        void 음식점_이미지들을_조회() {
+            long storeId = 1L;
+            ImagesResponse response = new ImagesResponse(List.of(
+                    "https://example.image/1.jpg",
+                    "https://example.image/2.jpg",
+                    "https://example.image/3.jpg"
+            ));
+            doReturn(response).when(storeService).getStoreImages(storeId);
+
+            var document = document("store/get-images", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}/images")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
+        @ParameterizedTest
+        void 음식점_이미지_조회_실패(BusinessErrorCode errorCode) {
+            long storeId = 1L;
+            doThrow(new BusinessException(errorCode)).when(storeService).getStoreImages(storeId);
+
+            var document = document("get-images", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}/images")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
+
     }
 
     @Nested

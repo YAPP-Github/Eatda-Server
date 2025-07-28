@@ -1,7 +1,7 @@
 package eatda.controller.story;
 
 public record StoryRegisterRequest(
-        String query,
+        String storeName,
         String storeKakaoId,
         String description
 ) {

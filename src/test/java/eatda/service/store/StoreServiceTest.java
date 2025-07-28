@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.store.ImagesResponse;
+import eatda.controller.store.StoreResponse;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
@@ -22,6 +23,61 @@ class StoreServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoreService storeService;
+
+    @Nested
+    class GetStore {
+
+        @Test
+        void 음식점_정보를_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            cheerGenerator.generateCommon(member, store, "image-key");
+
+            StoreResponse response = storeService.getStore(store.getId());
+
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(store.getId()),
+                    () -> assertThat(response.name()).isEqualTo(store.getName()),
+                    () -> assertThat(response.district()).isEqualTo("강남구"),
+                    () -> assertThat(response.neighborhood()).isEqualTo("대치동")
+            );
+        }
+
+        @Test
+        void 해당_음식점이_없을_경우_예외를_던진다() {
+            long nonExistentStoreId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> storeService.getStore(nonExistentStoreId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
+        }
+    }
+
+    @Nested
+    class GetStores {
+
+        @Test
+        void 음식점_목록을_최신순으로_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            cheerGenerator.generateCommon(member, store1, "image-key-1");
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45");
+            cheerGenerator.generateCommon(member, store2, "image-key-2");
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90");
+            cheerGenerator.generateCommon(member, store3, "image-key-3");
+
+            int size = 2;
+
+            var response = storeService.getStores(size);
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
+                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
+            );
+        }
+    }
 
     @Nested
     class GetStoreImages {
@@ -56,31 +112,6 @@ class StoreServiceTest extends BaseServiceTest {
                     () -> storeService.getStoreImages(nonExistentStoreId));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
-        }
-    }
-
-    @Nested
-    class GetStores {
-
-        @Test
-        void 음식점_목록을_최신순으로_조회한다() {
-            Member member = memberGenerator.generate("111");
-            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
-
-            int size = 2;
-
-            var response = storeService.getStores(size);
-
-            assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
-                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
-                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
-            );
         }
     }
 
