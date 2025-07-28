@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 
 import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
+import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoreSearchResponses;
@@ -40,6 +41,15 @@ public class StoreService {
                 .stream()
                 .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))
                 .collect(collectingAndThen(toList(), StoresResponse::new));
+    }
+
+    public ImagesResponse getStoreImages(long storeId) {
+        Store store = storeRepository.getById(storeId);
+        List<String> imageUrls = cheerRepository.findAllImageKey(store)
+                .stream()
+                .map(imageStorage::getPreSignedUrl)
+                .toList();
+        return new ImagesResponse(imageUrls);
     }
 
     private Optional<String> getStoreImageUrl(Store store) {

@@ -17,6 +17,11 @@ public class StoreController {
 
     private final StoreService storeService;
 
+    @GetMapping("/api/shops/{storeId}/images")
+    public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
+        return ResponseEntity.ok(storeService.getStoreImages(storeId));
+    }
+
     @GetMapping("/api/shops")
     public ResponseEntity<StoresResponse> getStores(@RequestParam @Min(1) @Max(50) int size) {
         return ResponseEntity.ok(storeService.getStores(size));
