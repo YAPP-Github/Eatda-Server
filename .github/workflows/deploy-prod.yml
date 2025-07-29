@@ -98,14 +98,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          fetch-tags: true
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Parse Terraform Outputs and Set Environment Variables
         run: |
@@ -116,13 +108,16 @@ jobs:
           echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_container_name.value')" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(echo "$TF_OUTPUTS" | jq -r '.rds_endpoint.value')" >> $GITHUB_ENV
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Update DB URL in Parameter Store
         run: |
-          aws ssm put-parameter \
-            --name "/prod/RDS_ENDPOINT" \
-            --value "jdbc:mysql://${{ env.RDS_ENDPOINT }}/eatda?useUnicode=true&characterEncoding=UTF-8" \
-            --type SecureString \
-            --overwrite
+          aws ssm put-parameter --name "/prod/RDS_ENDPOINT" --value "jdbc:mysql://${{ env.RDS_ENDPOINT }}/eatda?useUnicode=true&characterEncoding=UTF-8" --type SecureString --overwrite
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -130,9 +125,17 @@ jobs:
           node-version: '22'
 
       - name: Install Semantic Release dependencies
-        run: npm install semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github @semantic-release/changelog @semantic-release/git conventional-changelog-conventionalcommits
+        run: |
+          npm install \
+            semantic-release \
+            @semantic-release/commit-analyzer \
+            @semantic-release/release-notes-generator \
+            @semantic-release/github \
+            @semantic-release/changelog \
+            @semantic-release/git \
+            conventional-changelog-conventionalcommits
 
-      - name: Semantic Release (Dry Run)
+      - name: Get Next Version or Set Rollback
         id: get_version
         run: |
           if [[ -n "${{ github.event.inputs.rollback_version }}" ]]; then
@@ -140,6 +143,7 @@ jobs:
             echo "HAS_VERSION=true" >> $GITHUB_OUTPUT
             echo "VERSION=${{ github.event.inputs.rollback_version }}" >> $GITHUB_OUTPUT
             echo "SEMANTIC_VERSION=${{ github.event.inputs.rollback_version }}" >> $GITHUB_ENV
+            echo "SKIP_BUILD=true" >> $GITHUB_OUTPUT
           else
             echo "배포할 버전을 결정하기 위해 dry-run을 실행합니다..."
             OUTPUT=$(npm exec --no -- semantic-release --dry-run --no-ci)
@@ -150,18 +154,20 @@ jobs:
             if [[ -z "$VERSION" ]]; then
               echo "릴리즈할 새로운 버전이 없습니다. 배포를 건너뜁니다."
               echo "HAS_VERSION=false" >> $GITHUB_OUTPUT
+              echo "SKIP_BUILD=false" >> $GITHUB_OUTPUT
             else
               echo "배포 예정 버전: $VERSION"
               echo "HAS_VERSION=true" >> $GITHUB_OUTPUT
               echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
               echo "SEMANTIC_VERSION=$VERSION" >> $GITHUB_ENV
+              echo "SKIP_BUILD=false" >> $GITHUB_OUTPUT
             fi
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 21
-        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        if: steps.get_version.outputs.HAS_VERSION == 'true' && steps.get_version.outputs.SKIP_BUILD != 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -171,19 +177,14 @@ jobs:
           cache: 'gradle'
 
       - name: Get TEST_JWT_SECRET_KEY from SSM
-        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        if: steps.get_version.outputs.HAS_VERSION == 'true' && steps.get_version.outputs.SKIP_BUILD != 'true'
         id: get-test-secret
         run: |
-          SECRET_VALUE=$(aws ssm get-parameter \
-            --name "/common/TEST_JWT_SECRET_KEY" \
-            --with-decryption \
-            --region "${{ env.AWS_REGION }}" \
-            --query "Parameter.Value" \
-            --output text)
+          SECRET_VALUE=$(aws ssm get-parameter --name "/common/TEST_JWT_SECRET_KEY" --with-decryption --region "${{ env.AWS_REGION }}" --query "Parameter.Value" --output text)
           echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
 
       - name: Build with Gradle
-        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        if: steps.get_version.outputs.HAS_VERSION == 'true' && steps.get_version.outputs.SKIP_BUILD != 'true'
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
@@ -199,14 +200,18 @@ jobs:
           mask-password: 'true'
 
       - name: Build, tag, and push image to Amazon ECR
-        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        if: steps.get_version.outputs.HAS_VERSION == 'true' && steps.get_version.outputs.SKIP_BUILD != 'true'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION" >> $GITHUB_ENV
-
+      - name: Set Image URI
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        id: set-image
+        run: |
+          ECR_REGISTRY=$(aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} --query "repositories[0].registryId" --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          echo "image=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.SEMANTIC_VERSION }}" >> $GITHUB_OUTPUT
       - name: Get latest ECS task definition
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-latest-task-def
@@ -221,8 +226,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ env.image }}
-
+          image: ${{ steps.set-image.outputs.image }}
       - name: Deploy Amazon ECS task definition and wait for stability
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: deploy-ecs
@@ -237,7 +241,7 @@ jobs:
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         run: |
           DEPLOYED_ARN="${{ steps.deploy-ecs.outputs.task-definition-arn }}"
-          FINAL_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --query "services[0].taskDefinition" --output text)
+          FINAL_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --region "${{ env.AWS_REGION }}" --query "services[0].taskDefinition" --output text)
           echo "배포 시도 ARN: $DEPLOYED_ARN"
           echo "실제 적용된 ARN: $FINAL_ARN"
           if [[ "$DEPLOYED_ARN" == "$FINAL_ARN" ]]; then
@@ -248,10 +252,9 @@ jobs:
             exit 1
           fi
 
-      - name: Semantic Release (Final)
-        if: success() && env.SEMANTIC_VERSION != '' && (github.event.inputs.rollback_version == null || github.event.inputs.rollback_version == '')
-        run: |
-          ./node_modules/.bin/semantic-release --no-ci
+      - name: Create GitHub Release (Final)
+        if: success() && steps.get_version.outputs.HAS_VERSION == 'true' && steps.get_version.outputs.SKIP_BUILD != 'true'
+        run: npm exec --no -- semantic-release --no-ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -273,7 +276,7 @@ jobs:
           embed-title: "✅ 프로덕션 서버 배포 성공!"
           embed-color: 65280
           embed-description: |
-            새로운 버전이 성공적으로 배포되었습니다.
+            새로운 버전이 성공적으로 배포 및 릴리즈되었습니다.
             **버전**: [v${{ needs.deploy-service.outputs.version }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ needs.deploy-service.outputs.version }})
             **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             **배포자**: ${{ github.actor }}
@@ -287,7 +290,7 @@ jobs:
           embed-title: "❌ 프로덕션 서버 배포 실패!"
           embed-color: 16711680
           embed-description: |
-            배포 과정 중 오류가 발생했거나 롤백되었습니다. 아래 링크에서 로그를 확인하세요.
+            배포 과정 중 오류가 발생했거나 롤백되었습니다. GitHub 릴리즈는 생성되지 않았습니다.
             **시도 버전**: v${{ needs.deploy-service.outputs.version }}
             **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             **요청자**: ${{ github.actor }}

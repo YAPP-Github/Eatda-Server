@@ -114,7 +114,7 @@ jobs:
         run: |
           MYSQL_URL="jdbc:mysql://${PRIVATE_IP}:3306/eatda?useUnicode=true&characterEncoding=UTF-8"
           
-                    aws ssm put-parameter \
+            aws ssm put-parameter \
             --name "/dev/MYSQL_URL" \
             --type "SecureString" \
             --value "$MYSQL_URL" \
