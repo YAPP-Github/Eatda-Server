@@ -206,12 +206,14 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION
+
       - name: Set Image URI
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: set-image
         run: |
           ECR_REGISTRY=$(aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} --query "repositories[0].registryId" --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           echo "image=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.SEMANTIC_VERSION }}" >> $GITHUB_OUTPUT
+
       - name: Get latest ECS task definition
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-latest-task-def
@@ -227,6 +229,7 @@ jobs:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.set-image.outputs.image }}
+
       - name: Deploy Amazon ECS task definition and wait for stability
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: deploy-ecs
