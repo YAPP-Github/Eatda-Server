@@ -101,7 +101,9 @@ public class StoryService {
                 story.getAddressDistrict(),
                 story.getAddressNeighborhood(),
                 story.getDescription(),
-                imageStorage.getPreSignedUrl(story.getImageKey())
+                imageStorage.getPreSignedUrl(story.getImageKey()),
+                story.getMember().getId(),
+                story.getMember().getNickname()
         );
     }
 }

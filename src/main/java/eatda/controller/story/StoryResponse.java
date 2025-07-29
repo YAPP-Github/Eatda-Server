@@ -7,6 +7,8 @@ public record StoryResponse(
         String storeDistrict,
         String storeNeighborhood,
         String description,
-        String imageUrl
+        String imageUrl,
+        long memberId,
+        String memberNickname
 ) {
 }
