@@ -96,7 +96,9 @@ public class StoryControllerTest extends BaseControllerTest {
                     "성동구",
                     "성수동",
                     "곱창은 여기",
-                    "https://s3.bucket.com/story1.jpg"
+                    "https://s3.bucket.com/story1.jpg",
+                    1L,
+                    "커찬"
             )).when(storyService).getStory(storyId);
 
             StoryResponse response = given()
@@ -114,7 +116,9 @@ public class StoryControllerTest extends BaseControllerTest {
                     () -> assertThat(response.storeDistrict()).isEqualTo("성동구"),
                     () -> assertThat(response.storeNeighborhood()).isEqualTo("성수동"),
                     () -> assertThat(response.description()).isEqualTo("곱창은 여기"),
-                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story1.jpg")
+                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story1.jpg"),
+                    () -> assertThat(response.memberId()).isEqualTo(1L),
+                    () -> assertThat(response.memberNickname()).isEqualTo("커찬")
             );
         }
 

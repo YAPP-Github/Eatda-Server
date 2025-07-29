@@ -164,7 +164,9 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("storeDistrict").description("가게 주소의 구"),
                         fieldWithPath("storeNeighborhood").description("가게 주소의 동"),
                         fieldWithPath("description").description("스토리 내용"),
-                        fieldWithPath("imageUrl").description("스토리 이미지 URL")
+                        fieldWithPath("imageUrl").description("스토리 이미지 URL"),
+                        fieldWithPath("memberId").description("회원 ID"),
+                        fieldWithPath("memberNickname").description("회원 닉네임")
                 );
 
         @Test
@@ -177,7 +179,9 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     "성동구",
                     "성수동",
                     "곱창은 여기",
-                    "https://s3.bucket.com/story1.jpg"
+                    "https://s3.bucket.com/story1.jpg",
+                    1L,
+                    "커찬"
             );
             doReturn(response).when(storyService).getStory(storyId);
 
