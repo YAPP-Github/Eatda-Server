@@ -139,7 +139,11 @@ jobs:
         run: |
           OUTPUT=$(npm exec --no -- semantic-release --no-ci)
           echo "$OUTPUT"
-          VERSION=$(echo "$OUTPUT" | grep -oP 'Published (?:pre)?release v\K[0-9.a-z-]+' | head -n 1)
+          VERSION=$(echo "$OUTPUT" | grep -oP 'Published (?:pre)?release v?\K[0-9.a-z.-]+' | head -n 1)
+          if [[ -z "$VERSION" ]]; then
+            VERSION=$(echo "$OUTPUT" | grep -oP 'The next release version is \K[0-9.a-z.-]+' | head -n 1)
+          fi
+
           if [[ -z "$VERSION" ]]; then
             echo "릴리즈할 새로운 버전이 없습니다. 배포를 건너뜁니다."
             echo "HAS_VERSION=false" >> $GITHUB_OUTPUT
