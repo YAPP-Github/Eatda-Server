@@ -12,7 +12,7 @@ public enum StoreCategory {
     CHINESE("중식"),
     JAPANESE("일식"),
     WESTERN("양식"),
-    CAFE("카페"),
+    CAFE("카페/디저트"),
     OTHER("기타");
 
     private final String categoryName;
