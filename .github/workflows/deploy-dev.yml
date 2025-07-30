@@ -85,8 +85,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: develop
     needs: terraform-apply-dev
+    outputs:
+      outcome: ${{ job.status }}
+      has_version: ${{ steps.get_version.outputs.HAS_VERSION }}
+      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Parse Terraform Outputs and Set Environment Variables
         run: |
@@ -107,12 +113,12 @@ jobs:
       - name: Update MYSQL_URL in Parameter Store
         run: |
           MYSQL_URL="jdbc:mysql://${PRIVATE_IP}:3306/eatda?useUnicode=true&characterEncoding=UTF-8"
-
+          
           aws ssm put-parameter \
-            --name "/dev/MYSQL_URL" \
-            --type "SecureString" \
-            --value "$MYSQL_URL" \
-            --overwrite
+          --name "/dev/MYSQL_URL" \
+          --type "SecureString" \
+          --value "$MYSQL_URL" \
+          --overwrite
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -131,18 +137,23 @@ jobs:
       - name: Semantic Release
         id: get_version
         run: |
-          OUTPUT=$(./node_modules/.bin/semantic-release --no-ci)
+          OUTPUT=$(npm exec --no -- semantic-release --no-ci)
           echo "$OUTPUT"
-                    VERSION=$(echo "$OUTPUT" | grep -oP 'Published (?:pre)?release \K[0-9.a-z-]+')
-          if [ -z "$VERSION" ]; then
+          VERSION=$(echo "$OUTPUT" | grep -oP 'Published (?:pre)?release v\K[0-9.a-z-]+' | head -n 1)
+          if [[ -z "$VERSION" ]]; then
             echo "릴리즈할 새로운 버전이 없습니다. 배포를 건너뜁니다."
-            exit 0
+            echo "HAS_VERSION=false" >> $GITHUB_OUTPUT
+          else
+            echo "새 버전($VERSION) 릴리즈가 감지되었습니다."
+            echo "HAS_VERSION=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "SEMANTIC_VERSION=$VERSION" >> $GITHUB_ENV
           fi
-          echo "SEMANTIC_VERSION=$VERSION" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 21
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -152,17 +163,14 @@ jobs:
           cache: 'gradle'
 
       - name: Get TEST_JWT_SECRET_KEY from SSM
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-test-secret
         run: |
-          SECRET_VALUE=$(aws ssm get-parameter \
-            --name "/common/TEST_JWT_SECRET_KEY" \
-            --with-decryption \
-            --region "${{ env.AWS_REGION }}" \
-            --query "Parameter.Value" \
-            --output text)
+          SECRET_VALUE=$(aws ssm get-parameter --name "/common/TEST_JWT_SECRET_KEY" --with-decryption --region "${{ env.AWS_REGION }}" --query "Parameter.Value" --output text)
           echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
 
       - name: Build with Gradle
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         run: |
           cd ${{ github.workspace }}
           chmod +x gradlew
@@ -171,12 +179,14 @@ jobs:
           TEST_JWT_SECRET_KEY: ${{ env.TEST_JWT_SECRET_KEY }}
 
       - name: Login to Amazon ECR
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
 
       - name: Build, tag, and push image to Amazon ECR
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
@@ -185,12 +195,14 @@ jobs:
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$SEMANTIC_VERSION" >> $GITHUB_ENV
 
       - name: Get latest ECS task definition
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-latest-task-def
         run: |
-          TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --region "${{ env.AWS_REGION }}" --query "services[0].taskDefinition" --output text)
-          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --region "${{ env.AWS_REGION }}" --query "taskDefinition" --output json > task-definition.json
+          TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --query "services[0].taskDefinition" --output text)
+          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition" --output json > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -198,7 +210,9 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ env.image }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy Amazon ECS task definition and wait for stability
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
@@ -206,12 +220,35 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
+      - name: Verify deployment by comparing Task Definition ARNs
+        if: steps.get_version.outputs.HAS_VERSION == 'true'
+        run: |
+          DEPLOYED_ARN="${{ steps.deploy-ecs.outputs.task-definition-arn }}"
+          FINAL_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --query "services[0].taskDefinition" --output text)
+
+          echo "배포 시도 ARN: $DEPLOYED_ARN"
+          echo "실제 적용된 ARN: $FINAL_ARN"
+
+          if [[ "$DEPLOYED_ARN" == "$FINAL_ARN" ]]; then
+            echo "✅ 검증 성공. 서비스가 올바른 새 태스크 정의로 실행 중입니다."
+          else
+            echo "❌ 검증 실패. 롤백이 발생했습니다."
+            echo "서비스가 다른 태스크 정의($FINAL_ARN)로 안정화되었습니다."
+            exit 1 # 스크립트를 실패 처리하여 워크플로우 잡을 중단시킵니다.
+          fi
+
+  notify:
+    name: Send Discord Notification
+    runs-on: ubuntu-latest
+    needs: deploy-service
+    if: always()
+    steps:
       - name: Prepare Notification Info
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Discord Notify (Success)
-        if: success()
+        if: needs.deploy-service.outputs.has_version == 'true' && needs.deploy-service.outputs.outcome == 'success'
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
@@ -219,23 +256,34 @@ jobs:
           embed-color: 65280
           embed-description: |
             새로운 버전이 성공적으로 배포되었습니다.
-            
-            **버전**: [v${{ env.SEMANTIC_VERSION }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ env.SEMANTIC_VERSION }})
+            **버전**: [v${{ needs.deploy-service.outputs.version }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ needs.deploy-service.outputs.version }})
             **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             **배포자**: ${{ github.actor }}
           embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Discord Notify (Failure)
-        if: failure()
+        if: needs.deploy-service.outputs.has_version == 'true' && needs.deploy-service.outputs.outcome == 'failure'
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           embed-title: "❌ 개발 서버 배포 실패!"
           embed-color: 16711680
           embed-description: |
-            배포 과정 중 오류가 발생했습니다. 아래 링크에서 로그를 확인하세요.
-            
-            **시도 버전**: ${{ env.SEMANTIC_VERSION }}
+            배포 과정 중 오류가 발생했거나 롤백되었습니다. 아래 링크에서 로그를 확인하세요.
+            **시도 버전**: v${{ needs.deploy-service.outputs.version }}
+            **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **요청자**: ${{ github.actor }}
+          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Discord Notify (No Version to Release)
+        if: needs.deploy-service.outputs.has_version == 'false'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "ℹ️ 개발 서버 배포 건너뜀"
+          embed-color: 8421504
+          embed-description: |
+            릴리즈할 새로운 버전이 없어 배포를 진행하지 않았습니다.
             **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
             **요청자**: ${{ github.actor }}
           embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
