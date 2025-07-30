@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import eatda.controller.BaseControllerTest;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
+import eatda.domain.store.StoreCategory;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,12 +44,14 @@ class StoreControllerTest extends BaseControllerTest {
     class GetStores {
 
         @Test
-        void 음식점_목록을_최신순으로_조회한다() {
+        void 모든_카테고리의_음식점_목록을_최신순으로_조회한다() {
             Member member = memberGenerator.generate("111");
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
-            Store store1 = storeGenerator.generate("111", "서울 강남구 대치동 896-33", startAt);
-            Store store2 = storeGenerator.generate("222", "서울 강남구 대치동 896-34", startAt.plusHours(1));
-            Store store3 = storeGenerator.generate("333", "서울 강남구 대치동 896-35", startAt.plusHours(2));
+            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("113", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+                    startAt.plusHours(2));
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
@@ -67,6 +70,38 @@ class StoreControllerTest extends BaseControllerTest {
                     () -> assertThat(response.stores()).hasSize(size),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
+            );
+        }
+
+        @Test
+        void 특정_카테고리의_음식점_목록을_최신순으로_조회한다() {
+            Member member = memberGenerator.generate("111");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.CAFE, startAt);
+            Store store2 = storeGenerator.generate("113", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
+                    startAt.plusHours(2));
+            cheerGenerator.generateCommon(member, store1, "image-key-1");
+            cheerGenerator.generateCommon(member, store2, "image-key-2");
+            cheerGenerator.generateCommon(member, store3, "image-key-3");
+
+            int size = 2;
+            StoreCategory category = StoreCategory.CAFE;
+
+            StoresResponse response = given()
+                    .queryParam("size", size)
+                    .queryParam("category", category.getCategoryName())
+                    .when()
+                    .get("/api/shops")
+                    .then()
+                    .statusCode(200)
+                    .extract().as(StoresResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
+                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
             );
         }
     }

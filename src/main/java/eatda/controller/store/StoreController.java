@@ -23,8 +23,9 @@ public class StoreController {
     }
 
     @GetMapping("/api/shops")
-    public ResponseEntity<StoresResponse> getStores(@RequestParam @Min(1) @Max(50) int size) {
-        return ResponseEntity.ok(storeService.getStores(size));
+    public ResponseEntity<StoresResponse> getStores(@RequestParam @Min(1) @Max(50) int size,
+                                                    @RequestParam(required = false) String category) {
+        return ResponseEntity.ok(storeService.getStores(size, category));
     }
 
     @GetMapping("/api/shops/{storeId}")

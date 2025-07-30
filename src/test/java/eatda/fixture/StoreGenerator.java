@@ -26,9 +26,26 @@ public class StoreGenerator {
     }
 
     public Store generate(String kakaoId, String lotNumberAddress) {
-        Store store = Store.builder()
+        Store store = create(kakaoId, lotNumberAddress, DEFAULT_CATEGORY);
+        return storeRepository.save(store);
+    }
+
+    public Store generate(String kakaoId, String lotNumberAddress, LocalDateTime createdAt) {
+        Store store = create(kakaoId, lotNumberAddress, DEFAULT_CATEGORY);
+        DomainUtils.setCreatedAt(store, createdAt);
+        return storeRepository.save(store);
+    }
+
+    public Store generate(String kakaoId, String lotNumberAddress, StoreCategory category, LocalDateTime createdAt) {
+        Store store = create(kakaoId, lotNumberAddress, category);
+        DomainUtils.setCreatedAt(store, createdAt);
+        return storeRepository.save(store);
+    }
+
+    private Store create(String kakaoId, String lotNumberAddress, StoreCategory category) {
+        return Store.builder()
                 .kakaoId(kakaoId)
-                .category(DEFAULT_CATEGORY)
+                .category(category)
                 .phoneNumber(DEFAULT_PHONE_NUMBER)
                 .name(DEFAULT_NAME)
                 .placeUrl(DEFAULT_PLACE_URL)
@@ -37,12 +54,5 @@ public class StoreGenerator {
                 .latitude(DEFAULT_LATITUDE)
                 .longitude(DEFAULT_LONGITUDE)
                 .build();
-        return storeRepository.save(store);
-    }
-
-    public Store generate(String kakaoId, String lotNumberAddress, LocalDateTime createdAt) {
-        Store store = generate(kakaoId, lotNumberAddress);
-        DomainUtils.setCreatedAt(store, createdAt);
-        return storeRepository.save(store);
     }
 }

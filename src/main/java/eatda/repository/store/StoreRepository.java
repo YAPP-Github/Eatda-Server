@@ -1,6 +1,7 @@
 package eatda.repository.store;
 
 import eatda.domain.store.Store;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.util.List;
@@ -19,4 +20,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> findByKakaoId(String kakaoId);
 
     List<Store> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    List<Store> findAllByCategoryOrderByCreatedAtDesc(StoreCategory category, Pageable pageable);
 }
