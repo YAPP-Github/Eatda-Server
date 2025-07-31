@@ -179,7 +179,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
         @Test
         void 스토리_상세_조회_성공() {
             long storyId = 1L;
-            StoryResponse response =new StoryResponse(
+            StoryResponse response = new StoryResponse(
                     null,
                     "123456",
                     "한식",
