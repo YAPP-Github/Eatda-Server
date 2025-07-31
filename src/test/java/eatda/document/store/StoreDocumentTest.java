@@ -103,7 +103,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
                 .queryParameter(
                         parameterWithName("size").description("조회할 음식점 개수 (최소 1, 최대 50)"),
                         parameterWithName("category")
-                                .description("음식점 카테고리(기본값: 전체) (한식,중식,일식,양식,디저트/카페,기타)").optional()
+                                .description("음식점 카테고리(기본값: 전체) (한식,중식,일식,양식,카페/디저트,기타)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
