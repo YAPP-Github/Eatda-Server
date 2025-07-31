@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-public class StoryServiceTest extends BaseServiceTest {
+class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryService storyService;
@@ -247,7 +247,7 @@ public class StoryServiceTest extends BaseServiceTest {
                     .build();
             Story story2 = Story.builder()
                     .member(member)
-                    .storeKakaoId("drifferent-kakao-id")
+                    .storeKakaoId("different-kakao-id")
                     .storeName("순대국밥집")
                     .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                     .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
@@ -269,5 +269,14 @@ public class StoryServiceTest extends BaseServiceTest {
                     .extracting(StoriesDetailResponse.StoryDetailResponse::storyId)
                     .containsExactlyInAnyOrder(story1.getId());
         }
+    }
+
+    @Test
+    void 존재하지_않는_카카오ID로_조회하면_빈_목록을_반환한다() {
+        String nonExistentKakaoId = "non-existent";
+
+        var response = storyService.getPagedStoryDetails(nonExistentKakaoId, 5);
+
+        assertThat(response.stories()).isEmpty();
     }
 }
