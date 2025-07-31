@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
@@ -162,21 +164,23 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
-                        fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
-                        fieldWithPath("category").description("가게 카테고리"),
-                        fieldWithPath("storeName").description("가게 이름"),
-                        fieldWithPath("storeDistrict").description("가게 주소의 구"),
-                        fieldWithPath("storeNeighborhood").description("가게 주소의 동"),
-                        fieldWithPath("description").description("스토리 내용"),
-                        fieldWithPath("imageUrl").description("스토리 이미지 URL"),
-                        fieldWithPath("memberId").description("회원 ID"),
-                        fieldWithPath("memberNickname").description("회원 닉네임")
+                        fieldWithPath("storeId").type(NUMBER).description("가게의 카카오 ID (nullable)").optional(),
+                        fieldWithPath("storeKakaoId").type(STRING).description("가게의 카카오 ID"),
+                        fieldWithPath("category").type(STRING).description("가게 카테고리"),
+                        fieldWithPath("storeName").type(STRING).description("가게 이름"),
+                        fieldWithPath("storeDistrict").type(STRING).description("가게 주소의 구"),
+                        fieldWithPath("storeNeighborhood").type(STRING).description("가게 주소의 동"),
+                        fieldWithPath("description").type(STRING).description("스토리 내용"),
+                        fieldWithPath("imageUrl").type(STRING).description("스토리 이미지 URL"),
+                        fieldWithPath("memberId").type(NUMBER).description("회원 ID"),
+                        fieldWithPath("memberNickname").type(STRING).description("회원 닉네임")
                 );
 
         @Test
         void 스토리_상세_조회_성공() {
             long storyId = 1L;
             StoryResponse response = new StoryResponse(
+                    null,
                     "123456",
                     "한식",
                     "진또곱창집",
