@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
 import eatda.controller.story.StoriesResponse;
@@ -117,7 +118,10 @@ public class StoryDocumentTest extends BaseDocumentTest {
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORY_API)
                 .summary("스토리 목록 조회")
-                .description("스토리 목록을 페이지네이션하여 조회합니다.");
+                .description("스토리 목록을 페이지네이션하여 조회합니다.")
+                .queryParameter(
+                        parameterWithName("size").description("스토리 개수 (기본값: 5) (최소값: 1, 최대값: 50)").optional()
+                );
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
