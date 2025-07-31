@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StoryRepository extends JpaRepository<Story, Long> {
 
     Page<Story> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<Story> findAllByStoreKakaoIdOrderByCreatedAtDesc(String storeKakaoId, Pageable pageable);
 }

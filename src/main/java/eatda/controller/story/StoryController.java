@@ -42,4 +42,13 @@ public class StoryController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(storyService.getStory(storyId));
     }
+
+    @GetMapping("/api/stories/kakao/{kakaoId}")
+    public ResponseEntity<StoriesDetailResponse> getStoriesByKakaoId(
+            @PathVariable String kakaoId,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(storyService.getPagedStoryDetails(kakaoId, size));
+    }
 }

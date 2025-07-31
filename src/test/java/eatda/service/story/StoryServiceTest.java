@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import eatda.client.map.StoreSearchResult;
+import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
@@ -27,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-public class StoryServiceTest extends BaseServiceTest {
+class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryService storyService;
@@ -186,5 +187,96 @@ public class StoryServiceTest extends BaseServiceTest {
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining(BusinessErrorCode.STORY_NOT_FOUND.getMessage());
         }
+    }
+
+    @Nested
+    class GetPagedStoryDetails {
+
+        @Test
+        void 카카오ID로_스토리_목록을_조회할_수_있다() {
+            String kakaoId = "123456";
+            Member member = memberGenerator.generate("12345");
+            Story story1 = Story.builder()
+                    .member(member)
+                    .storeKakaoId(kakaoId)
+                    .storeName("곱창집")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
+                    .storeCategory(StoreCategory.KOREAN)
+                    .description("미쳤다 진짜")
+                    .imageKey(new ImageKey("image-key-1"))
+                    .build();
+            Story story2 = Story.builder()
+                    .member(member)
+                    .storeKakaoId(kakaoId)
+                    .storeName("순대국밥집")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
+                    .storeCategory(StoreCategory.KOREAN)
+                    .description("뜨끈한 국밥 최고")
+                    .imageKey(new ImageKey("image-key-2"))
+                    .build();
+            storyRepository.save(story1);
+            storyRepository.save(story2);
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("image-key-1")))
+                    .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("image-key-2")))
+                    .thenReturn("https://s3.bucket.com/story/dummy/2.jpg");
+
+            var response = storyService.getPagedStoryDetails(kakaoId, 5);
+
+            assertThat(response.stories())
+                    .hasSize(2)
+                    .extracting(StoriesDetailResponse.StoryDetailResponse::storyId)
+                    .containsExactlyInAnyOrder(story2.getId(), story1.getId());
+        }
+
+        @Test
+        void 카카오ID로_스토리_목록을_조회할_때_특정_스토리만_반환한다() {
+            String kakaoId = "123456";
+            Member member = memberGenerator.generate("12345");
+            Story story1 = Story.builder()
+                    .member(member)
+                    .storeKakaoId(kakaoId)
+                    .storeName("곱창집")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
+                    .storeCategory(StoreCategory.KOREAN)
+                    .description("미쳤다 진짜")
+                    .imageKey(new ImageKey("image-key-1"))
+                    .build();
+            Story story2 = Story.builder()
+                    .member(member)
+                    .storeKakaoId("different-kakao-id")
+                    .storeName("순대국밥집")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
+                    .storeCategory(StoreCategory.KOREAN)
+                    .description("뜨끈한 국밥 최고")
+                    .imageKey(new ImageKey("image-key-2"))
+                    .build();
+            storyRepository.save(story1);
+            storyRepository.save(story2);
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("image-key-1")))
+                    .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("image-key-2")))
+                    .thenReturn("https://s3.bucket.com/story/dummy/2.jpg");
+
+            var response = storyService.getPagedStoryDetails(kakaoId, 5);
+
+            assertThat(response.stories())
+                    .hasSize(1)
+                    .extracting(StoriesDetailResponse.StoryDetailResponse::storyId)
+                    .containsExactlyInAnyOrder(story1.getId());
+        }
+    }
+
+    @Test
+    void 존재하지_않는_카카오ID로_조회하면_빈_목록을_반환한다() {
+        String nonExistentKakaoId = "non-existent";
+
+        var response = storyService.getPagedStoryDetails(nonExistentKakaoId, 5);
+
+        assertThat(response.stories()).isEmpty();
     }
 }

@@ -5,12 +5,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
+import eatda.controller.story.StoriesDetailResponse;
+import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
@@ -28,6 +31,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
@@ -225,6 +230,70 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .statusCode(BusinessErrorCode.STORY_NOT_FOUND.getStatus().value())
                     .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
                     .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    class GetStoriesByKakaoId {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORY_API)
+                .summary("카카오 ID로 스토리 목록 조회")
+                .description("특정 카카오 ID에 해당하는 스토리 목록을 페이지네이션하여 조회합니다.")
+                .pathParameter(
+                        parameterWithName("kakaoId").description("가게의 카카오 ID")
+                )
+                .queryParameter(
+                        parameterWithName("size").description("스토리 개수 (기본값: 5) (최소값: 1, 최대값: 50)").optional()
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("stories").type(ARRAY).description("스토리 상세 리스트"),
+                        fieldWithPath("stories[].storyId").type(NUMBER).description("스토리 ID"),
+                        fieldWithPath("stories[].imageUrl").type(STRING).description("스토리 이미지 URL"),
+                        fieldWithPath("stories[].memberId").type(NUMBER).description("회원 ID"),
+                        fieldWithPath("stories[].memberNickname").type(STRING).description("회원 닉네임")
+                );
+
+        @Test
+        void 카카오_ID로_스토리_목록_조회_성공() {
+            String kakaoId = "123456";
+            int size = 5;
+            StoriesDetailResponse response = new StoriesDetailResponse(List.of(
+                    new StoryDetailResponse(1L, "https://dummy-s3.com/story1.png", 1L, "커찬"),
+                    new StoryDetailResponse(2L, "https://dummy-s3.com/story2.png", 2L, "준환")
+            ));
+            doReturn(response).when(storyService).getPagedStoryDetails(kakaoId, size);
+
+            var document = document("story/get-stories-by-kakao-id", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .queryParam("size", size)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/stories/kakao/{kakaoId}", kakaoId)
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
+        @ParameterizedTest
+        void 카카오_ID로_스토리_목록_조회_실패(BusinessErrorCode errorCode) {
+            String kakaoId = "nonexistent";
+            int size = 5;
+            doThrow(new BusinessException(errorCode)).when(storyService).getPagedStoryDetails(kakaoId, size);
+
+            var document = document("story/get-stories-by-kakao-id", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .queryParam("size", size)
+                    .when().get("/api/stories/kakao/{kakaoId}", kakaoId)
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 }
