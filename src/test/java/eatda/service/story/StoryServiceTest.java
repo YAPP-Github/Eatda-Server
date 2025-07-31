@@ -2,6 +2,7 @@ package eatda.service.story;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
@@ -107,7 +109,7 @@ public class StoryServiceTest extends BaseServiceTest {
     class GetStory {
 
         @Test
-        void 스토리_상세_정보를_조회할_수_있다() {
+        void 스토리_상세_정보를_조회할_때_스토어ID가_없으면_NULL로_반환된다() {
             Member member = memberGenerator.generate("99999");
 
             Story story = Story.builder()
@@ -120,7 +122,6 @@ public class StoryServiceTest extends BaseServiceTest {
                     .description("곱창은 여기")
                     .imageKey(new ImageKey("story-image-key"))
                     .build();
-
             storyRepository.save(story);
 
             when(externalImageStorage.getPreSignedUrl(new ImageKey("story-image-key")))
@@ -128,13 +129,54 @@ public class StoryServiceTest extends BaseServiceTest {
 
             StoryResponse response = storyService.getStory(story.getId());
 
-            assertThat(response.storeKakaoId()).isEqualTo("123456");
-            assertThat(response.category()).isEqualTo("한식");
-            assertThat(response.storeName()).isEqualTo("진또곱창집");
-            assertThat(response.storeDistrict()).isEqualTo("성동구");
-            assertThat(response.storeNeighborhood()).isEqualTo("성수동1가");
-            assertThat(response.description()).isEqualTo("곱창은 여기");
-            assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg");
+            assertAll(
+                    () -> assertThat(response.storeId()).isNull(),
+                    () -> assertThat(response.storeKakaoId()).isEqualTo("123456"),
+                    () -> assertThat(response.category()).isEqualTo("한식"),
+                    () -> assertThat(response.storeName()).isEqualTo("진또곱창집"),
+                    () -> assertThat(response.storeDistrict()).isEqualTo("성동구"),
+                    () -> assertThat(response.storeNeighborhood()).isEqualTo("성수동1가"),
+                    () -> assertThat(response.description()).isEqualTo("곱창은 여기"),
+                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg"),
+                    () -> assertThat(response.memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(response.memberNickname()).isEqualTo(member.getNickname())
+            );
+        }
+
+        @Test
+        void 스토리_상세_정보를_조회할_때_스토어ID가_있으면_해당_ID값을_반환한다() {
+            Member member = memberGenerator.generate("99999");
+            Store store = storeGenerator.generate("123456", "서울시 성북구 장위동 123-45");
+            Story story = Story.builder()
+                    .member(member)
+                    .storeKakaoId("123456")
+                    .storeName("진또곱창집")
+                    .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
+                    .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
+                    .storeCategory(StoreCategory.KOREAN)
+                    .description("곱창은 여기")
+                    .imageKey(new ImageKey("story-image-key"))
+                    .build();
+            storyRepository.save(story);
+
+            when(externalImageStorage.getPreSignedUrl(new ImageKey("story-image-key")))
+                    .thenReturn("https://s3.bucket.com/story/dummy/1.jpg");
+
+            StoryResponse response = storyService.getStory(story.getId());
+
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(store.getId()),
+                    () -> assertThat(response.storeKakaoId()).isEqualTo("123456"),
+                    () -> assertThat(response.category()).isEqualTo("한식"),
+                    () -> assertThat(response.storeName()).isEqualTo("진또곱창집"),
+                    () -> assertThat(response.storeDistrict()).isEqualTo("성동구"),
+                    () -> assertThat(response.storeNeighborhood()).isEqualTo("성수동1가"),
+                    () -> assertThat(response.description()).isEqualTo("곱창은 여기"),
+                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story/dummy/1.jpg"),
+                    () -> assertThat(response.memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(response.memberNickname()).isEqualTo(member.getNickname())
+            );
+            ;
         }
 
         @Test

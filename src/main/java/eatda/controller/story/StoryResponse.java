@@ -1,6 +1,9 @@
 package eatda.controller.story;
 
+import org.springframework.lang.Nullable;
+
 public record StoryResponse(
+        @Nullable Long storeId,
         String storeKakaoId,
         String category,
         String storeName,
@@ -11,4 +14,5 @@ public record StoryResponse(
         long memberId,
         String memberNickname
 ) {
+
 }
