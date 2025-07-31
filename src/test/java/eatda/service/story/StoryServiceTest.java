@@ -176,7 +176,6 @@ public class StoryServiceTest extends BaseServiceTest {
                     () -> assertThat(response.memberId()).isEqualTo(member.getId()),
                     () -> assertThat(response.memberNickname()).isEqualTo(member.getNickname())
             );
-            ;
         }
 
         @Test
