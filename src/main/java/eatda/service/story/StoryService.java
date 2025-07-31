@@ -3,6 +3,7 @@ package eatda.service.story;
 import eatda.client.map.MapClient;
 import eatda.client.map.StoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
+import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
@@ -105,5 +106,18 @@ public class StoryService {
                 story.getMember().getId(),
                 story.getMember().getNickname()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public StoriesDetailResponse getPagedStoryDetails(String kakaoId, int size) {
+        List<Story> stories = storyRepository
+                .findAllByStoreKakaoIdOrderByCreatedAtDesc(kakaoId, PageRequest.of(PAGE_START_NUMBER, size))
+                .getContent();
+
+        List<StoriesDetailResponse.StoryDetailResponse> responses = stories.stream()
+                .map(story -> new StoriesDetailResponse.StoryDetailResponse(
+                        story, imageStorage.getPreSignedUrl(story.getImageKey())))
+                .toList(); // TODO: N+1 문제 해결
+        return new StoriesDetailResponse(responses);
     }
 }
