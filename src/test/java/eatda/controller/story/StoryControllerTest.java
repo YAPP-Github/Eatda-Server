@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 import eatda.controller.BaseControllerTest;
+import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.util.ImageUtils;
@@ -135,6 +136,40 @@ public class StoryControllerTest extends BaseControllerTest {
                     .statusCode(404)
                     .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
                     .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    class GetPagedStoryDetailsByKakaoId {
+
+        @Test
+        void 카카오ID로_스토리_목록을_조회할_수_있다() {
+            String kakaoId = "123456";
+            List<StoryDetailResponse> mockDetails = List.of(
+                    new StoryDetailResponse(1L, "https://s3.bucket.com/story/dummy/1.jpg", 5L, "커찬"),
+                    new StoryDetailResponse(2L, "https://s3.bucket.com/story/dummy/2.jpg", 2L, "지민")
+            );
+
+            doReturn(new StoriesDetailResponse(mockDetails))
+                    .when(storyService)
+                    .getPagedStoryDetails(kakaoId, 5);
+
+            StoriesDetailResponse response = given()
+                    .pathParam("kakaoId", kakaoId)
+                    .queryParam("size", 5)
+                    .when()
+                    .get("/api/stories/kakao/{kakaoId}")
+                    .then().statusCode(200)
+                    .extract().as(StoriesDetailResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.stories()).hasSize(2),
+                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(1L),
+                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo(
+                            "https://s3.bucket.com/story/dummy/1.jpg"),
+                    () -> assertThat(response.stories().getFirst().memberId()).isEqualTo(5L),
+                    () -> assertThat(response.stories().getFirst().memberNickname()).isEqualTo("커찬")
+            );
         }
     }
 }
