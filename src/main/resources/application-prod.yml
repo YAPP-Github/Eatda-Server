@@ -7,6 +7,14 @@ spring:
     aws:
       region:
         static: ap-northeast-2
+      s3:
+        bucket: eatda-storage-prod
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
   config:
     import: "aws-parameterstore:/prod/"
 
@@ -43,3 +51,6 @@ oauth:
   allowed-origins:
     - "https://www.eatda.net"
     - "https://eatda.net"
+
+kakao:
+  api-key: ${KAKAO_API_KEY}

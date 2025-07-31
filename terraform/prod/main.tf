@@ -46,3 +46,10 @@ module "rds" {
   storage_encrypted       = true
   tags                    = local.common_tags
 }
+
+module "s3" {
+  source             = "./s3"
+  bucket_name_prefix = local.bucket_name_prefix
+  environment        = local.environment
+  allowed_origins    = local.allowed_origins
+}

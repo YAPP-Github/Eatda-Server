@@ -7,6 +7,14 @@ spring:
     aws:
       region:
         static: ap-northeast-2
+      s3:
+        bucket: eatda-storage-dev
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+
   config:
     import: "aws-parameterstore:/dev/"
 
@@ -35,7 +43,7 @@ jwt:
 cors:
   origin:
     - "http://localhost:3000"
-    - "https://api-dev.eatda.net"
+    - "https://dev.eatda.net"
 
 oauth:
   client-id: ${OAUTH_CLIENT_ID}
@@ -43,3 +51,6 @@ oauth:
   allowed-origins:
     - "http://localhost:3000"
     - "https://dev.eatda.net"
+
+kakao:
+  api-key: ${KAKAO_API_KEY}

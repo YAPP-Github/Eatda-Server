@@ -11,6 +11,13 @@ spring:
     import:
       - optional:file:.env-local[.properties]
 
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: eatda-storage-test
+
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:database
@@ -45,3 +52,6 @@ oauth:
   redirect-path: /callback
   allowed-origins:
     - "https://example.eat-da.com"
+
+kakao:
+  api-key: ablselfsgbwrlgrwrlhknwnkefknkwelfk
