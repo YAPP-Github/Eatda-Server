@@ -12,10 +12,12 @@ import eatda.domain.Image;
 import eatda.domain.ImageDomain;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.Store;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.member.MemberRepository;
+import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;
@@ -36,6 +38,7 @@ public class StoryService {
     private final ImageStorage imageStorage;
     private final MapClient mapClient;
     private final StoryRepository storyRepository;
+    private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -94,8 +97,12 @@ public class StoryService {
     public StoryResponse getStory(long storyId) {
         Story story = storyRepository.findById(storyId)
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORY_NOT_FOUND));
+        Long storeId = storeRepository.findByKakaoId(story.getStoreKakaoId())
+                .map(Store::getId)
+                .orElse(null);
 
         return new StoryResponse(
+                storeId,
                 story.getStoreKakaoId(),
                 story.getStoreCategory().getCategoryName(),
                 story.getStoreName(),

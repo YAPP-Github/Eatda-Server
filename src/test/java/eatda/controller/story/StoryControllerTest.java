@@ -91,6 +91,7 @@ public class StoryControllerTest extends BaseControllerTest {
             long storyId = 1L;
 
             doReturn(new StoryResponse(
+                    5L,
                     "123456",
                     "한식",
                     "진또곱창집",
@@ -111,6 +112,7 @@ public class StoryControllerTest extends BaseControllerTest {
                     .extract().as(StoryResponse.class);
 
             assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(5L),
                     () -> assertThat(response.storeKakaoId()).isEqualTo("123456"),
                     () -> assertThat(response.category()).isEqualTo("한식"),
                     () -> assertThat(response.storeName()).isEqualTo("진또곱창집"),
