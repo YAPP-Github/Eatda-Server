@@ -25,7 +25,9 @@ public class ArticleDocumentTest extends BaseDocumentTest {
                 .tag(Tag.ARTICLE_API)
                 .summary("가게의 담긴 이야기")
                 .description("게시글을 최신순으로 페이지네이션하여 조회합니다.")
-                .queryParameter(parameterWithName("size").description("페이지당 조회할 아티클 개수 (default = 3)"));
+                .queryParameter(
+                        parameterWithName("size").description("페이지당 조회할 아티클 개수 (default = 3)")
+                );
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
