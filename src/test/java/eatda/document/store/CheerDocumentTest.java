@@ -44,8 +44,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
         private static final String REQUEST_DESCRIPTION_MARKDOWN = """
                 - 요청 형식 : multipart/form-data
                 - 요청 field
-                  - `image` : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png)
-                  - `request` : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
+                  - image : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png)
+                  - request : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
                 - request body 예시
                     ```json
                     {
