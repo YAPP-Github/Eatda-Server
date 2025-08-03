@@ -34,8 +34,14 @@ public class LoggingInterceptor implements HandlerInterceptor {
             Exception ex
     ) {
         Long startTime = (Long) request.getAttribute(START_TIME);
-        long duration = System.currentTimeMillis() - startTime;
+        if (startTime == null) {
+            log.warn("[Response] {} {} (duration unknown - preHandle not called)",
+                    request.getMethod(), request.getRequestURI());
+            MDC.clear();
+            return;
+        }
 
+        long duration = System.currentTimeMillis() - startTime;
         log.info("[Response] {} {} ({}ms)", request.getMethod(), request.getRequestURI(), duration);
         MDC.clear();
     }
