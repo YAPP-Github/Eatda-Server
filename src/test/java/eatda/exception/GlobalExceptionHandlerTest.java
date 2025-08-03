@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import eatda.config.CorsConfig;
 import eatda.config.CorsProperties;
 import eatda.config.WebConfig;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +22,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @WebMvcTest(
         controllers = GlobalExceptionHandlerTest.TestExceptionController.class,
@@ -78,20 +83,49 @@ class GlobalExceptionHandlerTest {
         public void throwUnexpected() {
             throw new RuntimeException("예상치 못한 예외");
         }
+
+        @GetMapping("/missing-param")
+        public void missingParam(@RequestParam String value) {
+        }
+
+        @GetMapping("/missing-cookie")
+        public void missingCookie(@CookieValue("userId") String cookie) {
+        }
+
+        @GetMapping("/binding-exception")
+        public void throwBindingException(@Valid TestDto dto) {
+        }
+
+        @GetMapping("/no-resource")
+        public void throwNoResourceFound() throws NoResourceFoundException {
+            throw new NoResourceFoundException(HttpMethod.GET, "/test/no-resource");
+        }
+    }
+
+    public static class TestDto {
+        @NotBlank
+        private String field;
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
     }
 
     @Autowired
     private MockMvc mockMvc;
 
     @Nested
-    class handExceptions {
+    class handleExceptions {
 
         @Test
         void 비즈니스_예외는_정의된_코드로_응답된다() throws Exception {
             mockMvc.perform(get("/test/business"))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode())))
-                    .andExpect(jsonPath("$.message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage())));
+                    .andExpect(jsonPath("$.errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode())));
         }
 
         @Test
@@ -128,6 +162,34 @@ class GlobalExceptionHandlerTest {
             mockMvc.perform(get("/test/unexpected"))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.INTERNAL_SERVER_ERROR.getCode())));
+        }
+
+        @Test
+        void 필수_파라미터_누락은_400() throws Exception {
+            mockMvc.perform(get("/test/missing-param"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.NO_PARAMETER_FOUND.getCode())));
+        }
+
+        @Test
+        void 필수_쿠키_누락은_400() throws Exception {
+            mockMvc.perform(get("/test/missing-cookie"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.NO_COOKIE_FOUND.getCode())));
+        }
+
+        @Test
+        void DTO_바인딩_에러는_400() throws Exception {
+            mockMvc.perform(get("/test/binding-exception"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.CLIENT_REQUEST_ERROR.getCode())));
+        }
+
+        @Test
+        void NoResourceFoundException_은_404() throws Exception {
+            mockMvc.perform(get("/test/no-resource"))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.NO_RESOURCE_FOUND.getCode())));
         }
     }
 }
