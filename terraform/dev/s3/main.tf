@@ -8,6 +8,14 @@ resource "aws_s3_bucket" "dev" {
   }
 }
 
+resource "aws_s3_object" "app-backup-log-script" {
+  bucket       = aws_s3_bucket.dev.bucket
+  key          = "scripts/app-backup-dev-logs.sh"
+  source       = "${path.module}/scripts/app-backup-dev-logs.sh"
+  etag = filemd5("${path.module}/scripts/app-backup-dev-logs.sh")
+  content_type = "text/x-sh"
+}
+
 resource "aws_s3_bucket_public_access_block" "dev" {
   bucket = aws_s3_bucket.dev.id
 
