@@ -26,6 +26,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -99,6 +100,14 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/no-resource")
         public void throwNoResourceFound() throws NoResourceFoundException {
             throw new NoResourceFoundException(HttpMethod.GET, "/test/no-resource");
+        }
+
+        @GetMapping("/constraint")
+        public void throwConstraintViolation(@Validated @RequestParam @NotBlank String name) {
+        }
+
+        @GetMapping("/handler-validation")
+        public void throwHandlerMethodValidation(@Valid TestDto dto) {
         }
     }
 
@@ -190,6 +199,20 @@ class GlobalExceptionHandlerTest {
             mockMvc.perform(get("/test/no-resource"))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.NO_RESOURCE_FOUND.getCode())));
+        }
+
+        @Test
+        void 제약조건_위반은_400() throws Exception {
+            mockMvc.perform(get("/test/constraint?name="))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.CLIENT_REQUEST_ERROR.getCode())));
+        }
+
+        @Test
+        void HandlerMethodValidationException은_400() throws Exception {
+            mockMvc.perform(get("/test/handler-validation"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.VALIDATION_ERROR.getCode())));
         }
     }
 }
