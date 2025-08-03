@@ -205,14 +205,14 @@ class GlobalExceptionHandlerTest {
         void 제약조건_위반은_400() throws Exception {
             mockMvc.perform(get("/test/constraint?name="))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.CLIENT_REQUEST_ERROR.getCode())));
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.VALIDATION_ERROR.getCode())));
         }
 
         @Test
         void HandlerMethodValidationException은_400() throws Exception {
             mockMvc.perform(get("/test/handler-validation"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.VALIDATION_ERROR.getCode())));
+                    .andExpect(jsonPath("$.errorCode", equalTo(EtcErrorCode.CLIENT_REQUEST_ERROR.getCode())));
         }
     }
 }
