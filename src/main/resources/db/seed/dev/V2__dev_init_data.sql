@@ -34,6 +34,8 @@ VALUES (1, 1, 1, '정말 맛있어요! 강추합니다!', 'cheer/dummy/1.jpg', t
        (7, 7, 7, '패스트푸드가 빠르고 맛있어요!', 'cheer/dummy/7.jpg', false);
 
 INSERT INTO article (id, title, subtitle, article_url, image_key)
-VALUES (1, '첫 번째 기사', '서브타이틀 1', 'https://example.com/article1', 'article/dummy/1.jpg'),
+VALUES (1, '미식가를 위한 수제 아이스크림 가게 🍨', '센프란시스코에서 영감을 얻은 펠엔콜 사장님의 이야기',
+        'https://ultra-wallet-037.notion.site/240b6292d5398127a630fabaa9dcd80d?pvs=74',
+        'article/dummy/1.jpg'),
        (2, '두 번째 기사', '서브타이틀 2', 'https://example.com/article2', 'article/dummy/2.jpg'),
        (3, '세 번째 기사', '서브타이틀 3', 'https://example.com/article3', 'article/dummy/3.jpg');
