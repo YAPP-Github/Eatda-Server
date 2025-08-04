@@ -42,6 +42,8 @@
     </springProfile>
 
     <springProfile name="prod">
+        <property name="LOG_NAME_PATTERN" value="${LOG_DIR}/eatda-%d{yyyy-MM-dd}.%i.log.gz"/>
+
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ROLLING_LOG_FILE"/>
