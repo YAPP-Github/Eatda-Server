@@ -46,15 +46,9 @@ locals {
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
-    user_data            = <<-EOF
-#!/bin/bash
-echo ECS_CLUSTER=dev-cluster >> /etc/ecs/ecs.config
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
-EOF
+    user_data = templatefile("${path.module}/scripts/user-data.sh", {
+      ecs_cluster_name = "dev-cluster"
+    })
   }
 
   task_definitions_with_roles = {

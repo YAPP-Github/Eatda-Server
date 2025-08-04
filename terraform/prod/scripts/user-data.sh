@@ -1,0 +1,15 @@
+#!/bin/bash
+echo ECS_CLUSTER=${ecs_cluster_name} >> /etc/ecs/ecs.config
+
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+/bin/mkdir -p /home/ec2-user/logs/eatda
+
+aws s3 cp s3://eatda-storage-prod/scripts/app-backup-prod-logs.sh /home/ec2-user/logs/eatda/app-backup-prod-logs.sh
+chmod +x /home/ec2-user/logs/eatda/app-backup-prod-logs.sh
+
+(crontab -l 2>/dev/null; echo "0 0 * * 0 /home/ec2-user/logs/eatda/app-backup-prod-logs.sh >> /var/log/app-backup.log 2>&1") | crontab -
