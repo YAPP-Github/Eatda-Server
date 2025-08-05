@@ -16,4 +16,6 @@ yum install -y cronie
 systemctl enable crond
 systemctl start crond
 
+sleep 5
+
 (crontab -l 2>/dev/null; echo "0 0 * * 0 /home/ec2-user/logs/eatda/app-backup-prod-logs.sh >> /var/log/app-backup.log 2>&1") | crontab -
