@@ -1,32 +1,20 @@
 package eatda.controller.story;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
 import eatda.controller.BaseControllerTest;
-import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
+import eatda.domain.member.Member;
+import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
-import eatda.exception.BusinessException;
+import eatda.exception.ErrorResponse;
 import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
-import io.restassured.response.Response;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class StoryControllerTest extends BaseControllerTest {
-
-    @BeforeEach
-    void setUpMock() {
-        doReturn(new StoryRegisterResponse(1L))
-                .when(storyService)
-                .registerStory(any(), any(), any());
-    }
 
     @Nested
     class RegisterStory {
@@ -35,21 +23,18 @@ public class StoryControllerTest extends BaseControllerTest {
         void 스토리를_등록할_수_있다() {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
 
-            doReturn(new StoryRegisterResponse(123L))
-                    .when(storyService)
-                    .registerStory(any(), any(), any());
-
-            Response response = given()
+            StoryRegisterResponse response = given()
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
                     .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
                     .multiPart("image", ImageUtils.getTestImage(), "image/png")
                     .when()
-                    .post("/api/stories");
-
-            response.then()
+                    .post("/api/stories")
+                    .then()
                     .statusCode(201)
-                    .body("storyId", equalTo(123));
+                    .extract().as(StoryRegisterResponse.class);
+
+            assertThat(response.storyId()).isNotZero();
         }
     }
 
@@ -58,14 +43,10 @@ public class StoryControllerTest extends BaseControllerTest {
 
         @Test
         void 스토리_목록을_조회할_수_있다() {
-            StoriesResponse mockResponse = new StoriesResponse(List.of(
-                    new StoriesResponse.StoryPreview(1L, "https://s3.bucket.com/story/dummy/1.jpg"),
-                    new StoriesResponse.StoryPreview(2L, "https://s3.bucket.com/story/dummy/2.jpg")
-            ));
-
-            doReturn(mockResponse)
-                    .when(storyService)
-                    .getPagedStoryPreviews(5);
+            Member member = memberGenerator.generateRegisteredMember("test", "test@kakao.com", "812", "01081231234");
+            LocalDateTime createdAt = LocalDateTime.of(2025, 8, 5, 12, 0, 0);
+            Story story1 = storyGenerator.generate(member, "123456", "진또곱창집", createdAt);
+            Story story2 = storyGenerator.generate(member, "654321", "또진곱창집", createdAt.plusHours(1));
 
             StoriesResponse response = given()
                     .queryParam("size", 5)
@@ -76,9 +57,8 @@ public class StoryControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.stories()).hasSize(2),
-                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(1L),
-                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo(
-                            "https://s3.bucket.com/story/dummy/1.jpg")
+                    () -> assertThat(response.stories().get(0).storyId()).isEqualTo(story2.getId()),
+                    () -> assertThat(response.stories().get(1).storyId()).isEqualTo(story1.getId())
             );
         }
     }
@@ -88,23 +68,11 @@ public class StoryControllerTest extends BaseControllerTest {
 
         @Test
         void 해당_스토리를_상세_조회할_수_있다() {
-            long storyId = 1L;
-
-            doReturn(new StoryResponse(
-                    5L,
-                    "123456",
-                    "한식",
-                    "진또곱창집",
-                    "성동구",
-                    "성수동",
-                    "곱창은 여기",
-                    "https://s3.bucket.com/story1.jpg",
-                    1L,
-                    "커찬"
-            )).when(storyService).getStory(storyId);
+            Member member = memberGenerator.generateRegisteredMember("test", "test@kakao.com", "812", "01081231234");
+            Story story = storyGenerator.generate(member, "123456", "진또곱창집", "서울시 성동구 성수동 123-45", "곱창은 여기");
 
             StoryResponse response = given()
-                    .pathParam("storyId", storyId)
+                    .pathParam("storyId", story.getId())
                     .when()
                     .get("/api/stories/{storyId}")
                     .then()
@@ -112,16 +80,14 @@ public class StoryControllerTest extends BaseControllerTest {
                     .extract().as(StoryResponse.class);
 
             assertAll(
-                    () -> assertThat(response.storeId()).isEqualTo(5L),
+                    () -> assertThat(response.storeId()).isNull(),
                     () -> assertThat(response.storeKakaoId()).isEqualTo("123456"),
-                    () -> assertThat(response.category()).isEqualTo("한식"),
                     () -> assertThat(response.storeName()).isEqualTo("진또곱창집"),
                     () -> assertThat(response.storeDistrict()).isEqualTo("성동구"),
                     () -> assertThat(response.storeNeighborhood()).isEqualTo("성수동"),
                     () -> assertThat(response.description()).isEqualTo("곱창은 여기"),
-                    () -> assertThat(response.imageUrl()).isEqualTo("https://s3.bucket.com/story1.jpg"),
-                    () -> assertThat(response.memberId()).isEqualTo(1L),
-                    () -> assertThat(response.memberNickname()).isEqualTo("커찬")
+                    () -> assertThat(response.memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(response.memberNickname()).isEqualTo("test")
             );
         }
 
@@ -129,15 +95,16 @@ public class StoryControllerTest extends BaseControllerTest {
         void 존재하지_않는_스토리를_조회하면_404_응답한다() {
             long nonexistentId = 999L;
 
-            doThrow(new BusinessException(BusinessErrorCode.STORY_NOT_FOUND))
-                    .when(storyService).getStory(nonexistentId);
-
-            given().pathParam("storyId", nonexistentId)
+            ErrorResponse response = given().pathParam("storyId", nonexistentId)
                     .when().get("/api/stories/{storyId}")
                     .then()
                     .statusCode(404)
-                    .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
-                    .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
+                    .extract().as(ErrorResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.errorCode()).isEqualTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()),
+                    () -> assertThat(response.message()).isEqualTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage())
+            );
         }
     }
 
@@ -147,14 +114,10 @@ public class StoryControllerTest extends BaseControllerTest {
         @Test
         void 카카오ID로_스토리_목록을_조회할_수_있다() {
             String kakaoId = "123456";
-            List<StoryDetailResponse> mockDetails = List.of(
-                    new StoryDetailResponse(1L, "https://s3.bucket.com/story/dummy/1.jpg", 5L, "커찬"),
-                    new StoryDetailResponse(2L, "https://s3.bucket.com/story/dummy/2.jpg", 2L, "지민")
-            );
-
-            doReturn(new StoriesDetailResponse(mockDetails))
-                    .when(storyService)
-                    .getPagedStoryDetails(kakaoId, 5);
+            LocalDateTime startAt = LocalDateTime.of(2025, 8, 5, 12, 0, 0);
+            Member member = memberGenerator.generateRegisteredMember("test", "test@kakao.com", "812", "01081231234");
+            Story story1 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt);
+            Story story2 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt.plusHours(1));
 
             StoriesDetailResponse response = given()
                     .pathParam("kakaoId", kakaoId)
@@ -166,11 +129,12 @@ public class StoryControllerTest extends BaseControllerTest {
 
             assertAll(
                     () -> assertThat(response.stories()).hasSize(2),
-                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(1L),
-                    () -> assertThat(response.stories().getFirst().imageUrl()).isEqualTo(
-                            "https://s3.bucket.com/story/dummy/1.jpg"),
-                    () -> assertThat(response.stories().getFirst().memberId()).isEqualTo(5L),
-                    () -> assertThat(response.stories().getFirst().memberNickname()).isEqualTo("커찬")
+                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(story2.getId()),
+                    () -> assertThat(response.stories().getFirst().memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(response.stories().getFirst().memberNickname()).isEqualTo(member.getNickname()),
+                    () -> assertThat(response.stories().get(1).storyId()).isEqualTo(story1.getId()),
+                    () -> assertThat(response.stories().get(1).memberId()).isEqualTo(member.getId()),
+                    () -> assertThat(response.stories().get(1).memberNickname()).isEqualTo(member.getNickname())
             );
         }
     }

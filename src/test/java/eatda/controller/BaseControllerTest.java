@@ -17,10 +17,12 @@ import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
+import eatda.fixture.StoryGenerator;
+import eatda.repository.article.ArticleRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.service.story.StoryService;
+import eatda.repository.story.StoryRepository;
 import eatda.storage.image.ImageStorage;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -64,6 +66,9 @@ public class BaseControllerTest {
     protected ArticleGenerator articleGenerator;
 
     @Autowired
+    protected StoryGenerator storyGenerator;
+
+    @Autowired
     protected MemberRepository memberRepository;
 
     @Autowired
@@ -71,6 +76,12 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
+
+    @Autowired
+    protected ArticleRepository articleRepository;
+
+    @Autowired
+    protected StoryRepository storyRepository;
 
     @Autowired
     protected JwtManager jwtManager;
@@ -83,9 +94,6 @@ public class BaseControllerTest {
 
     @MockitoBean
     private ImageStorage imageStorage;
-
-    @MockitoBean
-    protected StoryService storyService; // TODO 실 객체로 변환
 
     @LocalServerPort
     private int port;
