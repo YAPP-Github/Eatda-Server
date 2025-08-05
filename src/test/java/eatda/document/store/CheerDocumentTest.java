@@ -57,7 +57,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 """;
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("응원 등록")
                 .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
@@ -133,7 +133,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
     class GetCheers {
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("최신 응원 검색")
                 .queryParameter(
                         parameterWithName("size").description("조회 개수 (최소 1, 최대 50)")
@@ -198,7 +198,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
     class GetCheersByStoreId {
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("가게별 응원 검색")
                 .pathParameter(
                         parameterWithName("storeId").description("가게 ID")
