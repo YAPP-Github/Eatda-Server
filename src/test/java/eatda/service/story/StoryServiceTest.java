@@ -3,30 +3,26 @@ package eatda.service.story;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import eatda.domain.store.StoreSearchResult;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 class StoryServiceTest extends BaseServiceTest {
 
@@ -40,32 +36,24 @@ class StoryServiceTest extends BaseServiceTest {
         void 스토리_등록에_성공한다() {
             Member member = memberGenerator.generate("12345");
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "123", "미쳤다 여기");
-            MultipartFile imageFile = new MockMultipartFile(
-                    "image", "story-image.jpg", "image/jpeg", new byte[]{1, 2});
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "곱창", "http://place.map.kakao.com/123",
+                    "서울시 강남구 사사로 3길 12-24", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
 
-            MapClientStoreSearchResult store = new MapClientStoreSearchResult(
-                    "123", "FD6", "음식점 > 한식", "010-1234-5678",
-                    "곱창집", "http://example.com",
-                    "서울 강남구", "서울 강남구", 37.0, 127.0
+            StoryRegisterResponse response = storyService.registerStory(request, result, imageKey, member.getId());
+
+            Story savedStory = storyRepository.findById(response.storyId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(savedStory.getMember().getId()).isEqualTo(member.getId()),
+                    () -> assertThat(savedStory.getStoreKakaoId()).isEqualTo("123"),
+                    () -> assertThat(savedStory.getStoreName()).isEqualTo("곱창"),
+                    () -> assertThat(savedStory.getStoreRoadAddress()).isEqualTo("서울시 강남구 역삼동 123-45"),
+                    () -> assertThat(savedStory.getStoreLotNumberAddress()).isEqualTo("서울시 강남구 사사로 3길 12-24"),
+                    () -> assertThat(savedStory.getStoreCategory()).isEqualTo(StoreCategory.KOREAN),
+                    () -> assertThat(savedStory.getDescription()).isEqualTo("미쳤다 여기"),
+                    () -> assertThat(savedStory.getImageKey()).isEqualTo(imageKey)
             );
-            doReturn(List.of(store)).when(mapClient).searchStores(request.storeName());
-
-            var response = storyService.registerStory(request, imageFile, member.getId());
-
-            assertThat(storyRepository.existsById(response.storyId())).isTrue();
-        }
-
-        @Test
-        void 클라이언트_요청과_일치하는_가게가_없으면_실패한다() {
-            Member member = memberGenerator.generate("12345");
-            StoryRegisterRequest request = new StoryRegisterRequest("곱창", "999", "미쳤다 여기");
-
-            MultipartFile image = mock(MultipartFile.class);
-            doReturn(Collections.emptyList()).when(mapClient).searchStores(request.storeName());
-
-            assertThatThrownBy(() -> storyService.registerStory(request, image, member.getId()))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining(BusinessErrorCode.STORE_NOT_FOUND.getMessage());
         }
     }
 

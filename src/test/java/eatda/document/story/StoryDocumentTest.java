@@ -2,6 +2,7 @@ package eatda.document.story;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -80,7 +81,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
         void 스토리_등록_성공() {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
             StoryRegisterResponse response = new StoryRegisterResponse(1L);
-            doReturn(response).when(storyService).registerStory(any(), any(), any());
+            doReturn(response).when(storyService).registerStory(any(), any(), any(), anyLong());
 
             var document = document("story/register", 201)
                     .request(requestDocument)
@@ -101,8 +102,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
             StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
             byte[] invalidImage = "not an image".getBytes(StandardCharsets.UTF_8);
             doThrow(new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE))
-                    .when(storyService)
-                    .registerStory(any(), any(), any());
+                    .when(storyService).registerStory(any(), any(), any(), anyLong());
 
             var document = document("story/register", BusinessErrorCode.INVALID_IMAGE_TYPE)
                     .request(requestDocument)
