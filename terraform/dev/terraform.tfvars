@@ -23,9 +23,16 @@ ecs_task_definitions_base = {
     cpu          = 256
     memory       = 256
     network_mode = "bridge"
-    container_port = [8080]
-    host_port = [0]
     requires_compatibilities = ["EC2"]
+
+    port_mappings = [
+      {
+        container_port = 8080,
+        host_port      = 0,
+        protocol       = "tcp"
+      }
+    ]
+
     environment = {}
     volumes = [
       {
@@ -42,10 +49,17 @@ ecs_task_definitions_base = {
     memoryReservation = 128
     memory            = 512
     network_mode      = "bridge"
-    container_port = [3306]
-    host_port = [3306]
     requires_compatibilities = ["EC2"]
     container_image   = "mysql:8"
+
+    port_mappings = [
+      {
+        container_port = 3306,
+        host_port      = 3306,
+        protocol       = "tcp"
+      }
+    ]
+
     environment = {
       MYSQL_DATABASE = "eatda"
     }
@@ -79,8 +93,6 @@ ecs_task_definitions_base = {
     network_mode    = "bridge"
     requires_compatibilities = ["EC2"]
     container_image = "public.ecr.aws/datadog/agent:latest"
-    container_port = [8125, 8126]
-    host_port = [8125, 8126]
 
     port_mappings = [
       {

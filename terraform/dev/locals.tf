@@ -85,8 +85,12 @@ locals {
           "/app/api.jar"
         ] : null
         portMappings = [
-          for idx, port in def.container_port :
-          { name = "${svc}-${port}-tcp", containerPort = port, hostPort = def.host_port[idx], protocol = "tcp" }
+          for m in lookup(def, "port_mappings", []) : {
+            name          = "${svc}-${m.container_port}-${m.protocol}"
+            containerPort = m.container_port
+            hostPort      = m.host_port
+            protocol      = m.protocol
+          }
         ]
         environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
         secrets     = svc == "datadog-agent-task" ? [

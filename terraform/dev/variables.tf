@@ -13,8 +13,6 @@ variable "ecs_task_definitions_base" {
     cpu          = number
     memory       = number
     network_mode = string
-    container_port = list(number)
-    host_port = list(number)
     environment = map(string)
     requires_compatibilities = optional(list(string))
     container_image = optional(string)
