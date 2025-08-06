@@ -68,9 +68,8 @@ locals {
         {
           name      = svc
           image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : task_def.container_image
-          cpu       = task_def.cpu
-          memory    = contains(keys(task_def), "memory") ? task_def.memory : null
-          memoryReservation = lookup(task_def, "memoryReservation", null)
+          cpu       = 256
+          memory    = 384
           essential = true
           command   = svc == "api-dev" ? tolist([
             "java", "-javaagent:/dd-java-agent.jar",
