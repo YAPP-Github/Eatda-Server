@@ -21,14 +21,10 @@ variable "ecs_task_definitions_base" {
     execution_role_arn = optional(string)
     task_role_arn = optional(string)
     volumes = list(object({
-      name      = string
-      host_path = string
+      name          = string
+      host_path     = string
+      containerPath = string
+      readOnly      = bool
     }))
   }))
-}
-
-variable "volume_mount_paths" {
-  description = "A map of volume names to their mount paths inside the container."
-  type = map(string)
-  default = {}
 }
