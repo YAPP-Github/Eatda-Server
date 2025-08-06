@@ -29,8 +29,10 @@ ecs_task_definitions_base = {
     environment = {}
     volumes = [
       {
-        name      = "dev-api-volume"
-        host_path = "/home/ec2-user/logs/"
+        name          = "dev-api-volume"
+        host_path     = "/home/ec2-user/logs/"
+        containerPath = "/logs"
+        readOnly      = false
       }
     ]
   }
@@ -63,8 +65,10 @@ ecs_task_definitions_base = {
     ]
     volumes = [
       {
-        name      = "dev-mysql-volume"
-        host_path = "/home/ec2-user/mysql/"
+        name          = "dev-mysql-volume"
+        host_path     = "/home/ec2-user/mysql/"
+        containerPath = "/var/lib/mysql"
+        readOnly      = false
       }
     ]
   }
@@ -106,16 +110,22 @@ ecs_task_definitions_base = {
 
     volumes = [
       {
-        name      = "docker_sock"
-        host_path = "/var/run/docker.sock"
+        name          = "docker_sock"
+        host_path     = "/var/run/docker.sock"
+        containerPath = "/var/run/docker.sock"
+        readOnly      = true
       },
       {
-        name      = "proc"
-        host_path = "/proc/"
+        name          = "proc"
+        host_path     = "/proc/"
+        containerPath = "/host/proc"
+        readOnly      = true
       },
       {
-        name      = "cgroup"
-        host_path = "/sys/fs/cgroup/"
+        name          = "cgroup"
+        host_path     = "/sys/fs/cgroup/"
+        containerPath = "/host/sys/fs/cgroup"
+        readOnly      = true
       }
     ]
   }

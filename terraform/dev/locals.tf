@@ -102,9 +102,10 @@ locals {
           }
         ])
         mountPoints = [
-          for vol in lookup(def, "volumes", []) :{
-            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/logs"),
-            readOnly     = false
+          for vol in lookup(def, "volumes", []) : {
+            sourceVolume  = vol.name
+            containerPath = vol.containerPath
+            readOnly      = vol.readOnly
           }
         ]
       }
