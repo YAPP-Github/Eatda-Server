@@ -1,7 +1,7 @@
 package eatda.service.cheer;
 
 import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
@@ -46,8 +46,8 @@ public class CheerService {
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
 
-        List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
-        StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
+        List<MapClientStoreSearchResult> searchResults = mapClient.searchStores(request.storeName());
+        MapClientStoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
         ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.CHEER, imageFile));
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())

@@ -32,7 +32,7 @@ class MapClientTest {
     }
 
     @Nested
-    class SearchShops {
+    class SearchStores {
 
         @Test
         void 가게_검색을_할_수_있다() {
@@ -68,9 +68,9 @@ class MapClientTest {
                     }""";
             setMockServer(HttpMethod.GET, url, responseBody);
 
-            List<StoreSearchResult> results = mapClient.searchShops("농민백암순대");
+            List<MapClientStoreSearchResult> results = mapClient.searchStores("농민백암순대");
 
-            StoreSearchResult result = results.getFirst();
+            MapClientStoreSearchResult result = results.getFirst();
             assertAll(
                     () -> assertThat(results).hasSize(1),
                     () -> assertThat(result.kakaoId()).isEqualTo("17163273"),
@@ -105,7 +105,7 @@ class MapClientTest {
                     }""";
             setMockServer(HttpMethod.GET, url, responseBody);
 
-            List<StoreSearchResult> results = mapClient.searchShops("존재하지 않는 가게");
+            List<MapClientStoreSearchResult> results = mapClient.searchStores("존재하지 않는 가게");
 
             assertThat(results).isEmpty();
         }

@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
@@ -69,8 +69,8 @@ public class StoreService {
     }
 
     public StoreSearchResponses searchStores(String query) {
-        List<StoreSearchResult> searchResults = mapClient.searchShops(query);
-        List<StoreSearchResult> filteredResults = storeSearchFilter.filterSearchedStores(searchResults);
+        List<MapClientStoreSearchResult> searchResults = mapClient.searchStores(query);
+        List<MapClientStoreSearchResult> filteredResults = storeSearchFilter.filterSearchedStores(searchResults);
         return StoreSearchResponses.from(filteredResults);
     }
 }

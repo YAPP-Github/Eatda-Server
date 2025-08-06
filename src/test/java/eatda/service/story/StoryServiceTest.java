@@ -7,7 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
@@ -43,12 +43,12 @@ class StoryServiceTest extends BaseServiceTest {
             MultipartFile imageFile = new MockMultipartFile(
                     "image", "story-image.jpg", "image/jpeg", new byte[]{1, 2});
 
-            StoreSearchResult store = new StoreSearchResult(
+            MapClientStoreSearchResult store = new MapClientStoreSearchResult(
                     "123", "FD6", "음식점 > 한식", "010-1234-5678",
                     "곱창집", "http://example.com",
                     "서울 강남구", "서울 강남구", 37.0, 127.0
             );
-            doReturn(List.of(store)).when(mapClient).searchShops(request.storeName());
+            doReturn(List.of(store)).when(mapClient).searchStores(request.storeName());
 
             var response = storyService.registerStory(request, imageFile, member.getId());
 
@@ -61,7 +61,7 @@ class StoryServiceTest extends BaseServiceTest {
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "999", "미쳤다 여기");
 
             MultipartFile image = mock(MultipartFile.class);
-            doReturn(Collections.emptyList()).when(mapClient).searchShops(request.storeName());
+            doReturn(Collections.emptyList()).when(mapClient).searchStores(request.storeName());
 
             assertThatThrownBy(() -> storyService.registerStory(request, image, member.getId()))
                     .isInstanceOf(BusinessException.class)

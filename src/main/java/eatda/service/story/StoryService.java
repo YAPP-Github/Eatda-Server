@@ -1,7 +1,7 @@
 package eatda.service.story;
 
 import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse;
@@ -44,7 +44,7 @@ public class StoryService {
     @Transactional
     public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile imageFile, Long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.storeName());
+        List<MapClientStoreSearchResult> searchResponses = mapClient.searchStores(request.storeName());
         FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
         ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile));
 
@@ -64,7 +64,7 @@ public class StoryService {
         return new StoryRegisterResponse(story.getId());
     }
 
-    private FilteredSearchResult filteredSearchResponse(List<StoreSearchResult> responses, String storeKakaoId) {
+    private FilteredSearchResult filteredSearchResponse(List<MapClientStoreSearchResult> responses, String storeKakaoId) {
         return responses.stream()
                 .filter(store -> store.kakaoId().equals(storeKakaoId))
                 .findFirst()

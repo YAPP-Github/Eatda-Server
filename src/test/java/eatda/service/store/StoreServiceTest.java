@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.domain.member.Member;
@@ -164,13 +164,13 @@ class StoreServiceTest extends BaseServiceTest {
     }
 
     void mockingMapClient() {
-        List<StoreSearchResult> searchResults = List.of(
-                new StoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점", "https://yapp.co.kr",
+        List<MapClientStoreSearchResult> searchResults = List.of(
+                new MapClientStoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점", "https://yapp.co.kr",
                         "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
-                new StoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점", "http://yapp.kr",
+                new MapClientStoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점", "http://yapp.kr",
                         "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
         );
 
-        doReturn(searchResults).when(mapClient).searchShops(anyString());
+        doReturn(searchResults).when(mapClient).searchStores(anyString());
     }
 }
