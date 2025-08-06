@@ -18,6 +18,11 @@ variable "ecs_task_definitions_base" {
     container_image = optional(string)
     execution_role_arn = optional(string)
     task_role_arn = optional(string)
+    port_mappings = optional(list(object({
+      container_port = number
+      host_port      = number
+      protocol       = string
+    })), [])
     volumes = list(object({
       name          = string
       host_path     = string
