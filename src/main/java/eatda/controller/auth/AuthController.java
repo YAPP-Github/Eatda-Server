@@ -1,8 +1,10 @@
 package eatda.controller.auth;
 
+import eatda.client.oauth.OauthMemberInformation;
 import eatda.controller.member.MemberResponse;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.service.auth.AuthService;
+import eatda.service.auth.OauthService;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -18,12 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final JwtManager jwtManager;
     private final AuthService authService;
+    private final OauthService oauthService;
+    private final JwtManager jwtManager;
 
     @GetMapping("/api/auth/login/oauth")
     public ResponseEntity<Void> redirectOauthLoginPage(@RequestHeader(HttpHeaders.REFERER) String origin) {
-        URI oauthLoginUrl = authService.getOauthLoginUrl(origin);
+        URI oauthLoginUrl = oauthService.getOauthLoginUrl(origin);
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -33,7 +36,9 @@ public class AuthController {
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        MemberResponse member = authService.login(request);
+        OauthMemberInformation oauthInformation = oauthService.getOAuthInformation(request.code(), request.origin());
+        MemberResponse member = authService.login(oauthInformation);
+
         TokenResponse token = new TokenResponse(
                 jwtManager.issueAccessToken(member.id()),
                 jwtManager.issueRefreshToken(member.id()));

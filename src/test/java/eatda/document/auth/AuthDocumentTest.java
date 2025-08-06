@@ -10,6 +10,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
+import eatda.client.oauth.OauthMemberInformation;
 import eatda.controller.auth.LoginRequest;
 import eatda.controller.auth.ReissueRequest;
 import eatda.controller.member.MemberResponse;
@@ -51,7 +52,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
 
         @Test
         void Oauth_로그인_페이지_리다이렉트_성공() throws URISyntaxException {
-            doReturn(new URI("http://localhost:8080")).when(authService).getOauthLoginUrl(anyString());
+            doReturn(new URI("http://localhost:8080")).when(oauthService).getOauthLoginUrl(anyString());
 
             var document = document("auth/oauth-redirect", 302)
                     .request(requestDocument)
@@ -70,7 +71,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_ORIGIN"})
         @ParameterizedTest
         void Oauth_로그인_페이지_리다이렉트_실패(BusinessErrorCode errorCode) {
-            doThrow(new BusinessException(errorCode)).when(authService).getOauthLoginUrl(anyString());
+            doThrow(new BusinessException(errorCode)).when(oauthService).getOauthLoginUrl(anyString());
 
             var document = document("auth/oauth-redirect", errorCode)
                     .request(requestDocument)
@@ -112,8 +113,10 @@ public class AuthDocumentTest extends BaseDocumentTest {
         @Test
         void 로그인_성공() {
             LoginRequest request = new LoginRequest("code", "http://localhost:3000");
+            OauthMemberInformation oauthInformation = new OauthMemberInformation(322L, "abc@kakao.com", "닉네임");
             MemberResponse response = new MemberResponse(1L, "abc@kakao.com", true, "닉네임", null, null);
-            doReturn(response).when(authService).login(request);
+            doReturn(oauthInformation).when(oauthService).getOAuthInformation(anyString(), anyString());
+            doReturn(response).when(authService).login(oauthInformation);
 
             var document = document("auth/login", 201)
                     .request(requestDocument)
@@ -132,7 +135,7 @@ public class AuthDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 로그인_실패(BusinessErrorCode errorCode) {
             LoginRequest request = new LoginRequest("code", "http://localhost:3000");
-            doThrow(new BusinessException(errorCode)).when(authService).login(request);
+            doThrow(new BusinessException(errorCode)).when(oauthService).getOAuthInformation(anyString(), anyString());
 
             var document = document("auth/login", errorCode)
                     .request(requestDocument)

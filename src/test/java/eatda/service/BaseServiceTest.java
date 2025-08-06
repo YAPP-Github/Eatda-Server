@@ -15,6 +15,8 @@ import eatda.repository.member.MemberRepository;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
+import eatda.service.auth.AuthService;
+import eatda.service.auth.OauthService;
 import eatda.service.store.StoreSearchService;
 import eatda.storage.image.ExternalImageStorage;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,12 @@ public abstract class BaseServiceTest {
 
     @MockitoBean
     protected ExternalImageStorage externalImageStorage;
+
+    @Autowired
+    protected OauthService oauthService;
+
+    @Autowired
+    protected AuthService authService;
 
     @Autowired
     protected MemberGenerator memberGenerator;
