@@ -2,7 +2,7 @@ package eatda.domain.store;
 
 public record StoreSearchResult(
         String kakaoId,
-        StoreCategory storeCategory,
+        StoreCategory category,
         String phoneNumber,
         String name,
         String placeUrl,
@@ -15,7 +15,7 @@ public record StoreSearchResult(
     public Store toStore() {
         return Store.builder()
                 .kakaoId(kakaoId)
-                .category(storeCategory)
+                .category(category)
                 .phoneNumber(phoneNumber)
                 .name(name)
                 .placeUrl(placeUrl)

@@ -28,7 +28,7 @@ class StoreSearchServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(response.kakaoId()).isEqualTo("123"),
-                    () -> assertThat(response.storeCategory()).isEqualTo(StoreCategory.KOREAN),
+                    () -> assertThat(response.category()).isEqualTo(StoreCategory.KOREAN),
                     () -> assertThat(response.lotNumberAddress()).isEqualTo("서울 강남구 대치동 896-33")
             );
         }
@@ -46,10 +46,10 @@ class StoreSearchServiceTest extends BaseServiceTest {
 
             assertAll(
                     () -> assertThat(response.get(0).kakaoId()).isEqualTo("123"),
-                    () -> assertThat(response.get(0).storeCategory()).isEqualTo(StoreCategory.KOREAN),
+                    () -> assertThat(response.get(0).category()).isEqualTo(StoreCategory.KOREAN),
                     () -> assertThat(response.get(0).lotNumberAddress()).isEqualTo("서울 강남구 대치동 896-33"),
                     () -> assertThat(response.get(1).kakaoId()).isEqualTo("456"),
-                    () -> assertThat(response.get(1).storeCategory()).isEqualTo(StoreCategory.KOREAN),
+                    () -> assertThat(response.get(1).category()).isEqualTo(StoreCategory.KOREAN),
                     () -> assertThat(response.get(1).lotNumberAddress()).isEqualTo("서울 중구 북창동 19-4")
             );
         }

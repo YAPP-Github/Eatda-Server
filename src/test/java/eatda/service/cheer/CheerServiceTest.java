@@ -3,28 +3,24 @@ package eatda.service.cheer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
-import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
+import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
+import eatda.domain.store.StoreCategory;
+import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 class CheerServiceTest extends BaseServiceTest {
 
@@ -33,19 +29,6 @@ class CheerServiceTest extends BaseServiceTest {
 
     @Nested
     class RegisterCheer {
-
-        @BeforeEach
-        void mockingImage() {
-            List<MapClientStoreSearchResult> searchResults = List.of(
-                    new MapClientStoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점",
-                            "https://yapp.co.kr",
-                            "서울시 강남구 역삼동 123-45", "서울 강남구 선릉로86길 40-4", 37.5d, 127.0d),
-                    new MapClientStoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점",
-                            "http://yapp.kr",
-                            "서울 중구 북창동 19-4", null, 37.5d, 127.0d)
-            );
-            doReturn(searchResults).when(mapClient).searchStores(anyString());
-        }
 
         @Test
         void 응원_개수가_최대_개수를_초과하면_예외가_발생한다() {
@@ -58,9 +41,13 @@ class CheerServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store3);
 
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> cheerService.registerCheer(request, null, member.getId()));
+                    () -> cheerService.registerCheer(request, result, imageKey, member.getId()));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER);
         }
@@ -70,10 +57,15 @@ class CheerServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("123");
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
             cheerGenerator.generateCommon(member, store);
+
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> cheerService.registerCheer(request, null, member.getId()));
+                    () -> cheerService.registerCheer(request, result, imageKey, member.getId()));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.ALREADY_CHEERED);
         }
@@ -81,10 +73,14 @@ class CheerServiceTest extends BaseServiceTest {
         @Test
         void 해당_응원의_가게가_저장되어_있지_않다면_가게와_응원을_저장한다() {
             Member member = memberGenerator.generate("123");
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
-            MultipartFile image = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
 
-            CheerResponse response = cheerService.registerCheer(request, image, member.getId());
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
@@ -98,10 +94,14 @@ class CheerServiceTest extends BaseServiceTest {
         void 해당_응원의_가게가_저장되어_있다면_응원만_저장한다() {
             Member member = memberGenerator.generate("123");
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
-            MultipartFile image = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
 
-            CheerResponse response = cheerService.registerCheer(request, image, member.getId());
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
@@ -115,9 +115,14 @@ class CheerServiceTest extends BaseServiceTest {
         @Test
         void 해당_응원의_이미지가_비어있어도_응원을_저장할_수_있다() {
             Member member = memberGenerator.generate("123");
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
 
-            CheerResponse response = cheerService.registerCheer(request, null, member.getId());
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey(null);
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
