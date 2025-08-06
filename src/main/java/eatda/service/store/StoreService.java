@@ -12,6 +12,7 @@ import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import eatda.domain.store.StoreSearchFilter;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;

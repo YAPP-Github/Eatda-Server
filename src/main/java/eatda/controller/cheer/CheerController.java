@@ -1,7 +1,7 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
 import eatda.controller.web.auth.LoginMember;
-import eatda.service.store.CheerService;
+import eatda.service.cheer.CheerService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package eatda.service.store;
+package eatda.service.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -7,12 +7,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.client.map.StoreSearchResult;
-import eatda.controller.store.CheerRegisterRequest;
-import eatda.controller.store.CheerResponse;
-import eatda.controller.store.CheersInStoreResponse;
-import eatda.controller.store.CheersResponse;
+import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheersInStoreResponse;
+import eatda.controller.cheer.CheersResponse;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
-import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;

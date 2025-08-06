@@ -1,8 +1,8 @@
 package eatda.repository.store;
 
 import eatda.domain.ImageKey;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
-import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
 import java.util.List;
 import java.util.Optional;

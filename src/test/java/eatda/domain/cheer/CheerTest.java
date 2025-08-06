@@ -1,4 +1,4 @@
-package eatda.domain.store;
+package eatda.domain.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.Store;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import org.junit.jupiter.api.Nested;

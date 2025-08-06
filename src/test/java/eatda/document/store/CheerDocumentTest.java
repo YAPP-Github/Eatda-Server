@@ -14,12 +14,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
-import eatda.controller.store.CheerInStoreResponse;
-import eatda.controller.store.CheerPreviewResponse;
-import eatda.controller.store.CheerRegisterRequest;
-import eatda.controller.store.CheerResponse;
-import eatda.controller.store.CheersInStoreResponse;
-import eatda.controller.store.CheersResponse;
+import eatda.controller.cheer.CheerInStoreResponse;
+import eatda.controller.cheer.CheerPreviewResponse;
+import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheersInStoreResponse;
+import eatda.controller.cheer.CheersResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;

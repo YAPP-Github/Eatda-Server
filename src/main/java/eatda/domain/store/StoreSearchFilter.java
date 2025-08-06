@@ -1,4 +1,4 @@
-package eatda.service.store;
+package eatda.domain.store;
 
 import eatda.client.map.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
