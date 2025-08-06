@@ -30,8 +30,11 @@ locals {
         DD_APM_ENABLED                       = "true"
         DD_LOGS_ENABLED                      = "true"
         DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
-        DD_APM_RECEIVER_PORT                 = "8126"
-        DD_APM_NON_LOCAL_TRAFFIC             = "true"
+        DD_EC2_USE_IMDSV2                    = "true"
+        DD_DOGSTATSD_NON_LOCAL_TRAFFIC       = "true"
+        DD_SERVICE                           = "eatda-api"
+        DD_ENV                               = "prod"
+        DD_VERSION                           = "v1"
       }
       secrets = [
         {
@@ -74,9 +77,16 @@ locals {
 
         command = svc == "api-prod" ? [
           "java",
+          "-javaagent:/app/dd-java-agent.jar",
+          "-Ddd.logs.injection=true",
+          "-Ddd.runtime-metrics.enabled=true",
+          "-Ddd.service=eatda-api",
+          "-Ddd.env=dev",
+          "-Ddd.version=v1",
+          "-Ddd.agent.host=10.0.7.245",
           "-Dspring.profiles.active=prod",
           "-jar",
-          "/api.jar"
+          "/app/api.jar"
         ] : null
 
         portMappings = [

@@ -74,6 +74,8 @@ locals {
         entryPoint = svc == "api-dev" ? ["java"] : null
         command    = svc == "api-dev" ? [
           "-javaagent:/app/dd-java-agent.jar",
+          "-Ddd.logs.injection=true",
+          "-Ddd.runtime-metrics.enabled=true",
           "-Ddd.service=eatda-api",
           "-Ddd.env=dev",
           "-Ddd.version=v1",
@@ -87,7 +89,9 @@ locals {
           { name = "${svc}-${port}-tcp", containerPort = port, hostPort = def.host_port[idx], protocol = "tcp" }
         ]
         environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
-        secrets     = svc == "mysql-dev" ? [
+        secrets     = svc == "datadog-agent-task" ? [
+          { name = "DD_API_KEY", valueFrom = "/dev/DD_API_KEY" }
+        ] : (svc == "mysql-dev" ? [
           { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
           { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
           { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
@@ -96,7 +100,7 @@ locals {
             name      = s.name
             valueFrom = s.valueFrom
           }
-        ]
+        ])
         mountPoints = [
           for vol in lookup(def, "volumes", []) :{
             sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/logs"),

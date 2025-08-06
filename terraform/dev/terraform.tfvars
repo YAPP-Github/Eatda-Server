@@ -11,6 +11,11 @@ ecs_services = {
   mysql-dev = {
     task_definition = "mysql"
   }
+
+  datadog-agent-task = {
+    task_definition     = "datadog-agent-task"
+    scheduling_strategy = "DAEMON"
+  }
 }
 
 ecs_task_definitions_base = {
@@ -60,6 +65,57 @@ ecs_task_definitions_base = {
       {
         name      = "dev-mysql-volume"
         host_path = "/home/ec2-user/mysql/"
+      }
+    ]
+  }
+
+  "datadog-agent-task" = {
+    cpu             = 100
+    memory          = 128
+    network_mode    = "bridge"
+    requires_compatibilities = ["EC2"]
+    container_image = "public.ecr.aws/datadog/agent:latest"
+    container_port = [8125, 8126]
+    host_port = [8125, 8126]
+
+    port_mappings = [
+      {
+        container_port = 8126,
+        host_port      = 8126,
+        protocol       = "tcp"
+      },
+      {
+        container_port = 8125,
+        host_port      = 8125,
+        protocol       = "udp"
+      }
+    ]
+
+    environment = {
+      DD_SITE                              = "us5.datadoghq.com"
+      DD_PROCESS_AGENT_ENABLED             = "true"
+      DD_APM_ENABLED                       = "true"
+      DD_LOGS_ENABLED                      = "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
+      DD_EC2_USE_IMDSV2                    = "true"
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC       = "true"
+      DD_SERVICE                           = "eatda-api"
+      DD_ENV                               = "dev"
+      DD_VERSION                           = "v1"
+    }
+
+    volumes = [
+      {
+        name      = "docker_sock"
+        host_path = "/var/run/docker.sock"
+      },
+      {
+        name      = "proc"
+        host_path = "/proc/"
+      },
+      {
+        name      = "cgroup"
+        host_path = "/sys/fs/cgroup/"
       }
     ]
   }
