@@ -11,7 +11,8 @@ variable "ecs_services" {
 variable "ecs_task_definitions_base" {
   type = map(object({
     cpu          = number
-    memory       = number
+    memory = optional(number)
+    memoryReservation = optional(number)
     network_mode = string
     environment = map(string)
     requires_compatibilities = optional(list(string))

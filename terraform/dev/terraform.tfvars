@@ -31,24 +31,28 @@ ecs_task_definitions_base = {
     environment = {}
     volumes = [
       {
-        name      = "dev-api-volume"
-        host_path = "/home/ec2-user/logs/"
-        readOnly  = false
+        name          = "dev-api-volume"
+        host_path     = "/home/ec2-user/logs/"
+        containerPath = "/logs"
+        readOnly      = false
       },
       {
-        name      = "docker_sock"
-        host_path = "/var/run/docker.sock"
-        readOnly  = true
+        name          = "docker_sock"
+        host_path     = "/var/run/docker.sock"
+        containerPath = "/var/run/docker.sock"
+        readOnly      = true
       },
       {
-        name      = "proc"
-        host_path = "/proc/"
-        readOnly  = true
+        name          = "proc"
+        host_path     = "/proc/"
+        containerPath = "/host/proc"
+        readOnly      = true
       },
       {
-        name      = "cgroup"
-        host_path = "/sys/fs/cgroup/"
-        readOnly  = true
+        name          = "cgroup"
+        host_path     = "/sys/fs/cgroup/"
+        containerPath = "/host/sys/fs/cgroup"
+        readOnly      = true
       }
     ]
   }

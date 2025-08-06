@@ -14,12 +14,12 @@ variable "ecs_task_definitions" {
     })), [])
 
     container_definitions = list(object({
-      name        = string
-      image       = string
-      cpu         = number
-      memory      = number
-      essential   = bool
-      stopTimeout = number
+      name      = string
+      image     = string
+      cpu       = number
+      memory    = number
+      essential = bool
+      stopTimeout = optional(number)
 
       command = optional(list(string))
 
