@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BACKUP_DIR="/home/ec2-user/eatda/mysql"
+BACKUP_DIR="/home/ec2-user/mysql"
 S3_BUCKET="s3://eatda-storage-dev/backup/mysql/"
 TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
 ARCHIVE_PATH="${BACKUP_DIR}/mysql-backup-${TIMESTAMP}.sql"

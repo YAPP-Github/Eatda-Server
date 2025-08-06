@@ -54,7 +54,7 @@ locals {
     role                 = "prod"
     iam_instance_profile = "ec2-to-ecs"
     key_name             = "eatda-ec2-prod-key"
-    user_data = templatefile("${path.module}/scripts/user-data.sh", {
+    user_data = templatefile("user-data.sh", {
       ecs_cluster_name = "prod-cluster"
     })
   }

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-LOG_DIR="/home/ec2-user/logs/eatda"
+LOG_DIR="/home/ec2-user/logs"
 S3_BUCKET="s3://eatda-storage-dev/backup/logs/"
 TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
 ARCHIVE_PATH="/tmp/eatda-logs-${TIMESTAMP}.tar.gz"

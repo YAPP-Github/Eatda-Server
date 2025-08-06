@@ -7,10 +7,11 @@ mkswap /swapfile
 swapon /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
-/bin/mkdir -p /home/ec2-user/logs/eatda
+mkdir -p /home/ec2-user/logs
+mkdir -p /home/ec2-user/scripts
 
-aws s3 cp s3://eatda-storage-prod/scripts/app-backup-prod-logs.sh /home/ec2-user/logs/app-backup-prod-logs.sh
-chmod +x /home/ec2-user/logs/app-backup-prod-logs.sh
+aws s3 cp s3://eatda-storage-prod/scripts/app-backup-prod-logs.sh /home/ec2-user/scripts/app-backup-prod-logs.sh
+chmod +x /home/ec2-user/scripts/app-backup-prod-logs.sh
 
 yum install -y cronie
 systemctl enable crond
@@ -20,4 +21,7 @@ until systemctl is-active --quiet crond; do
   sleep 1
 done
 
-(crontab -l 2>/dev/null; echo "0 0 * * 0 /home/ec2-user/logs/app-backup-prod-logs.sh >> /var/log/app-backup.log 2>&1") | crontab -
+(
+  sudo crontab -u ec2-user -l 2>/dev/null || true
+  echo "0 0 * * 0 /home/ec2-user/scripts/app-backup-prod-logs.sh >> /home/ec2-user/logs/app-backup.log 2>&1"
+) | sudo crontab -u ec2-user -

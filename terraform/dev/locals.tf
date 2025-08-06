@@ -46,7 +46,7 @@ locals {
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
-    user_data = templatefile("${path.module}/scripts/user-data.sh", {
+    user_data = templatefile("user-data.sh", {
       ecs_cluster_name = "dev-cluster"
     })
   }
@@ -65,13 +65,14 @@ locals {
   container_definitions_map = {
     for svc, def in local.task_definitions_with_roles : svc => [
       {
-        name      = svc
-        image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
-        cpu       = def.cpu
-        memory    = def.memory
-        essential = true
+        name              = svc
+        image             = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
+        cpu               = def.cpu
+        memory            = def.memory
+        essential         = true
         stopTimeout = lookup(def, "stop_timeout", 30)
-        command   = svc == "api-dev" ? [
+        working_directory = svc == "api-dev" ? "/app" : null,
+        command           = svc == "api-dev" ? [
           "java",
           "-javaagent:/app/dd-java-agent.jar",
           "-Ddd.service=eatda-api",
