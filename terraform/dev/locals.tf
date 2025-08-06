@@ -73,7 +73,7 @@ locals {
         stopTimeout = lookup(def, "stop_timeout", 30)
         command   = svc == "api-dev" ? [
           "java",
-          "-javaagent:/app/dd-java-agent.jar",
+          "-javaagent:/dd-java-agent.jar",
           "-Ddd.logs.injection=true",
           "-Ddd.runtime-metrics.enabled=true",
           "-Ddd.service=eatda-api",
