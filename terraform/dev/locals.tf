@@ -65,14 +65,14 @@ locals {
   container_definitions_map = {
     for svc, def in local.task_definitions_with_roles : svc => [
       {
-        name      = svc
-        image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
-        cpu       = def.cpu
-        memory    = def.memory
-        essential = true
+        name       = svc
+        image      = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
+        cpu        = def.cpu
+        memory     = def.memory
+        essential  = true
         stopTimeout = lookup(def, "stop_timeout", 30)
-        command   = svc == "api-dev" ? [
-          "java",
+        entryPoint = svc == "api-dev" ? ["java"] : null
+        command    = svc == "api-dev" ? [
           "-javaagent:/app/dd-java-agent.jar",
           "-Ddd.service=eatda-api",
           "-Ddd.env=dev",
