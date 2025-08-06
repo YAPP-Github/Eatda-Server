@@ -9,7 +9,7 @@ import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
-import eatda.repository.store.CheerRepository;
+import eatda.repository.cheer.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;

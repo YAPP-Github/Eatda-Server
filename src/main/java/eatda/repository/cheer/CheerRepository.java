@@ -1,4 +1,4 @@
-package eatda.repository.store;
+package eatda.repository.cheer;
 
 import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
