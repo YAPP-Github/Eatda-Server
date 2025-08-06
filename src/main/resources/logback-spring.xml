@@ -8,7 +8,7 @@
     <property name="ROLLING_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] [%X{requestId}] %logger{5} - %msg %n"/>
 
-    <property name="LOG_DIR" value="/eatda/dev/logs"/>
+    <property name="LOG_DIR" value="/logs"/>
     <property name="FILE_PATH_NAME" value="${LOG_DIR}/eatda.log"/>
     <property name="LOG_NAME_PATTERN" value="${LOG_DIR}/eatda-%d{yyyy-MM-dd}.%i.log"/>
     <property name="MAX_FILE_SIZE" value="10MB"/>

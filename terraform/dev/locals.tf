@@ -80,7 +80,7 @@ locals {
           "-Ddd.agent.host=172.17.0.1",
           "-Dspring.profiles.active=dev",
           "-jar",
-          "/app/api.jar"
+          "api.jar"
         ] : null
         portMappings = [
           for idx, port in def.container_port :
@@ -99,7 +99,7 @@ locals {
         ]
         mountPoints = [
           for vol in lookup(def, "volumes", []) :{
-            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/home/ec2-user/"),
+            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/logs"),
             readOnly     = false
           }
         ]

@@ -25,7 +25,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "dev-api-volume"
-        host_path = "/home/ec2-user/api/"
+        host_path = "/home/ec2-user/logs/"
       }
     ]
   }
