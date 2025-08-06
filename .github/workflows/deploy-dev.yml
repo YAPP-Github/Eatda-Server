@@ -202,8 +202,8 @@ jobs:
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-latest-task-def
         run: |
-          TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --query "services[0].taskDefinition" --output text)
-          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition" --output json > task-definition.json
+          TASK_DEF_ARN=$(aws ecs describe-task-definition --task-definition "${{ env.CONTAINER_NAME }}" --query "taskDefinition.taskDefinitionArn" --output text)
+              aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition" --output json > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         if: steps.get_version.outputs.HAS_VERSION == 'true'
