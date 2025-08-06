@@ -1,6 +1,6 @@
 package eatda.controller.store;
 
-import eatda.client.map.MapClientStoreSearchResult;
+import eatda.domain.store.StoreSearchResult;
 
 public record StoreSearchResponse(
         String kakaoId,
@@ -8,7 +8,7 @@ public record StoreSearchResponse(
         String address
 ) {
 
-    public StoreSearchResponse(MapClientStoreSearchResult searchResult) {
+    public StoreSearchResponse(StoreSearchResult searchResult) {
         this(
                 searchResult.kakaoId(),
                 searchResult.name(),

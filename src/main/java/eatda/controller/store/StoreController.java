@@ -1,9 +1,13 @@
 package eatda.controller.store;
 
 import eatda.controller.web.auth.LoginMember;
+import eatda.domain.store.StoreSearchResult;
+import eatda.service.image.ImageService;
+import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreSearchService storeSearchService;
+    private final ImageService imageService;
 
     @GetMapping("/api/shops/{storeId}/images")
     public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
@@ -36,7 +42,8 @@ public class StoreController {
 
     @GetMapping("/api/shop/search")
     public ResponseEntity<StoreSearchResponses> searchStore(@RequestParam String query, LoginMember member) {
-        StoreSearchResponses response = storeService.searchStores(query);
+        List<StoreSearchResult> storeSearchResults = storeSearchService.searchStores(query);
+        StoreSearchResponses response = StoreSearchResponses.from(storeSearchResults);
         return ResponseEntity.ok(response);
     }
 }

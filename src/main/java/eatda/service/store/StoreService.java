@@ -3,16 +3,12 @@ package eatda.service.store;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
-import eatda.client.map.MapClient;
-import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
-import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
-import eatda.domain.store.StoreSearchFilter;
 import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
@@ -27,8 +23,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StoreService {
 
-    private final MapClient mapClient;
-    private final StoreSearchFilter storeSearchFilter;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
     private final ImageStorage imageStorage;
@@ -66,11 +60,5 @@ public class StoreService {
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerRepository.findRecentImageKey(store)
                 .map(imageStorage::getPreSignedUrl);
-    }
-
-    public StoreSearchResponses searchStores(String query) {
-        List<MapClientStoreSearchResult> searchResults = mapClient.searchStores(query);
-        List<MapClientStoreSearchResult> filteredResults = storeSearchFilter.filterSearchedStores(searchResults);
-        return StoreSearchResponses.from(filteredResults);
     }
 }
