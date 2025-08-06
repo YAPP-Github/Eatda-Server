@@ -65,13 +65,23 @@ locals {
   container_definitions_map = {
     for svc, def in local.task_definitions_with_roles : svc => [
       {
-        name         = svc
-        image        = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
-        cpu          = def.cpu
-        memory       = def.memory
-        essential    = true
+        name      = svc
+        image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
+        cpu       = def.cpu
+        memory    = def.memory
+        essential = true
         stopTimeout = lookup(def, "stop_timeout", 30)
-        command      = svc == "api-dev" ? ["java", "-Dspring.profiles.active=dev", "-jar", "/api.jar"] : null
+        command   = svc == "api-dev" ? [
+          "java",
+          "-javaagent:/app/dd-java-agent.jar",
+          "-Ddd.service=eatda-api",
+          "-Ddd.env=dev",
+          "-Ddd.version=v1",
+          "-Ddd.agent.host=172.17.0.1",
+          "-Dspring.profiles.active=dev",
+          "-jar",
+          "/api.jar"
+        ] : null
         portMappings = [
           for idx, port in def.container_port :
           { name = "${svc}-${port}-tcp", containerPort = port, hostPort = def.host_port[idx], protocol = "tcp" }
