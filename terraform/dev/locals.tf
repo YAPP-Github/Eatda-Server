@@ -77,7 +77,7 @@ locals {
           "-Ddd.service=eatda-api",
           "-Ddd.env=dev",
           "-Ddd.version=v1",
-          "-Ddd.agent.host=172.17.0.1",
+          "-Ddd.agent.host=10.0.7.245",
           "-Dspring.profiles.active=dev",
           "-jar",
           "/app/api.jar"
