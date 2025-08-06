@@ -17,15 +17,11 @@ public class StoreSearchService {
 
     public StoreSearchResult searchStoreByKakaoId(String name, String kakaoId) {
         List<MapClientStoreSearchResult> searchResults = mapClient.searchStores(name);
-        return storeSearchFilter.filterStoreByKakaoId(searchResults, kakaoId)
-                .toDomain();
+        return storeSearchFilter.filterStoreByKakaoId(searchResults, kakaoId);
     }
 
     public List<StoreSearchResult> searchStores(String name) {
         List<MapClientStoreSearchResult> searchResults = mapClient.searchStores(name);
-        return storeSearchFilter.filterSearchedStores(searchResults)
-                .stream()
-                .map(MapClientStoreSearchResult::toDomain)
-                .toList();
+        return storeSearchFilter.filterSearchedStores(searchResults);
     }
 }
