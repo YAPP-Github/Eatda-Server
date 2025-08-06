@@ -82,7 +82,7 @@ locals {
           "-Ddd.agent.host=10.0.7.245",
           "-Dspring.profiles.active=dev",
           "-jar",
-          "/app/api.jar"
+          "/api.jar"
         ] : null
         portMappings = [
           for m in lookup(def, "port_mappings", []) : {
