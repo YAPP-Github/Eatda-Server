@@ -46,7 +46,7 @@ locals {
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
-    user_data = templatefile("user-data.sh", {
+    user_data = templatefile("${path.module}/scripts/user-data.sh", {
       ecs_cluster_name = "dev-cluster"
     })
   }
