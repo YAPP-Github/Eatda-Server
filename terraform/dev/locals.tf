@@ -89,7 +89,7 @@ locals {
         ]
         mountPoints = [
           for vol in lookup(def, "volumes", []) :{
-            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/eatda"),
+            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/home/ec2-user/"),
             readOnly     = false
           }
         ]

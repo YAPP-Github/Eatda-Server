@@ -25,7 +25,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "dev-api-volume"
-        host_path = "/home/ec2-user/eatda/dev/"
+        host_path = "/home/ec2-user/api/"
       }
     ]
   }
@@ -59,7 +59,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "dev-mysql-volume"
-        host_path = "/home/ec2-user/eatda/mysql/"
+        host_path = "/home/ec2-user/mysql/"
       }
     ]
   }

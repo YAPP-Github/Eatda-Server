@@ -27,7 +27,7 @@ ecs_task_definitions_base = {
     volumes = [
       {
         name      = "prod-api-volume"
-        host_path = "/home/ec2-user/eatda/prod/"
+        host_path = "/home/ec2-user/api"
       }
     ]
   }
