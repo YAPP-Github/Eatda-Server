@@ -80,7 +80,7 @@ locals {
           "-Ddd.agent.host=172.17.0.1",
           "-Dspring.profiles.active=dev",
           "-jar",
-          "/api.jar"
+          "/app/api.jar"
         ] : null
         portMappings = [
           for idx, port in def.container_port :
