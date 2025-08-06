@@ -88,7 +88,7 @@ ecs_task_definitions_base = {
   }
 
   "datadog-agent-task" = {
-    cpu             = 100
+    cpu             = 256
     memory          = 128
     network_mode    = "bridge"
     requires_compatibilities = ["EC2"]
