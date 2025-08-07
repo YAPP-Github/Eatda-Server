@@ -15,9 +15,9 @@ ecs_services = {
 
 ecs_task_definitions_base = {
   api-dev = {
-    cpu          = 512
-    memory       = 512
-    network_mode = "bridge"
+    cpu               = 512
+    memoryReservation = 384
+    network_mode      = "bridge"
     requires_compatibilities = ["EC2"]
 
     port_mappings = [
