@@ -4,9 +4,9 @@
     <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter"/>
 
     <property name="CONSOLE_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %white([%thread]) %clr([%p]) %magenta([%X{requestId}]) %blue(%logger{5}) - %msg %n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %white([%thread]) %clr([%p]) %cyan([trace=%X{dd.trace_id} span=%X{dd.span_id}]) %blue(%logger{5}) - %msg%n"/>
     <property name="ROLLING_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] [%X{requestId}] %logger{5} - %msg %n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] [trace=%X{dd.trace_id} span=%X{dd.span_id}] %logger{5} - %msg%n"/>
 
     <property name="LOG_DIR" value="/logs"/>
     <property name="FILE_PATH_NAME" value="${LOG_DIR}/eatda.log"/>
