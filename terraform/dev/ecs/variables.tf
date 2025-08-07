@@ -32,17 +32,17 @@ variable "ecs_task_definitions" {
     })), [])
 
     container_definitions = list(object({
-      name      = string
-      image     = string
-      cpu       = number
-      memory    = number
-      essential = bool
-      stopTimeout = optional(number)
+      name        = string
+      image       = string
+      cpu         = number
+      memory      = number
+      essential   = bool
+      stopTimeout = number
 
       command = optional(list(string))
 
       portMappings = list(object({
-        name = optional(string)
+        name          = string
         containerPort = number
         hostPort      = number
         protocol      = string

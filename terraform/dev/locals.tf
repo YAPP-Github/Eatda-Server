@@ -63,40 +63,25 @@ locals {
   }
 
   container_definitions_map = {
-    for svc, task_def in local.task_definitions_with_roles : svc => flatten([
+    for svc, task_def in local.task_definitions_with_roles : svc =>
+    (svc == "api-dev" ?
       [
         {
-          name      = svc
-          image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : task_def.container_image
+          name      = "api-dev"
+          image     = "${local.ecr_repo_urls["dev"]}:placeholder"
           cpu       = task_def.cpu
           memory    = contains(keys(task_def), "memory") ? task_def.memory : null
-          memoryReservation = lookup(task_def, "memoryReservation", null)
           essential = true
-          command   = svc == "api-dev" ? tolist([
+          command = [
             "java", "-javaagent:/dd-java-agent.jar",
             "-Ddd.logs.injection=true", "-Ddd.runtime-metrics.enabled=true",
             "-Ddd.service=eatda-api", "-Ddd.env=dev", "-Ddd.version=v1",
             "-Ddd.agent.host=127.0.0.1",
             "-Dspring.profiles.active=dev", "-jar", "/api.jar"
-          ]) : tolist([])
-          portMappings = [
-            for m in lookup(task_def, "port_mappings", []) :
-            { containerPort = m.container_port, hostPort = m.host_port, protocol = m.protocol }
           ]
-          environment = [for k, v in lookup(task_def, "environment", {}) : { name = k, value = v }]
-          secrets     = [for s in lookup(task_def, "secrets", []) : { name = s.name, valueFrom = s.valueFrom }]
-          mountPoints = [
-            for vol in lookup(task_def, "volumes", []) : {
-              sourceVolume  = vol.name
-              containerPath = (
-                (svc == "mysql-dev" && vol.name == "dev-mysql-volume") ? "/var/lib/mysql" : vol.containerPath
-              )
-              readOnly = false
-            }
-          ]
-        }
-      ],
-        svc == "api-dev" ? [
+          portMappings = [{ containerPort = 8080, hostPort = 0, protocol = "tcp" }]
+          mountPoints = [{ sourceVolume = "dev-api-volume", containerPath = "/logs", readOnly = false }]
+        },
         {
           name      = "datadog-agent"
           image     = "public.ecr.aws/datadog/agent:latest"
@@ -117,11 +102,32 @@ locals {
             { sourceVolume = "proc", containerPath = "/host/proc", readOnly = true },
             { sourceVolume = "cgroup", containerPath = "/host/sys/fs/cgroup", readOnly = true }
           ]
-          command = tolist([])
-          portMappings = []
         }
-      ] : []
-    ])
+      ]
+      :
+      [
+        {
+          name         = svc
+          image        = task_def.container_image
+          cpu          = task_def.cpu
+          memory       = task_def.memory
+          essential    = true
+          portMappings = [
+            for m in lookup(task_def, "port_mappings", []) :
+            { containerPort = m.container_port, hostPort = m.host_port, protocol = m.protocol }
+          ]
+          environment = [for k, v in lookup(task_def, "environment", {}) : { name = k, value = v }]
+          secrets     = [for s in lookup(task_def, "secrets", []) : { name = s.name, valueFrom = s.valueFrom }]
+          mountPoints = [
+            for vol in lookup(task_def, "volumes", []) : {
+              sourceVolume  = vol.name
+              containerPath = (svc == "mysql-dev" && vol.name == "dev-mysql-volume") ? "/var/lib/mysql" :
+                vol.containerPath
+              readOnly = false
+            }
+          ]
+        }
+      ])
   }
 
   final_ecs_definitions_for_module = {
