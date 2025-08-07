@@ -73,7 +73,8 @@ locals {
         stopTimeout = lookup(def, "stop_timeout", 30)
         command   = svc == "api-dev" ? [
           "java",
-          "-Xlog:gc*:stdout,file=/logs/gc.log:time,uptime,level,tags",
+          "-Xlog:gc*:stdout:time,uptime,level,tags",
+          "-Xlog:gc*:file=/logs/gc.log:time,uptime,level,tags",
           "-javaagent:/dd-java-agent.jar",
           "-Ddd.logs.injection=true",
           "-Ddd.runtime-metrics.enabled=true",
