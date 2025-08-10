@@ -1,7 +1,6 @@
 package eatda.document.store;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -208,7 +207,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         parameterWithName("storeId").description("가게 ID")
                 )
                 .queryParameter(
-                        parameterWithName("size").description("조회 개수 (최소 1, 최대 50)")
+                        parameterWithName("page").description("조회 페이지 (최소 0, 기본값 0)").optional(),
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -223,12 +223,13 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @Test
         void 가게별_응원_검색_성공() {
             Long storeId = 1L;
+            int page = 0;
             int size = 2;
             CheersInStoreResponse responses = new CheersInStoreResponse(List.of(
                     new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!"),
                     new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!")
             ));
-            doReturn(responses).when(cheerService).getCheersByStoreId(storeId, size);
+            doReturn(responses).when(cheerService).getCheersByStoreId(storeId, page, size);
 
             var document = document("cheer/get-store-id", 200)
                     .request(requestDocument)
@@ -237,6 +238,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .when().get("/api/shops/{storeId}/cheers", storeId)
                     .then().statusCode(200);
@@ -246,8 +248,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 가게별_응원_검색_실패(BusinessErrorCode errorCode) {
             Long storeId = 1L;
+            int page = 0;
             int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheersByStoreId(eq(storeId), anyInt());
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheersByStoreId(storeId, page, size);
 
             var document = document("cheer/get-store-id", errorCode)
                     .request(requestDocument)
@@ -256,6 +259,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .when().get("/api/shops/{storeId}/cheers", storeId)
                     .then().statusCode(errorCode.getStatus().value());

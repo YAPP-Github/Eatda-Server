@@ -49,8 +49,9 @@ public class CheerController {
 
     @GetMapping("/api/shops/{storeId}/cheers")
     public ResponseEntity<CheersInStoreResponse> getCheersByStoreId(@PathVariable Long storeId,
-                                                                    @RequestParam @Min(1) @Max(50) int size) {
-        CheersInStoreResponse response = cheerService.getCheersByStoreId(storeId, size);
+                                                                    @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size) {
+        CheersInStoreResponse response = cheerService.getCheersByStoreId(storeId, page, size);
         return ResponseEntity.ok(response);
     }
 }

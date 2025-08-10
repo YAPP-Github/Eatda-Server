@@ -81,4 +81,15 @@ public class CheerService {
                 .toList(); // TODO N+1 문제 해결
         return new CheersInStoreResponse(cheersResponse);
     }
+
+    @Transactional(readOnly = true)
+    public CheersInStoreResponse getCheersByStoreId(Long storeId, int page, int size) {
+        Store store = storeRepository.getById(storeId);
+        List<Cheer> cheers = cheerRepository.findAllByStoreOrderByCreatedAtDesc(store, PageRequest.of(page, size));
+
+        List<CheerInStoreResponse> cheersResponse = cheers.stream()
+                .map(CheerInStoreResponse::new)
+                .toList(); // TODO N+1 문제 해결
+        return new CheersInStoreResponse(cheersResponse);
+    }
 }
