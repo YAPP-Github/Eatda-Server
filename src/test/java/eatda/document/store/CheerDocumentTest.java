@@ -136,8 +136,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .tag(Tag.CHEER_API)
                 .summary("최신 응원 검색")
                 .queryParameter(
-                        parameterWithName("page").description("조회 페이지 (최소 0, 기본값 0)").optional(),
-                        parameterWithName("size").description("조회 개수 (최소 1, 최대 50)").optional()
+                        parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -207,7 +207,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         parameterWithName("storeId").description("가게 ID")
                 )
                 .queryParameter(
-                        parameterWithName("page").description("조회 페이지 (최소 0, 기본값 0)").optional(),
+                        parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
                         parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
                 );
 
