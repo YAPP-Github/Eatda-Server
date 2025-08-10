@@ -41,8 +41,9 @@ public class CheerController {
     }
 
     @GetMapping("/api/cheer")
-    public ResponseEntity<CheersResponse> getCheers(@RequestParam @Min(1) @Max(50) int size) {
-        CheersResponse response = cheerService.getCheers(size);
+    public ResponseEntity<CheersResponse> getCheers(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size) {
+        CheersResponse response = cheerService.getCheers(page, size);
         return ResponseEntity.ok(response);
     }
 

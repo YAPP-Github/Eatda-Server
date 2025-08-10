@@ -19,6 +19,7 @@ import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +59,8 @@ public class CheerService {
     }
 
     @Transactional(readOnly = true)
-    public CheersResponse getCheers(int size) {
-        List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(Pageable.ofSize(size));
+    public CheersResponse getCheers(int page, int size) {
+        List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
         return toCheersResponse(cheers);
     }
 
