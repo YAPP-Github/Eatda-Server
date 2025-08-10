@@ -21,7 +21,7 @@ public class MapClient {
         this.kakaoProperties = properties;
     }
 
-    public List<StoreSearchResult> searchShops(String query) {
+    public List<MapClientStoreSearchResult> searchStores(String query) {
         return restClient.get()
                 .uri("https://dapi.kakao.com/v2/local/search/keyword.json", builder -> builder
                         .queryParam("query", query)
@@ -35,7 +35,7 @@ public class MapClient {
                         .build())
                 .header("Authorization", "KakaoAK " + kakaoProperties.getApiKey())
                 .retrieve()
-                .body(StoreSearchResults.class)
+                .body(MapClientStoreSearchResults.class)
                 .results();
     }
 }

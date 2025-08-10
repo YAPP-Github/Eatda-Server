@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doReturn;
 
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
+import eatda.client.map.MapClientStoreSearchResult;
 import eatda.client.oauth.OauthClient;
 import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
@@ -19,8 +19,8 @@ import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
 import eatda.repository.article.ArticleRepository;
+import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
-import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
 import eatda.storage.image.ImageStorage;
@@ -114,13 +114,15 @@ public class BaseControllerTest {
         doReturn(DEFAULT_OAUTH_TOKEN).when(oauthClient).requestOauthToken(anyString(), anyString());
         doReturn(DEFAULT_OAUTH_MEMBER_INFO).when(oauthClient).requestMemberInformation(DEFAULT_OAUTH_TOKEN);
 
-        List<StoreSearchResult> searchResults = List.of(
-                new StoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점", "https://yapp.co.kr",
+        List<MapClientStoreSearchResult> searchResults = List.of(
+                new MapClientStoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점",
+                        "https://yapp.co.kr",
                         "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
-                new StoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점", "http://yapp.kr",
+                new MapClientStoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점",
+                        "http://yapp.kr",
                         "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
         );
-        doReturn(searchResults).when(mapClient).searchShops(anyString());
+        doReturn(searchResults).when(mapClient).searchStores(anyString());
 
         doReturn(MOCKED_IMAGE_URL).when(imageStorage).getPreSignedUrl(any());
         doReturn(MOCKED_IMAGE_KEY).when(imageStorage).upload(any());

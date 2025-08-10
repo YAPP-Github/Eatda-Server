@@ -1,6 +1,6 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
-import eatda.domain.store.Cheer;
+import eatda.domain.cheer.Cheer;
 
 public record CheerInStoreResponse(
         long id,

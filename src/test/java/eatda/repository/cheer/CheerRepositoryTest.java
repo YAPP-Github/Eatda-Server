@@ -1,4 +1,4 @@
-package eatda.repository.store;
+package eatda.repository.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

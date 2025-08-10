@@ -1,11 +1,11 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import eatda.controller.BaseControllerTest;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
-import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
 import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;

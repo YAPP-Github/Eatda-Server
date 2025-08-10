@@ -9,8 +9,11 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.EtcErrorCode;
 import eatda.service.article.ArticleService;
 import eatda.service.auth.AuthService;
+import eatda.service.auth.OauthService;
+import eatda.service.cheer.CheerService;
+import eatda.service.image.ImageService;
 import eatda.service.member.MemberService;
-import eatda.service.store.CheerService;
+import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
 import eatda.service.story.StoryService;
 import io.restassured.RestAssured;
@@ -41,6 +44,9 @@ public abstract class BaseDocumentTest {
     private static final String MOCKED_REFRESH_TOKEN = "refresh-token";
 
     @MockitoBean
+    protected OauthService oauthService;
+
+    @MockitoBean
     protected AuthService authService;
 
     @MockitoBean
@@ -50,6 +56,9 @@ public abstract class BaseDocumentTest {
     protected StoreService storeService;
 
     @MockitoBean
+    protected StoreSearchService storeSearchService;
+
+    @MockitoBean
     protected StoryService storyService;
 
     @MockitoBean
@@ -57,6 +66,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected ArticleService articleService;
+
+    @MockitoBean
+    protected ImageService imageService;
 
     @MockitoBean
     protected JwtManager jwtManager;

@@ -1,23 +1,20 @@
-package eatda.service.store;
+package eatda.service.cheer;
 
-import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
-import eatda.controller.store.CheerInStoreResponse;
-import eatda.controller.store.CheerPreviewResponse;
-import eatda.controller.store.CheerRegisterRequest;
-import eatda.controller.store.CheerResponse;
-import eatda.controller.store.CheersInStoreResponse;
-import eatda.controller.store.CheersResponse;
-import eatda.domain.Image;
-import eatda.domain.ImageDomain;
+import eatda.controller.cheer.CheerInStoreResponse;
+import eatda.controller.cheer.CheerPreviewResponse;
+import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheersInStoreResponse;
+import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
-import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
+import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
-import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;
@@ -25,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -33,21 +29,18 @@ public class CheerService {
 
     private static final int MAX_CHEER_SIZE = 3;
 
-    private final MapClient mapClient;
-    private final StoreSearchFilter storeSearchFilter;
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
     private final ImageStorage imageStorage;
 
     @Transactional
-    public CheerResponse registerCheer(CheerRegisterRequest request, MultipartFile imageFile, long memberId) {
+    public CheerResponse registerCheer(CheerRegisterRequest request,
+                                       StoreSearchResult result,
+                                       ImageKey imageKey,
+                                       long memberId) {
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
-
-        List<StoreSearchResult> searchResults = mapClient.searchShops(request.storeName());
-        StoreSearchResult result = storeSearchFilter.filterStoreByKakaoId(searchResults, request.storeKakaoId());
-        ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.CHEER, imageFile));
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결

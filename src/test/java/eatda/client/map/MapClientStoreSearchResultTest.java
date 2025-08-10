@@ -6,14 +6,14 @@ import eatda.domain.store.StoreCategory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class StoreSearchResultTest {
+class MapClientStoreSearchResultTest {
 
     @Nested
     class GetStoreCategory {
 
         @Test
         void 제공된_카테고리_이름에_맞는_음식점_카테고리를_반환한다() {
-            StoreSearchResult store = new StoreSearchResult(
+            MapClientStoreSearchResult store = new MapClientStoreSearchResult(
                     "1062153333",
                     "FD6",
                     "음식점 > 한식 > 순대",
@@ -32,7 +32,7 @@ class StoreSearchResultTest {
 
         @Test
         void 특정_카테고리에_없을_경우_기타_카테고리를_반환한다() {
-            StoreSearchResult store = new StoreSearchResult(
+            MapClientStoreSearchResult store = new MapClientStoreSearchResult(
                     "1062153333",
                     "FD6",
                     "음식점 > 기타",

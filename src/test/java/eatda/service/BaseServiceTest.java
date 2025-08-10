@@ -11,10 +11,13 @@ import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
+import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
-import eatda.repository.store.CheerRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
+import eatda.service.auth.AuthService;
+import eatda.service.auth.OauthService;
+import eatda.service.store.StoreSearchService;
 import eatda.storage.image.ExternalImageStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,12 @@ public abstract class BaseServiceTest {
     protected ExternalImageStorage externalImageStorage;
 
     @Autowired
+    protected OauthService oauthService;
+
+    @Autowired
+    protected AuthService authService;
+
+    @Autowired
     protected MemberGenerator memberGenerator;
 
     @Autowired
@@ -55,6 +64,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected StoreRepository storeRepository;
+
+    @Autowired
+    protected StoreSearchService storeSearchService;
 
     @Autowired
     protected CheerRepository cheerRepository;

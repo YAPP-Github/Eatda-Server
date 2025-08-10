@@ -1,4 +1,4 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
 import java.util.List;
 

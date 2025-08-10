@@ -1,8 +1,9 @@
-package eatda.domain.store;
+package eatda.domain.cheer;
 
 import eatda.domain.AuditingEntity;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import jakarta.persistence.Column;

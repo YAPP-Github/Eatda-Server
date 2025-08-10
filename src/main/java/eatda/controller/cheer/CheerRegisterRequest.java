@@ -1,4 +1,4 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
 public record CheerRegisterRequest(
         String storeKakaoId,

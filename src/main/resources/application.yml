@@ -7,6 +7,7 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: false
+    open-in-view: false
 
 springdoc:
   swagger-ui:

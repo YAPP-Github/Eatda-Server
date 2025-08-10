@@ -1,7 +1,12 @@
-package eatda.controller.store;
+package eatda.controller.cheer;
 
 import eatda.controller.web.auth.LoginMember;
-import eatda.service.store.CheerService;
+import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
+import eatda.domain.store.StoreSearchResult;
+import eatda.service.cheer.CheerService;
+import eatda.service.image.ImageService;
+import eatda.service.store.StoreSearchService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +25,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class CheerController {
 
     private final CheerService cheerService;
+    private final ImageService imageService;
+    private final StoreSearchService storeSearchService;
 
     @PostMapping("/api/cheer")
     public ResponseEntity<CheerResponse> registerCheer(@RequestPart("request") CheerRegisterRequest request,
                                                        @RequestPart(value = "image", required = false) MultipartFile image,
                                                        LoginMember member) {
-        CheerResponse response = cheerService.registerCheer(request, image, member.id());
+        ImageKey imageKey = imageService.uploadImage(ImageDomain.CHEER, image);
+        StoreSearchResult searchResult = storeSearchService.searchStoreByKakaoId(
+                request.storeName(), request.storeKakaoId());
+        CheerResponse response = cheerService.registerCheer(request, searchResult, imageKey, member.id());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }

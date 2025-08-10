@@ -15,14 +15,13 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
-import eatda.controller.store.StoreSearchResponse;
-import eatda.controller.store.StoreSearchResponses;
 import eatda.controller.store.StoresResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.domain.store.StoreCategory;
+import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import io.restassured.http.ContentType;
@@ -241,11 +240,13 @@ public class StoreDocumentTest extends BaseDocumentTest {
         @Test
         void 음식점_검색_성공() {
             String query = "농민백암순대";
-            StoreSearchResponses responses = new StoreSearchResponses(List.of(
-                    new StoreSearchResponse("17163273", "농민백암순대 본점", "서울 강남구 대치동 896-33"),
-                    new StoreSearchResponse("1062153333", "농민백암순대 시청직영점", "서울 중구 북창동 19-4")
-            ));
-            doReturn(responses).when(storeService).searchStores(anyString());
+            List<StoreSearchResult> responses = List.of(
+                    new StoreSearchResult("123", StoreCategory.KOREAN, "010-1234-1234", "농민백암순대 본점",
+                            "https://yap.co.kr", "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
+                    new StoreSearchResult("456", StoreCategory.KOREAN, "010-1234-1234", "농민백암순대 시청점",
+                            "https://yapp.kr", "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
+            );
+            doReturn(responses).when(storeSearchService).searchStores(anyString());
 
             var document = document("store/search", 200)
                     .request(requestDocument)
@@ -265,7 +266,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
             String query = "농민백암순대";
-            doThrow(new BusinessException(errorCode)).when(storeService).searchStores(anyString());
+            doThrow(new BusinessException(errorCode)).when(storeSearchService).searchStores(anyString());
 
             var document = document("store/search", errorCode)
                     .request(requestDocument)

@@ -14,12 +14,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
-import eatda.controller.store.CheerInStoreResponse;
-import eatda.controller.store.CheerPreviewResponse;
-import eatda.controller.store.CheerRegisterRequest;
-import eatda.controller.store.CheerResponse;
-import eatda.controller.store.CheersInStoreResponse;
-import eatda.controller.store.CheersResponse;
+import eatda.controller.cheer.CheerInStoreResponse;
+import eatda.controller.cheer.CheerPreviewResponse;
+import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheersInStoreResponse;
+import eatda.controller.cheer.CheersResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -83,7 +83,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         void 응원_등록_성공() {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
             CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!");
-            doReturn(response).when(cheerService).registerCheer(eq(request), any(), anyLong());
+            doReturn(response).when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 
             var document = document("cheer/register", 201)
                     .request(requestDocument)
@@ -112,7 +112,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 응원_등록_실패(BusinessErrorCode errorCode) {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
-            doThrow(new BusinessException(errorCode)).when(cheerService).registerCheer(eq(request), any(), anyLong());
+            doThrow(new BusinessException(errorCode))
+                    .when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 
             var document = document("cheer/register", errorCode)
                     .request(requestDocument)

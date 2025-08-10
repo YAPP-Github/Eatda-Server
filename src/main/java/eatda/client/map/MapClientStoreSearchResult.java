@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import eatda.domain.store.StoreSearchResult;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record StoreSearchResult(
+public record MapClientStoreSearchResult(
         @JsonProperty("id") String kakaoId,
         @JsonProperty("category_group_code") String categoryGroupCode,
         @JsonProperty("category_name") String categoryName,
@@ -65,5 +66,19 @@ public record StoreSearchResult(
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
+    }
+
+    public StoreSearchResult toDomain() {
+        return new StoreSearchResult(
+                kakaoId,
+                getStoreCategory(),
+                phoneNumber,
+                name,
+                placeUrl,
+                lotNumberAddress,
+                roadAddress,
+                latitude,
+                longitude
+        );
     }
 }

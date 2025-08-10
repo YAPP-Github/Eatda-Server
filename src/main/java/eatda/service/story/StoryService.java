@@ -1,18 +1,14 @@
 package eatda.service.story;
 
-import eatda.client.map.MapClient;
-import eatda.client.map.StoreSearchResult;
-import eatda.controller.story.FilteredSearchResult;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
-import eatda.domain.Image;
-import eatda.domain.ImageDomain;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
+import eatda.domain.store.StoreSearchResult;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
@@ -27,7 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -35,47 +30,29 @@ public class StoryService {
 
     private static final int PAGE_START_NUMBER = 0;
 
-    private final ImageStorage imageStorage;
-    private final MapClient mapClient;
     private final StoryRepository storyRepository;
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
+    private final ImageStorage imageStorage;
 
     @Transactional
-    public StoryRegisterResponse registerStory(StoryRegisterRequest request, MultipartFile imageFile, Long memberId) {
+    public StoryRegisterResponse registerStory(StoryRegisterRequest request,
+                                               StoreSearchResult result,
+                                               ImageKey imageKey,
+                                               long memberId) {
         Member member = memberRepository.getById(memberId);
-        List<StoreSearchResult> searchResponses = mapClient.searchShops(request.storeName());
-        FilteredSearchResult matchedStore = filteredSearchResponse(searchResponses, request.storeKakaoId());
-        ImageKey imageKey = imageStorage.upload(new Image(ImageDomain.STORY, imageFile));
-
         Story story = Story.builder()
                 .member(member)
-                .storeKakaoId(matchedStore.kakaoId())
-                .storeName(matchedStore.name())
-                .storeRoadAddress(matchedStore.roadAddress())
-                .storeLotNumberAddress(matchedStore.lotNumberAddress())
-                .storeCategory(matchedStore.category())
+                .storeKakaoId(result.kakaoId())
+                .storeName(result.name())
+                .storeRoadAddress(result.roadAddress())
+                .storeLotNumberAddress(result.lotNumberAddress())
+                .storeCategory(result.category())
                 .description(request.description())
                 .imageKey(imageKey)
                 .build();
-
         storyRepository.save(story);
-
         return new StoryRegisterResponse(story.getId());
-    }
-
-    private FilteredSearchResult filteredSearchResponse(List<StoreSearchResult> responses, String storeKakaoId) {
-        return responses.stream()
-                .filter(store -> store.kakaoId().equals(storeKakaoId))
-                .findFirst()
-                .map(store -> new FilteredSearchResult(
-                        store.kakaoId(),
-                        store.name(),
-                        store.roadAddress(),
-                        store.lotNumberAddress(),
-                        store.getStoreCategory()
-                ))
-                .orElseThrow(() -> new BusinessException(BusinessErrorCode.STORE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
