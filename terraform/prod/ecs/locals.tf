@@ -78,16 +78,16 @@ locals {
         command = svc == "api-prod" ? [
           "java",
           "-Xlog:gc*:time,uptime,level,tags",
-          "-javaagent:/app/dd-java-agent.jar",
+          "-javaagent:/dd-java-agent.jar",
           "-Ddd.logs.injection=true",
           "-Ddd.runtime-metrics.enabled=true",
           "-Ddd.service=eatda-api",
           "-Ddd.env=dev",
           "-Ddd.version=v1",
-          "-Ddd.agent.host=10.0.7.245",
+          "-Ddd.agent.host=127.0.0.1",
           "-Dspring.profiles.active=prod",
           "-jar",
-          "/app/api.jar"
+          "/api.jar"
         ] : null
 
         portMappings = [

@@ -21,8 +21,8 @@ ecs_services = {
 ecs_task_definitions_base = {
   api-dev = {
     cpu          = 256
-    memory       = 256
-    network_mode = "bridge"
+    memory       = 1024
+    network_mode = "host"
     requires_compatibilities = ["EC2"]
 
     port_mappings = [
@@ -48,7 +48,7 @@ ecs_task_definitions_base = {
     cpu               = 256
     memoryReservation = 128
     memory            = 512
-    network_mode      = "bridge"
+    network_mode      = "host"
     requires_compatibilities = ["EC2"]
     container_image   = "mysql:8"
 
@@ -89,8 +89,8 @@ ecs_task_definitions_base = {
 
   "datadog-agent-task" = {
     cpu             = 256
-    memory          = 128
-    network_mode    = "bridge"
+    memory          = 256
+    network_mode    = "host"
     requires_compatibilities = ["EC2"]
     container_image = "public.ecr.aws/datadog/agent:latest"
 
