@@ -20,7 +20,6 @@ import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,17 +68,6 @@ public class CheerService {
                 .map(cheer -> new CheerPreviewResponse(cheer, cheer.getStore(),
                         imageStorage.getPreSignedUrl(cheer.getImageKey())))
                 .toList());
-    }
-
-    @Transactional(readOnly = true)
-    public CheersInStoreResponse getCheersByStoreId(Long storeId, int size) {
-        Store store = storeRepository.getById(storeId);
-        List<Cheer> cheers = cheerRepository.findAllByStoreOrderByCreatedAtDesc(store, Pageable.ofSize(size));
-
-        List<CheerInStoreResponse> cheersResponse = cheers.stream()
-                .map(CheerInStoreResponse::new)
-                .toList(); // TODO N+1 문제 해결
-        return new CheersInStoreResponse(cheersResponse);
     }
 
     @Transactional(readOnly = true)
