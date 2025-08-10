@@ -3,10 +3,7 @@ package eatda.service.store;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
-import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.domain.member.Member;
@@ -16,7 +13,6 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +67,10 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
+            int page = 0;
             int size = 2;
 
-            var response = storeService.getStores(size, null);
+            var response = storeService.getStores(page, size, null);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(size),
@@ -94,15 +91,63 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
+            int page = 0;
             int size = 2;
             StoreCategory category = StoreCategory.KOREAN;
 
-            var response = storeService.getStores(size, category.getCategoryName());
+            var response = storeService.getStores(page, size, category.getCategoryName());
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(size),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
+            );
+        }
+
+        @Test
+        void 음식점_목록을_페이지네이션하여_조회한다() {
+            Member member = memberGenerator.generate("111");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+                    startAt.plusHours(2));
+            cheerGenerator.generateCommon(member, store1, "image-key-1");
+            cheerGenerator.generateCommon(member, store2, "image-key-2");
+            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            int page = 1;
+            int size = 2;
+
+            var response = storeService.getStores(page, size, null);
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(1),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
+            );
+        }
+
+        @Test
+        void 특정_카테고리의_음식점_목록을_페이지네이션하여_조회한다() {
+            Member member = memberGenerator.generate("111");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+                    startAt.plusHours(2));
+            cheerGenerator.generateCommon(member, store1, "image-key-1");
+            cheerGenerator.generateCommon(member, store2, "image-key-2");
+            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            int page = 1;
+            int size = 1;
+            StoreCategory category = StoreCategory.KOREAN;
+
+            var response = storeService.getStores(page, size, category.getCategoryName());
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(1),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
             );
         }
     }
