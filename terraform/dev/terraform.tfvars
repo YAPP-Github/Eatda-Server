@@ -115,7 +115,7 @@ ecs_task_definitions_base = {
       DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
       DD_EC2_USE_IMDSV2                    = "true"
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC       = "true"
-      DD_SERVICE                           = "eatda-api"
+      DD_SERVICE                           = "eatda-api-dev"
       DD_ENV                               = "dev"
       DD_VERSION                           = "v1"
     }
