@@ -17,29 +17,29 @@ ecs_services = {
 
 ecs_task_definitions_base = {
   api-prod = {
-    cpu          = 256
-    memory       = 1024
-    network_mode = "host"
+    cpu            = 1500
+    memory         = 1024
+    network_mode   = "host"
     container_port = [8080]
-    host_port = [0]
-    log_group    = "/ecs/eatda-api"
-    environment = {}
+    host_port      = [0]
+    log_group      = "/ecs/eatda-api"
+    environment    = {}
     volumes = [
       {
-        name          = "prod-api-volume"
-        host_path     = "/home/ec2-user/logs/"
+        name      = "prod-api-volume"
+        host_path = "/home/ec2-user/logs/"
       }
     ]
   }
 
   datadog = {
-    container_image   = "public.ecr.aws/datadog/agent:latest"
-    cpu               = 256
-    memoryReservation = 256
-    memory            = 512
-    network_mode      = "host"
-    container_port = [8125, 8126]
-    host_port = [8125, 8126]
+    container_image          = "public.ecr.aws/datadog/agent:latest"
+    cpu                      = 256
+    memoryReservation        = 256
+    memory                   = 512
+    network_mode             = "host"
+    container_port           = [8125, 8126]
+    host_port                = [8125, 8126]
     requires_compatibilities = ["EC2"]
     environment = {
       DD_SITE                              = "datadoghq.com"
