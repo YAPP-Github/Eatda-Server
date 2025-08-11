@@ -18,16 +18,16 @@ ecs_services = {
 ecs_task_definitions_base = {
   api-prod = {
     cpu          = 256
-    memory       = 256
-    network_mode = "bridge"
+    memory       = 1024
+    network_mode = "host"
     container_port = [8080]
     host_port = [0]
     log_group    = "/ecs/eatda-api"
     environment = {}
     volumes = [
       {
-        name      = "prod-api-volume"
-        host_path = "/home/ec2-user/api"
+        name          = "prod-api-volume"
+        host_path     = "/home/ec2-user/logs/"
       }
     ]
   }
@@ -35,9 +35,9 @@ ecs_task_definitions_base = {
   datadog = {
     container_image   = "public.ecr.aws/datadog/agent:latest"
     cpu               = 256
-    memoryReservation = 128
+    memoryReservation = 256
     memory            = 512
-    network_mode      = "bridge"
+    network_mode      = "host"
     container_port = [8125, 8126]
     host_port = [8125, 8126]
     requires_compatibilities = ["EC2"]

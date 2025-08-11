@@ -50,7 +50,7 @@ locals {
 locals {
   prod_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t3.micro"
+    instance_type        = "t3a.small"
     role                 = "prod"
     iam_instance_profile = "ec2-to-ecs"
     key_name             = "eatda-ec2-prod-key"
