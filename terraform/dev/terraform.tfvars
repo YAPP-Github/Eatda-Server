@@ -28,7 +28,7 @@ ecs_task_definitions_base = {
     port_mappings = [
       {
         container_port = 8080,
-        host_port      = 0,
+        host_port      = 8080,
         protocol       = "tcp"
       }
     ]
