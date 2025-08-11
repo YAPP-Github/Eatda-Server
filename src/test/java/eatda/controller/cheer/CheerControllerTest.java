@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import eatda.controller.BaseControllerTest;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
@@ -63,8 +64,8 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 요청한_응원_중_최신_응원_N개를_조회한다() {
             Member member = memberGenerator.generateRegisteredMember("nickname", "ac@kakao.com", "123", "01011111111");
-            Store store1 = storeGenerator.generate("111", "서울시 노원구 월계3동 123-45");
-            Store store2 = storeGenerator.generate("222", "서울시 성북구 석관동 123-45");
+            Store store1 = storeGenerator.generate("111", "서울시 노원구 월계3동 123-45", District.NOWON);
+            Store store2 = storeGenerator.generate("222", "서울시 성북구 석관동 123-45", District.SEONGBUK);
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
             Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
             Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));

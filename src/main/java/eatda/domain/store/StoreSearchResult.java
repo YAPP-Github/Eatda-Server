@@ -22,6 +22,7 @@ public record StoreSearchResult(
                 .placeUrl(placeUrl)
                 .roadAddress(roadAddress)
                 .lotNumberAddress(lotNumberAddress)
+                .district(district)
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
