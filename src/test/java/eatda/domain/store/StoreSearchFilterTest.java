@@ -15,6 +15,12 @@ class StoreSearchFilterTest {
 
     private final StoreSearchFilter storeSearchFilter = new StoreSearchFilter();
 
+    private MapClientStoreSearchResult createStore(String id, String name, String categoryGroupCode,
+                                                   String location) {
+        return new MapClientStoreSearchResult(id, categoryGroupCode, "음식점 > 식당", "010-1234-1234", name,
+                "https://yapp.co.kr", location, null, 37.0d, 128.0d);
+    }
+
     @Nested
     class FilterSearchedStores {
 
@@ -70,11 +76,5 @@ class StoreSearchFilterTest {
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
         }
-    }
-
-    private MapClientStoreSearchResult createStore(String id, String name, String categoryGroupCode,
-                                                   String location) {
-        return new MapClientStoreSearchResult(id, categoryGroupCode, "음식점 > 식당", "010-1234-1234", name,
-                "https://yapp.co.kr", location, null, 37.0d, 128.0d);
     }
 }

@@ -1,1 +1,2 @@
-ALTER TABLE story MODIFY COLUMN description TEXT NULL;
+ALTER TABLE story
+    MODIFY COLUMN description TEXT NULL;

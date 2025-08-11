@@ -15,6 +15,16 @@ import org.junit.jupiter.api.Test;
 
 class StoreSearchServiceTest extends BaseServiceTest {
 
+    void mockingMapClient() {
+        List<MapClientStoreSearchResult> searchResults = List.of(
+                new MapClientStoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점",
+                        "https://yapp.co.kr", "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
+                new MapClientStoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점",
+                        "http://yapp.kr", "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
+        );
+        doReturn(searchResults).when(mapClient).searchStores(anyString());
+    }
+
     @Nested
     class SearchStoreByKakaoId {
 
@@ -53,15 +63,5 @@ class StoreSearchServiceTest extends BaseServiceTest {
                     () -> assertThat(response.get(1).lotNumberAddress()).isEqualTo("서울 중구 북창동 19-4")
             );
         }
-    }
-
-    void mockingMapClient() {
-        List<MapClientStoreSearchResult> searchResults = List.of(
-                new MapClientStoreSearchResult("123", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 본점",
-                        "https://yapp.co.kr", "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
-                new MapClientStoreSearchResult("456", "FD6", "음식점 > 한식 > 국밥", "010-1234-1234", "농민백암순대 시청점",
-                        "http://yapp.kr", "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
-        );
-        doReturn(searchResults).when(mapClient).searchStores(anyString());
     }
 }

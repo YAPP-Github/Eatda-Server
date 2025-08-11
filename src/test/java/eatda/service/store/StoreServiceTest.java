@@ -3,10 +3,7 @@ package eatda.service.store;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
-import eatda.client.map.MapClientStoreSearchResult;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.domain.member.Member;
@@ -16,7 +13,6 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
