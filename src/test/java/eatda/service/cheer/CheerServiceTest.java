@@ -11,6 +11,7 @@ import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
@@ -43,7 +44,7 @@ class CheerServiceTest extends BaseServiceTest {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey("image-key");
 
             BusinessException exception = assertThrows(BusinessException.class,
@@ -61,7 +62,7 @@ class CheerServiceTest extends BaseServiceTest {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey("image-key");
 
             BusinessException exception = assertThrows(BusinessException.class,
@@ -77,7 +78,7 @@ class CheerServiceTest extends BaseServiceTest {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey("image-key");
 
             CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
@@ -98,7 +99,7 @@ class CheerServiceTest extends BaseServiceTest {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey("image-key");
 
             CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
@@ -119,7 +120,7 @@ class CheerServiceTest extends BaseServiceTest {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey(null);
 
             CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());

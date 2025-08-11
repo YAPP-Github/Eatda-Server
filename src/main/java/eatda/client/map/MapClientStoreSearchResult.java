@@ -75,6 +75,7 @@ public record MapClientStoreSearchResult(
                 placeUrl,
                 lotNumberAddress,
                 roadAddress,
+                getDistrict(),
                 latitude,
                 longitude
         );
