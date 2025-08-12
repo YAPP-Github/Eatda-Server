@@ -29,6 +29,10 @@ public enum BusinessErrorCode {
     FULL_CHEER_SIZE_PER_MEMBER("CHE003", "회원당 응원 한도가 넘었습니다."),
     ALREADY_CHEERED("CHE004", "이미 응원한 가게입니다."),
 
+    // CheerTag
+    CHEER_TAGS_DUPLICATED("CHE_TAG001", "응원 태그는 중복될 수 없습니다."),
+    EXCEED_CHEER_TAGS_PER_TYPE("CHE_TAG002", "각 응원 태그 타입당 최대 태그 개수를 초과했습니다."),
+
     // Map
     MAP_SERVER_ERROR("MAP001", "지도 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
@@ -53,7 +57,8 @@ public enum BusinessErrorCode {
     INVALID_STORE_ID("STY006", "유효하지 않은 가게 ID입니다."),
     INVALID_STORE_KAKAO_ID("STY007", "스토어 Kakao ID는 필수입니다."),
     INVALID_STORE_NAME("STY008", "스토어 이름은 필수입니다."),
-    INVALID_STORE_ADDRESS("STY009", "스토어 주소는 필수입니다.");
+    INVALID_STORE_ADDRESS("STY009", "스토어 주소는 필수입니다."),
+    ;
 
     private final String code;
     private final String message;
