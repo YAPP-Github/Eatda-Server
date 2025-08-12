@@ -13,12 +13,10 @@ import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
-import eatda.fixture.ArticleGenerator;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
-import eatda.repository.article.ArticleRepository;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
@@ -52,7 +50,6 @@ public class BaseControllerTest {
     private static final ImageKey MOCKED_IMAGE_KEY = new ImageKey("mocked-image-path");
     private static final String MOCKED_IMAGE_URL = "https://example.com/image.jpg";
 
-
     @Autowired
     protected MemberGenerator memberGenerator;
 
@@ -61,9 +58,6 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
-
-    @Autowired
-    protected ArticleGenerator articleGenerator;
 
     @Autowired
     protected StoryGenerator storyGenerator;
@@ -76,9 +70,6 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
-
-    @Autowired
-    protected ArticleRepository articleRepository;
 
     @Autowired
     protected StoryRepository storyRepository;
