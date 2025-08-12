@@ -41,8 +41,11 @@ public enum District {
     }
 
     public static District fromName(String name) {
+        if (name == null || name.isEmpty()) {
+            return ETC;
+        }
         return Arrays.stream(District.values())
-                .filter(district -> district.name.equals(name))
+                .filter(district -> district.name.equals(name.trim()))
                 .findFirst()
                 .orElse(ETC);
     }
