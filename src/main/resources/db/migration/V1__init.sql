@@ -20,6 +20,7 @@ CREATE TABLE `store`
     `place_url`          VARCHAR(255) NOT NULL,
     `road_address`       VARCHAR(255) NOT NULL,
     `lot_number_address` VARCHAR(255) NOT NULL,
+    `district`           VARCHAR(31)  NOT NULL,
     `latitude`           DOUBLE       NOT NULL,
     `longitude`          DOUBLE       NOT NULL,
     `created_at`         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,

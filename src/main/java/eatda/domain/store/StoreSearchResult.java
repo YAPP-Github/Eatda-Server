@@ -8,6 +8,7 @@ public record StoreSearchResult(
         String placeUrl,
         String lotNumberAddress,
         String roadAddress,
+        District district,
         double latitude,
         double longitude
 ) {
@@ -21,6 +22,7 @@ public record StoreSearchResult(
                 .placeUrl(placeUrl)
                 .roadAddress(roadAddress)
                 .lotNumberAddress(lotNumberAddress)
+                .district(district)
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
