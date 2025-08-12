@@ -2,7 +2,7 @@ package eatda.client.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import eatda.domain.store.Store;
+import eatda.domain.store.District;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import java.util.Map;
@@ -29,6 +29,7 @@ public record MapClientStoreSearchResult(
             "음식점 > 카페", StoreCategory.CAFE,
             "음식점 > 간식 > 제과,베이커리", StoreCategory.CAFE
     );
+    private static final District DEFAULT_DISTRICT = District.ETC;
 
     public boolean isFoodStore() {
         return "FD6".equals(categoryGroupCode);
@@ -54,18 +55,15 @@ public record MapClientStoreSearchResult(
                 .orElse(StoreCategory.OTHER);
     }
 
-    public Store toStore() {
-        return Store.builder()
-                .kakaoId(kakaoId)
-                .category(getStoreCategory())
-                .phoneNumber(phoneNumber)
-                .name(name)
-                .placeUrl(placeUrl)
-                .roadAddress(roadAddress)
-                .lotNumberAddress(lotNumberAddress)
-                .latitude(latitude)
-                .longitude(longitude)
-                .build();
+    public District getDistrict() {
+        if (lotNumberAddress == null || lotNumberAddress.isBlank()) {
+            return DEFAULT_DISTRICT;
+        }
+        String[] addressParts = lotNumberAddress.split(" ");
+        if (addressParts.length < 2) {
+            return DEFAULT_DISTRICT;
+        }
+        return District.fromName(addressParts[1]);
     }
 
     public StoreSearchResult toDomain() {
@@ -77,6 +75,7 @@ public record MapClientStoreSearchResult(
                 placeUrl,
                 lotNumberAddress,
                 roadAddress,
+                getDistrict(),
                 latitude,
                 longitude
         );

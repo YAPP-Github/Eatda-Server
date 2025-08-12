@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import eatda.controller.BaseControllerTest;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
@@ -21,7 +22,7 @@ class CheerControllerTest extends BaseControllerTest {
 
         @Test
         void 응원을_등록한다() {
-            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
             CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
 
             CheerResponse response = given()
@@ -40,7 +41,7 @@ class CheerControllerTest extends BaseControllerTest {
 
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
-            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
             CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
 
             CheerResponse response = given()
@@ -63,16 +64,19 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 요청한_응원_중_최신_응원_N개를_조회한다() {
             Member member = memberGenerator.generateRegisteredMember("nickname", "ac@kakao.com", "123", "01011111111");
-            Store store1 = storeGenerator.generate("111", "서울시 노원구 월계3동 123-45");
-            Store store2 = storeGenerator.generate("222", "서울시 성북구 석관동 123-45");
+            Store store1 = storeGenerator.generate("111", "서울시 노원구 월계3동 123-45", District.NOWON);
+            Store store2 = storeGenerator.generate("222", "서울시 성북구 석관동 123-45", District.SEONGBUK);
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
             Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
             Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
             Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
+            int page = 0;
+            int size = 2;
 
             CheersResponse response = given()
                     .when()
-                    .queryParam("size", 2)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
                     .get("/api/cheer")
                     .then()
                     .statusCode(200)
@@ -95,14 +99,17 @@ class CheerControllerTest extends BaseControllerTest {
             void 가게_아이디로_응원을_조회한다() throws InterruptedException {
                 Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
                 Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
-                Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+                Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45", District.GANGNAM);
                 Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
                 Thread.sleep(5);
                 Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
+                int page = 0;
+                int size = 2;
 
                 CheersInStoreResponse response = given()
                         .when()
-                        .queryParam("size", 2)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
                         .get("/api/shops/{storeId}/cheers", store.getId())
                         .then()
                         .statusCode(200)

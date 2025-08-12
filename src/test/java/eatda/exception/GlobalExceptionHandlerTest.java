@@ -47,6 +47,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @ActiveProfiles("local")
 class GlobalExceptionHandlerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @TestConfiguration
     static class TestCorsConfig {
         @Bean
@@ -123,9 +126,6 @@ class GlobalExceptionHandlerTest {
             this.field = field;
         }
     }
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Nested
     class handleExceptions {

@@ -47,6 +47,10 @@ public class Store extends AuditingEntity {
     @Column(name = "lot_number_address", nullable = false)
     private String lotNumberAddress;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "district", nullable = false, length = 31)
+    private District district;
+
     @Embedded
     private Coordinates coordinates;
 
@@ -58,6 +62,7 @@ public class Store extends AuditingEntity {
                   String placeUrl,
                   String roadAddress,
                   String lotNumberAddress,
+                  District district,
                   Double latitude,
                   Double longitude) {
         this.kakaoId = kakaoId;
@@ -66,16 +71,13 @@ public class Store extends AuditingEntity {
         this.name = name;
         this.placeUrl = placeUrl;
         this.roadAddress = roadAddress;
+        this.district = district;
         this.lotNumberAddress = lotNumberAddress;
         this.coordinates = new Coordinates(latitude, longitude);
     }
 
     public String getAddressDistrict() {
-        String[] addressParts = lotNumberAddress.split(" ");
-        if (addressParts.length < 2) {
-            return "";
-        }
-        return addressParts[1];
+        return district.getName();
     }
 
     public String getAddressNeighborhood() {

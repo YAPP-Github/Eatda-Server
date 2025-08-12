@@ -4,9 +4,8 @@ resource "aws_iam_group" "admin" {
 
 resource "aws_iam_user" "user" {
   for_each = toset(var.user_names)
-
-  name = each.value
-  tags = var.tags
+  name     = each.value
+  tags     = var.tags
 }
 
 resource "aws_iam_group_membership" "membership" {
@@ -16,8 +15,7 @@ resource "aws_iam_group_membership" "membership" {
 }
 
 resource "aws_iam_group_policy_attachment" "admin_policy" {
-  for_each = toset(var.policy_arns)
-
+  for_each   = toset(var.policy_arns)
   group      = aws_iam_group.admin.name
   policy_arn = each.value
 }
@@ -36,14 +34,26 @@ resource "aws_iam_group_policy_attachment" "deny_no_mfa_attach" {
 
 data "aws_iam_policy_document" "deny_without_mfa" {
   statement {
+    sid    = "DenyAllExceptMfaAndPwdWhenNoMFA"
     effect = "Deny"
-    actions = ["*"]
+
+    not_actions = [
+      "iam:GetUser",
+      "iam:ListMFADevices",
+      "iam:ListVirtualMFADevices",
+      "iam:CreateVirtualMFADevice",
+      "iam:EnableMFADevice",
+      "iam:ResyncMFADevice",
+      "iam:DeactivateMFADevice",
+      "iam:ChangePassword",
+      "sts:GetSessionToken"
+    ]
     resources = ["*"]
 
     condition {
       test     = "BoolIfExists"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["false"]
+      values   = ["false"]
     }
   }
 }

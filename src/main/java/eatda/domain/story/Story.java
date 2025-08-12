@@ -54,7 +54,7 @@ public class Story extends AuditingEntity {
     @Column(name = "store_category", nullable = false)
     private StoreCategory storeCategory;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
     @NotNull
