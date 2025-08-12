@@ -29,9 +29,11 @@ public class StoreController {
     }
 
     @GetMapping("/api/shops")
-    public ResponseEntity<StoresResponse> getStores(@RequestParam @Min(1) @Max(50) int size,
+    public ResponseEntity<StoresResponse> getStores(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
                                                     @RequestParam(required = false) String category) {
-        return ResponseEntity.ok(storeService.getStores(size, category));
+        StoresResponse response = storeService.getStores(page, size, category);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/shops/{storeId}")

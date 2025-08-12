@@ -3,19 +3,14 @@ package eatda.domain;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.util.Set;
-import lombok.Getter;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
-public class Image {
+public record Image(ImageDomain domain, MultipartFile file) {
 
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpg", "image/jpeg", "image/png");
     private static final String EXTENSION_DELIMITER = ".";
     private static final String DEFAULT_CONTENT_TYPE = "bin";
-
-    private final ImageDomain domain;
-    private final MultipartFile file;
 
     public Image(ImageDomain domain, @Nullable MultipartFile file) {
         validateContentType(file);

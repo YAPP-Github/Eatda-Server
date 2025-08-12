@@ -15,7 +15,7 @@ import eatda.storage.image.ImageStorage;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -33,19 +33,19 @@ public class StoreService {
     }
 
     // TODO : N+1 문제 해결
-    public StoresResponse getStores(int size, @Nullable String category) {
-        return findStores(size, category)
+    public StoresResponse getStores(int page, int size, @Nullable String category) {
+        return findStores(page, size, category)
                 .stream()
                 .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))
                 .collect(collectingAndThen(toList(), StoresResponse::new));
     }
 
-    private List<Store> findStores(int size, @Nullable String category) {
+    private List<Store> findStores(int page, int size, @Nullable String category) {
         if (category == null || category.isBlank()) {
-            return storeRepository.findAllByOrderByCreatedAtDesc(Pageable.ofSize(size));
+            return storeRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
         }
         return storeRepository.findAllByCategoryOrderByCreatedAtDesc(
-                StoreCategory.from(category), Pageable.ofSize(size));
+                StoreCategory.from(category), PageRequest.of(page, size));
     }
 
     public ImagesResponse getStoreImages(long storeId) {

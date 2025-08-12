@@ -19,6 +19,16 @@ public class Coordinates {
     private static final double MAX_LATITUDE = 37.715133;
     private static final double MIN_LONGITUDE = 126.734086;
     private static final double MAX_LONGITUDE = 127.269311;
+    @Column(nullable = false)
+    private Double latitude;
+    @Column(nullable = false)
+    private Double longitude;
+
+    public Coordinates(Double latitude, Double longitude) {
+        validate(latitude, longitude);
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public static double getMinLatitude() {
         return MIN_LATITUDE;
@@ -34,18 +44,6 @@ public class Coordinates {
 
     public static double getMaxLongitude() {
         return MAX_LONGITUDE;
-    }
-
-    @Column(nullable = false)
-    private Double latitude;
-
-    @Column(nullable = false)
-    private Double longitude;
-
-    public Coordinates(Double latitude, Double longitude) {
-        validate(latitude, longitude);
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     private void validate(Double latitude, Double longitude) {

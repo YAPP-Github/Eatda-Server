@@ -42,7 +42,7 @@ locals {
 
   dev_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t2.micro"
+    instance_type        = "t3a.small"
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
@@ -65,23 +65,30 @@ locals {
   container_definitions_map = {
     for svc, def in local.task_definitions_with_roles : svc => [
       {
-        name      = svc
-        image     = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
-        cpu       = def.cpu
-        memory    = def.memory
-        essential = true
+        name        = svc
+        image       = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
+        cpu         = def.cpu
+        memory      = def.memory
+        essential   = true
         stopTimeout = lookup(def, "stop_timeout", 30)
-        command   = svc == "api-dev" ? [
+        command = svc == "api-dev" ? [
           "java",
           "-Xlog:gc*:stdout:time,uptime,level,tags",
           "-Xlog:gc*:file=/logs/gc.log:time,uptime,level,tags",
+          "-XX:+UseG1GC",
+          "-XX:InitialRAMPercentage=30",
+          "-XX:MaxRAMPercentage=70",
+          "-XX:ParallelGCThreads=2",
+          "-XX:ConcGCThreads=1",
+          "-XX:MaxDirectMemorySize=128m",
+          "-Xlog:ergo=trace",
           "-javaagent:/dd-java-agent.jar",
           "-Ddd.logs.injection=true",
           "-Ddd.runtime-metrics.enabled=true",
-          "-Ddd.service=eatda-api",
+          "-Ddd.service=eatda-api-dev",
           "-Ddd.env=dev",
           "-Ddd.version=v1",
-          "-Ddd.agent.host=10.0.7.245",
+          "-Ddd.agent.host=127.0.0.1",
           "-Dspring.profiles.active=dev",
           "-jar",
           "/api.jar"
@@ -95,17 +102,17 @@ locals {
           }
         ]
         environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
-        secrets     = svc == "datadog-agent-task" ? [
+        secrets = svc == "datadog-agent-task" ? [
           { name = "DD_API_KEY", valueFrom = "/dev/DD_API_KEY" }
-        ] : (svc == "mysql-dev" ? [
-          { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
-          { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
-          { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
-        ] : [
-          for s in lookup(def, "secrets", []) : {
-            name      = s.name
-            valueFrom = s.valueFrom
-          }
+          ] : (svc == "mysql-dev" ? [
+            { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
+            { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
+            { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
+            ] : [
+            for s in lookup(def, "secrets", []) : {
+              name      = s.name
+              valueFrom = s.valueFrom
+            }
         ])
         mountPoints = [
           for vol in lookup(def, "volumes", []) : {

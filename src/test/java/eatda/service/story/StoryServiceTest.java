@@ -29,6 +29,15 @@ class StoryServiceTest extends BaseServiceTest {
     @Autowired
     private StoryService storyService;
 
+    @Test
+    void 존재하지_않는_카카오ID로_조회하면_빈_목록을_반환한다() {
+        String nonExistentKakaoId = "non-existent";
+
+        var response = storyService.getPagedStoryDetails(nonExistentKakaoId, 5);
+
+        assertThat(response.stories()).isEmpty();
+    }
+
     @Nested
     class RegisterStory {
 
@@ -257,14 +266,5 @@ class StoryServiceTest extends BaseServiceTest {
                     .extracting(StoriesDetailResponse.StoryDetailResponse::storyId)
                     .containsExactlyInAnyOrder(story1.getId());
         }
-    }
-
-    @Test
-    void 존재하지_않는_카카오ID로_조회하면_빈_목록을_반환한다() {
-        String nonExistentKakaoId = "non-existent";
-
-        var response = storyService.getPagedStoryDetails(nonExistentKakaoId, 5);
-
-        assertThat(response.stories()).isEmpty();
     }
 }

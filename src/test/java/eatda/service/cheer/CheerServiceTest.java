@@ -145,8 +145,10 @@ class CheerServiceTest extends BaseServiceTest {
             Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
             Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
             Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
+            int page = 0;
+            int size = 2;
 
-            CheersResponse response = cheerService.getCheers(2);
+            CheersResponse response = cheerService.getCheers(page, size);
 
             assertAll(
                     () -> assertThat(response.cheers()).hasSize(2),
@@ -155,29 +157,73 @@ class CheerServiceTest extends BaseServiceTest {
             );
         }
 
-        @Nested
-        class GetCheersByStoreId {
+        @Test
+        void 요청한_응원을_페이지네이션하여_응원을_최신순으로_반환한다() {
+            Member member = memberGenerator.generate("123");
+            Store store1 = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+            Store store2 = storeGenerator.generate("456", "서울시 성북구 석관동 123-45");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
+            Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
+            Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
+            int page = 1;
+            int size = 2;
 
-            @Test
-            void 요청한_가게의_응원을_최신순으로_반환한다() throws InterruptedException {
-                Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
-                Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
-                Member member3 = memberGenerator.generateRegisteredMember("125", "c@gmail.com", "1236", "01012341236");
-                Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
-                Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
-                Thread.sleep(5);
-                Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
-                Thread.sleep(5);
-                Cheer cheer3 = cheerGenerator.generateCommon(member3, store);
+            CheersResponse response = cheerService.getCheers(page, size);
 
-                CheersInStoreResponse response = cheerService.getCheersByStoreId(store.getId(), 2);
+            assertAll(
+                    () -> assertThat(response.cheers()).hasSize(1),
+                    () -> assertThat(response.cheers().get(0).cheerId()).isEqualTo(cheer1.getId())
+            );
+        }
+    }
 
-                assertAll(
-                        () -> assertThat(response.cheers()).hasSize(2),
-                        () -> assertThat(response.cheers().get(0).id()).isEqualTo(cheer3.getId()),
-                        () -> assertThat(response.cheers().get(1).id()).isEqualTo(cheer2.getId())
-                );
-            }
+    @Nested
+    class GetCheersByStoreId {
+
+        @Test
+        void 요청한_가게의_응원을_최신순으로_반환한다() throws InterruptedException {
+            Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
+            Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
+            Member member3 = memberGenerator.generateRegisteredMember("125", "c@gmail.com", "1236", "01012341236");
+            Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+            Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
+            Thread.sleep(5);
+            Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
+            Thread.sleep(5);
+            Cheer cheer3 = cheerGenerator.generateCommon(member3, store);
+            int page = 0;
+            int size = 2;
+
+            CheersInStoreResponse response = cheerService.getCheersByStoreId(store.getId(), page, size);
+
+            assertAll(
+                    () -> assertThat(response.cheers()).hasSize(2),
+                    () -> assertThat(response.cheers().get(0).id()).isEqualTo(cheer3.getId()),
+                    () -> assertThat(response.cheers().get(1).id()).isEqualTo(cheer2.getId())
+            );
+        }
+
+        @Test
+        void 요청한_가게의_응원을_페이지네이션하여_최신순으로_반환한다() throws InterruptedException {
+            Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
+            Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
+            Member member3 = memberGenerator.generateRegisteredMember("125", "c@gmail.com", "1236", "01012341236");
+            Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+            Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
+            Thread.sleep(5);
+            Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
+            Thread.sleep(5);
+            Cheer cheer3 = cheerGenerator.generateCommon(member3, store);
+            int page = 1;
+            int size = 2;
+
+            CheersInStoreResponse response = cheerService.getCheersByStoreId(store.getId(), page, size);
+
+            assertAll(
+                    () -> assertThat(response.cheers()).hasSize(1),
+                    () -> assertThat(response.cheers().get(0).id()).isEqualTo(cheer1.getId())
+            );
         }
     }
 }
