@@ -20,7 +20,7 @@ public enum CheerTagName {
     PET_FRIENDLY(CheerTagCategory.PRACTICAL),
     LATE_NIGHT(CheerTagCategory.PRACTICAL),
     NEAR_SUBWAY(CheerTagCategory.PRACTICAL),
-    MANY_NEARBY_ATTRACTIONS(CheerTagCategory.PRACTICAL);
+    MANY_NEARBY_ATTRACTIONS(CheerTagCategory.PRACTICAL),
     ;
 
     private final CheerTagCategory type;
