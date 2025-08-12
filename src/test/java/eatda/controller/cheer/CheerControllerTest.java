@@ -22,7 +22,7 @@ class CheerControllerTest extends BaseControllerTest {
 
         @Test
         void 응원을_등록한다() {
-            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
             CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
 
             CheerResponse response = given()
@@ -41,7 +41,7 @@ class CheerControllerTest extends BaseControllerTest {
 
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
-            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
             CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
 
             CheerResponse response = given()
@@ -99,7 +99,7 @@ class CheerControllerTest extends BaseControllerTest {
             void 가게_아이디로_응원을_조회한다() throws InterruptedException {
                 Member member1 = memberGenerator.generateRegisteredMember("123", "a@gmail.com", "1234", "01012341234");
                 Member member2 = memberGenerator.generateRegisteredMember("124", "b@gmail.com", "1235", "01012341235");
-                Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
+                Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45", District.GANGNAM);
                 Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
                 Thread.sleep(5);
                 Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
