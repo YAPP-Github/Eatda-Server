@@ -70,10 +70,13 @@ class CheerControllerTest extends BaseControllerTest {
             Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
             Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
             Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
+            int page = 0;
+            int size = 2;
 
             CheersResponse response = given()
                     .when()
-                    .queryParam("size", 2)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
                     .get("/api/cheer")
                     .then()
                     .statusCode(200)
@@ -100,10 +103,13 @@ class CheerControllerTest extends BaseControllerTest {
                 Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
                 Thread.sleep(5);
                 Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
+                int page = 0;
+                int size = 2;
 
                 CheersInStoreResponse response = given()
                         .when()
-                        .queryParam("size", 2)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
                         .get("/api/shops/{storeId}/cheers", store.getId())
                         .then()
                         .statusCode(200)

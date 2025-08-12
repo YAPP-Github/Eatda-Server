@@ -1,6 +1,5 @@
 package eatda.document.store;
 
-
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -101,7 +100,8 @@ public class StoreDocumentTest extends BaseDocumentTest {
                 .tag(Tag.STORE_API)
                 .summary("음식점 목록 조회")
                 .queryParameter(
-                        parameterWithName("size").description("조회할 음식점 개수 (최소 1, 최대 50)"),
+                        parameterWithName("page").description("조회할 음식점 페이지 (기본 값 0,시작 값 0)").optional(),
+                        parameterWithName("size").description("조회할 음식점 개수 (기본 값 5, 최소 1, 최대 50)").optional(),
                         parameterWithName("category")
                                 .description("음식점 카테고리(기본값: 전체) (한식,중식,일식,양식,카페/디저트,기타)").optional()
                 );
@@ -119,13 +119,14 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
         @Test
         void 음식점_목록_최신순으로_조회() {
+            int page = 0;
             int size = 2;
             StoreCategory category = StoreCategory.CAFE;
             StoresResponse response = new StoresResponse(List.of(
                     new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
                     new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
             ));
-            doReturn(response).when(storeService).getStores(size, category.getCategoryName());
+            doReturn(response).when(storeService).getStores(page, size, category.getCategoryName());
 
             var document = document("store/get", 200)
                     .request(requestDocument)
@@ -134,6 +135,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .queryParam("category", category.getCategoryName())
                     .when().get("/api/shops")
@@ -143,9 +145,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_목록_조회_실패(BusinessErrorCode errorCode) {
+            int page = 0;
             int size = 2;
             StoreCategory category = StoreCategory.CAFE;
-            doThrow(new BusinessException(errorCode)).when(storeService).getStores(size, category.getCategoryName());
+            doThrow(new BusinessException(errorCode))
+                    .when(storeService).getStores(page, size, category.getCategoryName());
 
             var document = document("store/get", errorCode)
                     .request(requestDocument)
@@ -154,6 +158,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .queryParam("category", category.getCategoryName())
                     .when().get("/api/shops")
