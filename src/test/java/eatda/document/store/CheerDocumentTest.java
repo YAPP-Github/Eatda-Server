@@ -23,6 +23,7 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.util.ImageUtils;
@@ -67,7 +68,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 ).requestBodyField("request",
                         fieldWithPath("storeKakaoId").type(STRING).description("가게 카카오 ID"),
                         fieldWithPath("storeName").type(STRING).description("가게 이름"),
-                        fieldWithPath("description").type(STRING).description("응원 내용")
+                        fieldWithPath("description").type(STRING).description("응원 내용"),
+                        fieldWithPath("tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -75,13 +77,16 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("storeId").type(NUMBER).description("가게 ID"),
                         fieldWithPath("cheerId").type(NUMBER).description("응원 ID"),
                         fieldWithPath("imageUrl").type(STRING).description("이미지 URL").optional(),
-                        fieldWithPath("cheerDescription").type(STRING).description("응원 내용")
+                        fieldWithPath("cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         @Test
         void 응원_등록_성공() {
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
-            CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             doReturn(response).when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 
             var document = document("cheer/register", 201)
@@ -110,7 +115,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 "INVALID_CHEER_DESCRIPTION"})
         @ParameterizedTest
         void 응원_등록_실패(BusinessErrorCode errorCode) {
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             doThrow(new BusinessException(errorCode))
                     .when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 

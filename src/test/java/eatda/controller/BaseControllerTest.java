@@ -20,6 +20,7 @@ import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
 import eatda.repository.article.ArticleRepository;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
@@ -76,6 +77,9 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
+
+    @Autowired
+    protected CheerTagRepository cheerTagRepository;
 
     @Autowired
     protected ArticleRepository articleRepository;

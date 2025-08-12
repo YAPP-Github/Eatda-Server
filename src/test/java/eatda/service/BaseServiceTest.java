@@ -12,6 +12,7 @@ import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
@@ -70,6 +71,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
+
+    @Autowired
+    protected CheerTagRepository cheerTagRepository;
 
     @Autowired
     protected StoryRepository storyRepository;

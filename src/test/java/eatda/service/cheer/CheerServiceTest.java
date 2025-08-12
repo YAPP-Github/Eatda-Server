@@ -10,6 +10,7 @@ import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
@@ -18,6 +19,7 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,8 @@ class CheerServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
 
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
@@ -58,7 +61,8 @@ class CheerServiceTest extends BaseServiceTest {
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
             cheerGenerator.generateCommon(member, store);
 
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
@@ -74,7 +78,8 @@ class CheerServiceTest extends BaseServiceTest {
         void 해당_응원의_가게가_저장되어_있지_않다면_가게와_응원을_저장한다() {
             Member member = memberGenerator.generate("123");
 
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
@@ -95,7 +100,8 @@ class CheerServiceTest extends BaseServiceTest {
             Member member = memberGenerator.generate("123");
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
 
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
@@ -116,7 +122,8 @@ class CheerServiceTest extends BaseServiceTest {
         void 해당_응원의_이미지가_비어있어도_응원을_저장할_수_있다() {
             Member member = memberGenerator.generate("123");
 
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
