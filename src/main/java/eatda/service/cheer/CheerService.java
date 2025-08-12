@@ -8,12 +8,15 @@ import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTag;
+import eatda.domain.cheer.CheerTagNames;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
@@ -32,6 +35,7 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
+    private final CheerTagRepository cheerTagRepository;
     private final ImageStorage imageStorage;
 
     @Transactional
@@ -39,13 +43,15 @@ public class CheerService {
                                        StoreSearchResult result,
                                        ImageKey imageKey,
                                        long memberId) {
+        CheerTagNames cheerTagNames = new CheerTagNames(request.tags());
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
-        return new CheerResponse(cheer, imageStorage.getPreSignedUrl(imageKey), store);
+        List<CheerTag> cheerTags = cheerTagRepository.saveAll(cheerTagNames.toCheerTags(cheer));
+        return new CheerResponse(cheer, cheerTags, store, imageStorage.getPreSignedUrl(imageKey));
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {

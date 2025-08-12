@@ -91,7 +91,9 @@ class CheerServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(response.imageUrl()).isNotNull()
+                    () -> assertThat(response.imageUrl()).isNotNull(),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
 
@@ -114,7 +116,9 @@ class CheerServiceTest extends BaseServiceTest {
                     () -> assertThat(foundStore.getId()).isEqualTo(store.getId()),
                     () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(response.imageUrl()).isNotNull()
+                    () -> assertThat(response.imageUrl()).isNotNull(),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
 
@@ -135,7 +139,9 @@ class CheerServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(response.imageUrl()).isNull()
+                    () -> assertThat(response.imageUrl()).isNull(),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
     }
