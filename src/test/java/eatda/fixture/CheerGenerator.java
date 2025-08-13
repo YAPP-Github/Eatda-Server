@@ -1,10 +1,10 @@
 package eatda.fixture;
 
 import eatda.domain.ImageKey;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
-import eatda.domain.store.Cheer;
 import eatda.domain.store.Store;
-import eatda.repository.store.CheerRepository;
+import eatda.repository.cheer.CheerRepository;
 import eatda.util.DomainUtils;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;

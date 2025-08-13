@@ -17,9 +17,9 @@ locals {
       container_image      = "${var.ecr_repo_urls["prod"]}:placeholder"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
-      environment = {}
-      secrets = []
-    }) : name == "datadog" ? merge(def, {
+      environment          = {}
+      secrets              = []
+      }) : name == "datadog" ? merge(def, {
       task_definition_name = "datadog-agent"
       container_image      = "public.ecr.aws/datadog/agent:latest"
       task_role_arn        = def.task_role_arn
@@ -30,8 +30,11 @@ locals {
         DD_APM_ENABLED                       = "true"
         DD_LOGS_ENABLED                      = "true"
         DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
-        DD_APM_RECEIVER_PORT                 = "8126"
-        DD_APM_NON_LOCAL_TRAFFIC             = "true"
+        DD_EC2_USE_IMDSV2                    = "true"
+        DD_DOGSTATSD_NON_LOCAL_TRAFFIC       = "true"
+        DD_SERVICE                           = "eatda-api"
+        DD_ENV                               = "prod"
+        DD_VERSION                           = "v1"
       }
       secrets = [
         {
@@ -39,12 +42,12 @@ locals {
           valueFrom = "/prod/DD_API_KEY"
         }
       ]
-    }) : merge(def, {
+      }) : merge(def, {
       task_definition_name = "dummy"
       container_image      = "dummy"
       task_role_arn        = def.task_role_arn
       execution_role_arn   = def.execution_role_arn
-      environment = {}
+      environment          = {}
       secrets = [
         {
           name      = "DUMMY_${name}"
@@ -56,8 +59,8 @@ locals {
 
   resolved_ecs_services = {
     for name, def in var.ecs_services : name => {
-      name         = name
-      iam_role_arn = var.ecs_task_definitions[name].task_role_arn
+      name          = name
+      iam_role_arn  = var.ecs_task_definitions[name].task_role_arn
       load_balancer = try(def.load_balancer, null)
     }
   }
@@ -65,15 +68,30 @@ locals {
   container_definitions_map = {
     for svc, def in local.resolved_task_definitions : svc => [
       {
-        name      = def.task_definition_name
-        image     = def.container_image
-        cpu       = def.cpu
-        memory    = def.memory
-        essential = true
+        name        = def.task_definition_name
+        image       = def.container_image
+        cpu         = def.cpu
+        memory      = def.memory
+        essential   = true
         stopTimeout = lookup(def, "stop_timeout", var.default_stop_timeout)
 
         command = svc == "api-prod" ? [
           "java",
+          "-Xlog:gc*:time,uptime,level,tags",
+          "-XX:+UseG1GC",
+          "-XX:InitialRAMPercentage=30",
+          "-XX:MaxRAMPercentage=70",
+          "-XX:ParallelGCThreads=2",
+          "-XX:ConcGCThreads=1",
+          "-XX:MaxDirectMemorySize=128m",
+          "-Xlog:ergo=trace",
+          "-javaagent:/dd-java-agent.jar",
+          "-Ddd.logs.injection=true",
+          "-Ddd.runtime-metrics.enabled=true",
+          "-Ddd.service=eatda-api-prod",
+          "-Ddd.env=prod",
+          "-Ddd.version=v1",
+          "-Ddd.agent.host=127.0.0.1",
           "-Dspring.profiles.active=prod",
           "-jar",
           "/api.jar"
@@ -84,7 +102,7 @@ locals {
             name          = "${svc}-${port}-tcp"
             containerPort = port
             hostPort      = def.host_port[idx]
-            protocol = lookup(def, "protocol", var.default_protocol)
+            protocol      = lookup(def, "protocol", var.default_protocol)
           }
         ]
 
@@ -103,7 +121,7 @@ locals {
         ]
 
         mountPoints = [
-          for vol in (def.volumes != null ? def.volumes : []) : {
+          for vol in(def.volumes != null ? def.volumes : []) : {
             sourceVolume  = vol.name
             containerPath = vol.host_path
             readOnly      = false

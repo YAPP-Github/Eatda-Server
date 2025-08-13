@@ -13,22 +13,21 @@ variable "ecs_task_definitions_base" {
     cpu          = number
     memory       = number
     network_mode = string
-    container_port = list(number)
-    host_port = list(number)
     environment = map(string)
     requires_compatibilities = optional(list(string))
     container_image = optional(string)
     execution_role_arn = optional(string)
     task_role_arn = optional(string)
+    port_mappings = optional(list(object({
+      container_port = number
+      host_port      = number
+      protocol       = string
+    })), [])
     volumes = list(object({
-      name      = string
-      host_path = string
+      name          = string
+      host_path     = string
+      containerPath = string
+      readOnly      = bool
     }))
   }))
-}
-
-variable "volume_mount_paths" {
-  description = "A map of volume names to their mount paths inside the container."
-  type = map(string)
-  default = {}
 }

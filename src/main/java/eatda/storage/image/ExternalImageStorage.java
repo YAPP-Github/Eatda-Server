@@ -22,7 +22,7 @@ public class ExternalImageStorage {
 
     public ImageKey upload(Image image) {
         String createdKey = createKey(image.getDomainName(), image.getExtension());
-        fileClient.upload(image.getFile(), createdKey);
+        fileClient.upload(image.file(), createdKey);
         return new ImageKey(createdKey);
     }
 

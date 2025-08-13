@@ -218,7 +218,15 @@ jobs:
         if: steps.get_version.outputs.HAS_VERSION == 'true'
         id: get-latest-task-def
         run: |
-          TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --region "${{ env.AWS_REGION }}" --query "services[0].taskDefinition" --output text)
+          if [[ -n "${{ github.event.inputs.rollback_version }}" ]]; then
+            echo "롤백 모드: 현재 서비스에서 실행 중인 안정적인 Task Definition을 사용합니다."
+            TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.ECS_CLUSTER }}" --services "${{ env.ECS_SERVICE }}" --region "${{ env.AWS_REGION }}" --query "services[0].taskDefinition" --output text)
+          else
+            echo "일반 배포 모드: 가장 최신 버전의 Task Definition을 사용합니다."
+            TASK_DEF_ARN=$(aws ecs describe-task-definition --task-definition "${{ env.CONTAINER_NAME }}" --query "taskDefinition.taskDefinitionArn" --output text)
+          fi
+
+          echo "사용할 Task Definition ARN: $TASK_DEF_ARN"
           aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --region "${{ env.AWS_REGION }}" --query "taskDefinition" --output json > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition

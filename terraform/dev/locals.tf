@@ -42,19 +42,13 @@ locals {
 
   dev_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t2.micro"
+    instance_type        = "t3a.small"
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
-    user_data            = <<-EOF
-#!/bin/bash
-echo ECS_CLUSTER=dev-cluster >> /etc/ecs/ecs.config
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
-EOF
+    user_data = templatefile("${path.module}/scripts/user-data.sh", {
+      ecs_cluster_name = "dev-cluster"
+    })
   }
 
   task_definitions_with_roles = {
@@ -71,32 +65,60 @@ EOF
   container_definitions_map = {
     for svc, def in local.task_definitions_with_roles : svc => [
       {
-        name         = svc
-        image        = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
-        cpu          = def.cpu
-        memory       = def.memory
-        essential    = true
+        name        = svc
+        image       = svc == "api-dev" ? "${local.ecr_repo_urls["dev"]}:placeholder" : def.container_image
+        cpu         = def.cpu
+        memory      = def.memory
+        essential   = true
         stopTimeout = lookup(def, "stop_timeout", 30)
-        command      = svc == "api-dev" ? ["java", "-Dspring.profiles.active=dev", "-jar", "/api.jar"] : null
+        command = svc == "api-dev" ? [
+          "java",
+          "-Xlog:gc*:stdout:time,uptime,level,tags",
+          "-Xlog:gc*:file=/logs/gc.log:time,uptime,level,tags",
+          "-XX:+UseG1GC",
+          "-XX:InitialRAMPercentage=30",
+          "-XX:MaxRAMPercentage=70",
+          "-XX:ParallelGCThreads=2",
+          "-XX:ConcGCThreads=1",
+          "-XX:MaxDirectMemorySize=128m",
+          "-Xlog:ergo=trace",
+          "-javaagent:/dd-java-agent.jar",
+          "-Ddd.logs.injection=true",
+          "-Ddd.runtime-metrics.enabled=true",
+          "-Ddd.service=eatda-api-dev",
+          "-Ddd.env=dev",
+          "-Ddd.version=v1",
+          "-Ddd.agent.host=127.0.0.1",
+          "-Dspring.profiles.active=dev",
+          "-jar",
+          "/api.jar"
+        ] : null
         portMappings = [
-          for idx, port in def.container_port :
-          { name = "${svc}-${port}-tcp", containerPort = port, hostPort = def.host_port[idx], protocol = "tcp" }
-        ]
-        environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
-        secrets     = svc == "mysql-dev" ? [
-          { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
-          { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
-          { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
-        ] : [
-          for s in lookup(def, "secrets", []) : {
-            name      = s.name
-            valueFrom = s.valueFrom
+          for m in lookup(def, "port_mappings", []) : {
+            name          = "${svc}-${m.container_port}-${m.protocol}"
+            containerPort = m.container_port
+            hostPort      = m.host_port
+            protocol      = m.protocol
           }
         ]
+        environment = [for k, v in lookup(def, "environment", {}) : { name = k, value = v }]
+        secrets = svc == "datadog-agent-task" ? [
+          { name = "DD_API_KEY", valueFrom = "/dev/DD_API_KEY" }
+          ] : (svc == "mysql-dev" ? [
+            { name = "MYSQL_USER", valueFrom = "/dev/MYSQL_USER_NAME" },
+            { name = "MYSQL_ROOT_PASSWORD", valueFrom = "/dev/MYSQL_ROOT_PASSWORD" },
+            { name = "MYSQL_PASSWORD", valueFrom = "/dev/MYSQL_PASSWORD" }
+            ] : [
+            for s in lookup(def, "secrets", []) : {
+              name      = s.name
+              valueFrom = s.valueFrom
+            }
+        ])
         mountPoints = [
-          for vol in lookup(def, "volumes", []) :{
-            sourceVolume = vol.name, containerPath = lookup(var.volume_mount_paths, vol.name, "/eatda"),
-            readOnly     = false
+          for vol in lookup(def, "volumes", []) : {
+            sourceVolume  = vol.name
+            containerPath = vol.containerPath
+            readOnly      = vol.readOnly
           }
         ]
       }

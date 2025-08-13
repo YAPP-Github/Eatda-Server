@@ -50,21 +50,13 @@ locals {
 locals {
   prod_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t3.micro"
+    instance_type        = "t3a.small"
     role                 = "prod"
     iam_instance_profile = "ec2-to-ecs"
     key_name             = "eatda-ec2-prod-key"
-    user_data            = <<-EOF
-#!/bin/bash
-echo ECS_CLUSTER=prod-cluster >> /etc/ecs/ecs.config
-
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
-EOF
+    user_data = templatefile("${path.module}/scripts/user-data.sh", {
+      ecs_cluster_name = "prod-cluster"
+    })
   }
 }
 

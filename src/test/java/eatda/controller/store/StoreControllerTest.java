@@ -56,9 +56,11 @@ class StoreControllerTest extends BaseControllerTest {
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
 
+            int page = 0;
             int size = 2;
 
             StoresResponse response = given()
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .when()
                     .get("/api/shops")
@@ -86,10 +88,12 @@ class StoreControllerTest extends BaseControllerTest {
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
 
+            int page = 0;
             int size = 2;
             StoreCategory category = StoreCategory.CAFE;
 
             StoresResponse response = given()
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .queryParam("category", category.getCategoryName())
                     .when()

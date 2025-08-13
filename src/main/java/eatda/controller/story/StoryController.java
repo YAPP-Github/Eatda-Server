@@ -1,6 +1,11 @@
 package eatda.controller.story;
 
 import eatda.controller.web.auth.LoginMember;
+import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
+import eatda.domain.store.StoreSearchResult;
+import eatda.service.image.ImageService;
+import eatda.service.store.StoreSearchService;
 import eatda.service.story.StoryService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class StoryController {
 
     private final StoryService storyService;
+    private final ImageService imageService;
+    private final StoreSearchService storeSearchService;
 
     @PostMapping("/api/stories")
     public ResponseEntity<StoryRegisterResponse> registerStory(
@@ -27,8 +34,12 @@ public class StoryController {
             @RequestPart("image") MultipartFile image,
             LoginMember member
     ) {
+        ImageKey imageKey = imageService.uploadImage(ImageDomain.STORY, image);
+        StoreSearchResult searchResult = storeSearchService.searchStoreByKakaoId(
+                request.storeName(), request.storeKakaoId());
+        StoryRegisterResponse response = storyService.registerStory(request, searchResult, imageKey, member.id());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(storyService.registerStory(request, image, member.id()));
+                .body(response);
     }
 
     @GetMapping("api/stories")

@@ -1,7 +1,6 @@
 package eatda.document.store;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -14,12 +13,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
-import eatda.controller.store.CheerInStoreResponse;
-import eatda.controller.store.CheerPreviewResponse;
-import eatda.controller.store.CheerRegisterRequest;
-import eatda.controller.store.CheerResponse;
-import eatda.controller.store.CheersInStoreResponse;
-import eatda.controller.store.CheersResponse;
+import eatda.controller.cheer.CheerInStoreResponse;
+import eatda.controller.cheer.CheerPreviewResponse;
+import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheersInStoreResponse;
+import eatda.controller.cheer.CheersResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -44,8 +43,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
         private static final String REQUEST_DESCRIPTION_MARKDOWN = """
                 - 요청 형식 : multipart/form-data
                 - 요청 field
-                  - `image` : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png
-                  - `request` : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
+                  - image : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png)
+                  - request : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
                 - request body 예시
                     ```json
                     {
@@ -57,7 +56,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 """;
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("응원 등록")
                 .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
@@ -83,7 +82,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         void 응원_등록_성공() {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
             CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!");
-            doReturn(response).when(cheerService).registerCheer(eq(request), any(), anyLong());
+            doReturn(response).when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 
             var document = document("cheer/register", 201)
                     .request(requestDocument)
@@ -112,7 +111,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 응원_등록_실패(BusinessErrorCode errorCode) {
             CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
-            doThrow(new BusinessException(errorCode)).when(cheerService).registerCheer(eq(request), any(), anyLong());
+            doThrow(new BusinessException(errorCode))
+                    .when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
 
             var document = document("cheer/register", errorCode)
                     .request(requestDocument)
@@ -133,10 +133,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
     class GetCheers {
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("최신 응원 검색")
                 .queryParameter(
-                        parameterWithName("size").description("조회 개수 (최소 1, 최대 50)")
+                        parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -154,6 +155,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
         @Test
         void 음식점_검색_성공() {
+            int page = 0;
             int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
                     new CheerPreviewResponse(2L, "https://example.image", "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
@@ -161,7 +163,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                     new CheerPreviewResponse(1L, null, "석관동떡볶이", "성북구", "석관동", "기타", 1L,
                             "너무 매워요! 하지만 맛있어요!")
             ));
-            doReturn(responses).when(cheerService).getCheers(anyInt());
+            doReturn(responses).when(cheerService).getCheers(page, size);
 
             var document = document("cheer/get-many", 200)
                     .request(requestDocument)
@@ -178,8 +180,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
+            int page = 0;
             int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(anyInt());
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(page, size);
 
             var document = document("cheer/get-many", errorCode)
                     .request(requestDocument)
@@ -198,13 +201,14 @@ public class CheerDocumentTest extends BaseDocumentTest {
     class GetCheersByStoreId {
 
         RestDocsRequest requestDocument = request()
-                .tag(Tag.STORE_API)
+                .tag(Tag.CHEER_API)
                 .summary("가게별 응원 검색")
                 .pathParameter(
                         parameterWithName("storeId").description("가게 ID")
                 )
                 .queryParameter(
-                        parameterWithName("size").description("조회 개수 (최소 1, 최대 50)")
+                        parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -219,12 +223,13 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @Test
         void 가게별_응원_검색_성공() {
             Long storeId = 1L;
+            int page = 0;
             int size = 2;
             CheersInStoreResponse responses = new CheersInStoreResponse(List.of(
                     new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!"),
                     new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!")
             ));
-            doReturn(responses).when(cheerService).getCheersByStoreId(storeId, size);
+            doReturn(responses).when(cheerService).getCheersByStoreId(storeId, page, size);
 
             var document = document("cheer/get-store-id", 200)
                     .request(requestDocument)
@@ -233,6 +238,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .when().get("/api/shops/{storeId}/cheers", storeId)
                     .then().statusCode(200);
@@ -242,8 +248,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @ParameterizedTest
         void 가게별_응원_검색_실패(BusinessErrorCode errorCode) {
             Long storeId = 1L;
+            int page = 0;
             int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheersByStoreId(eq(storeId), anyInt());
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheersByStoreId(storeId, page, size);
 
             var document = document("cheer/get-store-id", errorCode)
                     .request(requestDocument)
@@ -252,6 +259,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
+                    .queryParam("page", page)
                     .queryParam("size", size)
                     .when().get("/api/shops/{storeId}/cheers", storeId)
                     .then().statusCode(errorCode.getStatus().value());

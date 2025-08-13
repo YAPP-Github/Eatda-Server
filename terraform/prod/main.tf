@@ -15,6 +15,7 @@ module "ec2" {
   instance_subnet_map  = local.instance_subnet_map
   name_prefix          = local.name_prefix
   tags                 = local.common_tags
+  depends_on = [module.s3]
 }
 
 module "ecs" {
@@ -42,7 +43,7 @@ module "rds" {
   password                = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids  = local.vpc_security_group_ids
   multi_az                = false
-  backup_retention_period = 0
+  backup_retention_period = 7
   storage_encrypted       = true
   tags                    = local.common_tags
 }

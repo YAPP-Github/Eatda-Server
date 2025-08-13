@@ -20,7 +20,7 @@ locals {
       health_check = {
         path                = "/actuator/health/"
         protocol            = "HTTP"
-        interval            = 30
+        interval            = 60
         matcher             = "200"
         healthy_threshold   = 5
         unhealthy_threshold = 5
@@ -35,7 +35,7 @@ locals {
       health_check = {
         path                = "/actuator/health"
         protocol            = "HTTP"
-        interval            = 30
+        interval            = 60
         matcher             = "200"
         healthy_threshold   = 5
         unhealthy_threshold = 5

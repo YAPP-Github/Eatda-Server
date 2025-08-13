@@ -5,8 +5,8 @@ public enum Tag {
     AUTH_API("Auth API"),
     MEMBER_API("Member API"),
     STORE_API("Store API"),
-    STORY_API("Story API"),
     CHEER_API("Cheer API"),
+    STORY_API("Story API"),
     ARTICLE_API("Article API"),
     ;
 

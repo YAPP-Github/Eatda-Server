@@ -1,6 +1,6 @@
 package eatda.controller.store;
 
-import eatda.client.map.StoreSearchResult;
+import eatda.domain.store.StoreSearchResult;
 
 public record StoreSearchResponse(
         String kakaoId,
