@@ -49,3 +49,6 @@ oauth:
 
 kakao:
   api-key: ${KAKAO_API_KEY}
+
+cloudfront:
+  url: "http://localhost:8080"
