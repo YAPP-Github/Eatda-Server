@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
@@ -26,6 +27,7 @@ class CheerTest {
             .placeUrl("https://place.kakao.com/1234567890")
             .roadAddress("서울시 성북구 대학로 1길 1")
             .lotNumberAddress("서울시 성북구 동선동 1-1")
+            .district(District.SEONGBUK)
             .latitude(37.5665)
             .longitude(126.978)
             .build();

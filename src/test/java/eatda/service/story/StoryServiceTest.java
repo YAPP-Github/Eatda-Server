@@ -12,6 +12,7 @@ import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
@@ -47,7 +48,7 @@ class StoryServiceTest extends BaseServiceTest {
             StoryRegisterRequest request = new StoryRegisterRequest("곱창", "123", "미쳤다 여기");
             StoreSearchResult result = new StoreSearchResult(
                     "123", StoreCategory.KOREAN, "02-755-5232", "곱창", "http://place.map.kakao.com/123",
-                    "서울시 강남구 사사로 3길 12-24", "서울시 강남구 역삼동 123-45", 37.5665, 126.9780);
+                    "서울시 강남구 사사로 3길 12-24", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
             ImageKey imageKey = new ImageKey("image-key");
 
             StoryRegisterResponse response = storyService.registerStory(request, result, imageKey, member.getId());

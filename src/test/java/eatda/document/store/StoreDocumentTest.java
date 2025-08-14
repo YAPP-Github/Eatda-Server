@@ -19,6 +19,7 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.store.District;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
@@ -247,9 +248,10 @@ public class StoreDocumentTest extends BaseDocumentTest {
             String query = "농민백암순대";
             List<StoreSearchResult> responses = List.of(
                     new StoreSearchResult("123", StoreCategory.KOREAN, "010-1234-1234", "농민백암순대 본점",
-                            "https://yap.co.kr", "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", 37.0d, 128.0d),
+                            "https://yap.co.kr", "서울 강남구 대치동 896-33", "서울 강남구 선릉로86길 40-4", District.GANGNAM,
+                            37.0d, 128.0d),
                     new StoreSearchResult("456", StoreCategory.KOREAN, "010-1234-1234", "농민백암순대 시청점",
-                            "https://yapp.kr", "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
+                            "https://yapp.kr", "서울 중구 북창동 19-4", null, District.JUNG, 37.0d, 128.0d)
             );
             doReturn(responses).when(storeSearchService).searchStores(anyString());
 

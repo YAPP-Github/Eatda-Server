@@ -9,7 +9,7 @@ public class CheerTagNames {
 
     private static final int MAX_CHEER_TAGS_PER_TYPE = 2;
 
-    private List<CheerTagName> cheerTagNames;
+    private final List<CheerTagName> cheerTagNames;
 
     public CheerTagNames(List<CheerTagName> cheerTagNames) {
         validate(cheerTagNames);
@@ -20,7 +20,7 @@ public class CheerTagNames {
         if (isDuplicated(cheerTagNames)) {
             throw new BusinessException(BusinessErrorCode.CHEER_TAGS_DUPLICATED);
         }
-        if (countMaxCountByType(cheerTagNames) > MAX_CHEER_TAGS_PER_TYPE) {
+        if (maxCountByType(cheerTagNames) > MAX_CHEER_TAGS_PER_TYPE) {
             throw new BusinessException(BusinessErrorCode.EXCEED_CHEER_TAGS_PER_TYPE);
         }
     }
@@ -32,7 +32,7 @@ public class CheerTagNames {
         return distinctCount != cheerTagNames.size();
     }
 
-    private long countMaxCountByType(List<CheerTagName> cheerTagNames) {
+    private long maxCountByType(List<CheerTagName> cheerTagNames) {
         return cheerTagNames.stream()
                 .collect(Collectors.groupingBy(CheerTagName::getType, Collectors.counting()))
                 .values()

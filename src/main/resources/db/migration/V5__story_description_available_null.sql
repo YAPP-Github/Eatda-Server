@@ -1,2 +1,0 @@
-ALTER TABLE story
-    MODIFY COLUMN description TEXT NULL;

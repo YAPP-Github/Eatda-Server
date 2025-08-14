@@ -15,6 +15,7 @@ class StoreTest {
             .placeUrl("https://place.kakao.com/123456789")
             .roadAddress("")
             .lotNumberAddress("서울특별시 강남구 역삼동 123-45")
+            .district(District.GANGNAM)
             .latitude(37.5665)
             .longitude(126.978);
 
@@ -22,9 +23,9 @@ class StoreTest {
     class GetAddressDistrict {
 
         @Test
-        void 주소_구_정보를_지번_주소에서_반환한다() {
+        void 주소_구_정보를_ENUM을_통해_반환한다() {
             Store store = DEFAULT_BUILDER
-                    .lotNumberAddress("서울특별시 성북구 석관동 123-45")
+                    .district(District.SEONGBUK)
                     .build();
 
             String actual = store.getAddressDistrict();

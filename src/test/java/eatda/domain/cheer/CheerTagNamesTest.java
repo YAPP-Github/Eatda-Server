@@ -17,7 +17,7 @@ class CheerTagNamesTest {
     class Validate {
 
         @Test
-        void 각_카테고리별_테그는_최대_개수가_정해져있다() {
+        void 각_카테고리별_태그는_최대_개수가_정해져있다() {
             List<CheerTagName> tagNames = List.of(
                     CheerTagName.OLD_STORE_MOOD, CheerTagName.ENERGETIC,
                     CheerTagName.GROUP_RESERVATION, CheerTagName.LARGE_PARKING);
@@ -26,14 +26,14 @@ class CheerTagNamesTest {
         }
 
         @Test
-        void 테그_이름은_비어있을_수_있다() {
+        void 태그_이름은_비어있을_수_있다() {
             List<CheerTagName> tagNames = Collections.emptyList();
 
             assertThatCode(() -> new CheerTagNames(tagNames)).doesNotThrowAnyException();
         }
 
         @Test
-        void 각_카테고리별_테그는_최대_개수를_초과할_수_없다() {
+        void 카테고리별_태그는_최대_개수를_초과할_수_없다() {
             List<CheerTagName> tagNames = List.of(
                     CheerTagName.OLD_STORE_MOOD, CheerTagName.ENERGETIC, CheerTagName.GOOD_FOR_DATING);
 
@@ -43,7 +43,7 @@ class CheerTagNamesTest {
         }
 
         @Test
-        void 테그_이름은_중복될_수_없다() {
+        void 태그_이름은_중복될_수_없다() {
             List<CheerTagName> tagNames = List.of(CheerTagName.OLD_STORE_MOOD, CheerTagName.OLD_STORE_MOOD);
 
             BusinessException exception = assertThrows(BusinessException.class, () -> new CheerTagNames(tagNames));
