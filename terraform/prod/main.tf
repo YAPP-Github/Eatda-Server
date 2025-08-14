@@ -1,11 +1,27 @@
-data "aws_ssm_parameter" "rds_user_name" {
-  name            = "/prod/MYSQL_USER_NAME"
-  with_decryption = true
+resource "random_pet" "rds_user_name" {
+  length    = 2
+  separator = "_"
 }
 
-data "aws_ssm_parameter" "rds_password" {
-  name            = "/prod/MYSQL_PASSWORD"
-  with_decryption = true
+resource "random_password" "rds_password" {
+  length  = 16
+  special = true
+}
+
+resource "aws_ssm_parameter" "mysql_user_name" {
+  name        = "/prod/MYSQL_USER_NAME"
+  type        = "SecureString"
+  value       = random_pet.rds_user_name.id
+  description = "Generated MySQL user name for prod RDS"
+  overwrite   = true
+}
+
+resource "aws_ssm_parameter" "mysql_password" {
+  name        = "/prod/MYSQL_PASSWORD"
+  type        = "SecureString"
+  value       = random_password.rds_password.result
+  description = "Generated MySQL user name for prod RDS"
+  overwrite   = true
 }
 
 module "ec2" {
@@ -15,7 +31,7 @@ module "ec2" {
   instance_subnet_map  = local.instance_subnet_map
   name_prefix          = local.name_prefix
   tags                 = local.common_tags
-  depends_on = [module.s3]
+  depends_on           = [module.s3]
 }
 
 module "ecs" {
@@ -39,13 +55,18 @@ module "rds" {
   engine_version          = local.engine_version
   allocated_storage       = local.allocated_storage
   db_name                 = local.db_name
-  username                = data.aws_ssm_parameter.rds_user_name.value
-  password                = data.aws_ssm_parameter.rds_password.value
+  username                = random_pet.rds_user_name.id
+  password                = random_password.rds_password.result
   vpc_security_group_ids  = local.vpc_security_group_ids
   multi_az                = false
   backup_retention_period = 7
   storage_encrypted       = true
   tags                    = local.common_tags
+
+  depends_on = [
+    aws_ssm_parameter.mysql_user_name,
+    aws_ssm_parameter.mysql_password
+  ]
 }
 
 module "s3" {

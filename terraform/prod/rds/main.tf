@@ -18,32 +18,6 @@ resource "aws_db_subnet_group" "private" {
   })
 }
 
-resource "random_pet" "rds_user_name" {
-  length    = 2
-  separator = "_"
-}
-
-resource "random_password" "rds_password" {
-  length  = 16
-  special = true
-}
-
-resource "aws_ssm_parameter" "mysql_user_name" {
-  name        = "/prod/MYSQL_USER_NAME"
-  type        = "SecureString"
-  value       = random_pet.rds_user_name.id
-  description = "Generated MySQL user name for prod RDS"
-  overwrite   = true
-}
-
-resource "aws_ssm_parameter" "mysql_password" {
-  name        = "/prod/MYSQL_PASSWORD"
-  type        = "SecureString"
-  value       = random_password.rds_password.result
-  description = "Generated MySQL user name for prod RDS"
-  overwrite   = true
-}
-
 resource "aws_db_instance" "prod" {
   identifier              = var.identifier
   engine                  = var.engine
@@ -51,8 +25,8 @@ resource "aws_db_instance" "prod" {
   instance_class          = var.instance_class
   allocated_storage       = var.allocated_storage
   db_name                 = var.db_name
-  username                = random_pet.rds_user_name.id
-  password                = random_password.rds_password.result
+  username                = var.rds_user_name
+  password                = var.rds_password
   vpc_security_group_ids  = var.vpc_security_group_ids
   db_subnet_group_name    = aws_db_subnet_group.private.name
   multi_az                = var.multi_az
