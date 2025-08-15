@@ -231,6 +231,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORE_API)
                 .summary("회원이 응원한 가게 목록 조회")
+                .description("- 응답 순서 : 최신 응원순")
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 );
@@ -265,7 +266,8 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .then().statusCode(200);
         }
 
-        @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "INVALID_MEMBER_ID"})
+        @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN",
+                "INVALID_MEMBER_ID"})
         @ParameterizedTest
         void 회원이_응원한_음식점_목록_조회_실패(BusinessErrorCode errorCode) {
             doThrow(new BusinessException(errorCode)).when(storeService).getStoresByCheeredMember(anyLong());
