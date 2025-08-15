@@ -31,5 +31,7 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
 
     int countByMember(Member member);
 
+    int countByStore(Store store);
+
     boolean existsByMemberAndStoreKakaoId(Member member, String storeKakaoId);
 }

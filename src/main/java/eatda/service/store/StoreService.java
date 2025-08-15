@@ -4,8 +4,10 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import eatda.controller.store.ImagesResponse;
+import eatda.controller.store.StoreInMemberResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +63,14 @@ public class StoreService {
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerRepository.findRecentImageKey(store)
                 .map(imageStorage::getPreSignedUrl);
+    }
+
+    @Transactional(readOnly = true)
+    public StoresInMemberResponse getStoresByCheeredMember(long memberId) {
+        List<Store> stores = storeRepository.findAllByCheeredMemberId(memberId);
+        List<StoreInMemberResponse> responses = stores.stream()
+                .map(store -> new StoreInMemberResponse(store, cheerRepository.countByStore(store)))
+                .toList();
+        return new StoresInMemberResponse(responses);
     }
 }
