@@ -42,6 +42,12 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/shops/cheered-member")
+    public ResponseEntity<StoresInMemberResponse> getStoresByCheeredMember(LoginMember member) {
+        StoresInMemberResponse response = storeService.getStoresByCheeredMember(member.id());
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/api/shop/search")
     public ResponseEntity<StoreSearchResponses> searchStore(@RequestParam String query, LoginMember member) {
         List<StoreSearchResult> storeSearchResults = storeSearchService.searchStores(query);

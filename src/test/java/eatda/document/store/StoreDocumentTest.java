@@ -12,8 +12,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 import eatda.controller.store.ImagesResponse;
+import eatda.controller.store.StoreInMemberResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
@@ -221,6 +223,64 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .then().statusCode(errorCode.getStatus().value());
         }
 
+    }
+
+    @Nested
+    class GetStoresByCheeredMember {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("회원이 응원한 가게 목록 조회")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("stores").type(ARRAY).description("응원한 음식점 목록"),
+                        fieldWithPath("stores[].id").type(NUMBER).description("음식점 ID"),
+                        fieldWithPath("stores[].name").type(STRING).description("음식점 이름"),
+                        fieldWithPath("stores[].district").type(STRING).description("음식점 주소 (구)"),
+                        fieldWithPath("stores[].neighborhood").type(STRING).description("음식점 주소 (동)"),
+                        fieldWithPath("stores[].cheerCount").type(NUMBER).description("해당 음식점 응원 횟수 (자신 포함)")
+                );
+
+        @Test
+        void 회원이_응원한_음식점_목록을_조회() {
+            StoresInMemberResponse response = new StoresInMemberResponse(List.of(
+                    new StoreInMemberResponse(1L, "농민백암순대", "강남구", "대치동", 5L),
+                    new StoreInMemberResponse(2L, "홍콩반점", "강남구", "역삼동", 1L)
+            ));
+            doReturn(response).when(storeService).getStoresByCheeredMember(anyLong());
+
+            var document = document("store/get-by-cheered-member", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/shops/cheered-member")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"UNAUTHORIZED_MEMBER", "EXPIRED_TOKEN", "INVALID_MEMBER_ID"})
+        @ParameterizedTest
+        void 회원이_응원한_음식점_목록_조회_실패(BusinessErrorCode errorCode) {
+            doThrow(new BusinessException(errorCode)).when(storeService).getStoresByCheeredMember(anyLong());
+
+            var document = document("store/get-by-cheered-member", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/shops/cheered-member")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
     }
 
     @Nested
