@@ -42,7 +42,7 @@ class CheerControllerTest extends BaseControllerTest {
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(store.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
-                    () -> assertThat(response.tags()).containsAll(request.tags())
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
             );
         }
 
@@ -65,7 +65,7 @@ class CheerControllerTest extends BaseControllerTest {
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(store.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
-                    () -> assertThat(response.tags()).containsAll(request.tags())
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
             );
         }
     }
