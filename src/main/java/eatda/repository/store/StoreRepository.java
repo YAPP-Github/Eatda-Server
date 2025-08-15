@@ -25,7 +25,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findAllByCategoryOrderByCreatedAtDesc(StoreCategory category, Pageable pageable);
 
     @Query("""
-            SELECT DISTINCT s FROM Store s
+            SELECT s FROM Store s
                 JOIN Cheer c ON s.id = c.store.id
                 WHERE c.member.id = :memberId
                 ORDER BY c.createdAt DESC
