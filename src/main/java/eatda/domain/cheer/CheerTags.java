@@ -8,11 +8,8 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CheerTags {
 
     private static final int MAX_CHEER_TAGS_PER_TYPE = 2;
@@ -20,11 +17,14 @@ public class CheerTags {
     @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CheerTag> values = new ArrayList<>();
 
-    public CheerTags(Cheer cheer, List<CheerTagName> cheerTagsNames) {
-        validate(cheerTagsNames);
-        this.values = cheerTagsNames.stream()
-                .map(name -> new CheerTag(cheer, name))
-                .collect(Collectors.toList());
+    public void setTags(Cheer cheer, List<CheerTagName> cheerTagNames) {
+        validate(cheerTagNames);
+        List<CheerTag> cheerTags = cheerTagNames.stream()
+                .map(name -> new CheerTag(cheer, name)) // cheer is set later
+                .toList();
+
+        this.values.clear();
+        this.values.addAll(cheerTags);
     }
 
     private void validate(List<CheerTagName> cheerTagNames) {

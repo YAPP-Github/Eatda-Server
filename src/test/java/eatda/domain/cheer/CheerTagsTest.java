@@ -35,31 +35,34 @@ class CheerTagsTest {
             new ImageKey("imageKey"));
 
     @Nested
-    class Validate {
+    class SetTags {
 
         @Test
         void 각_카테고리별_태그는_최대_개수가_정해져있다() {
             List<CheerTagName> tagNames = List.of(
                     CheerTagName.OLD_STORE_MOOD, CheerTagName.ENERGETIC,
                     CheerTagName.GROUP_RESERVATION, CheerTagName.LARGE_PARKING);
+            CheerTags cheerTags = new CheerTags();
 
-            assertThatCode(() -> new CheerTags(DEFAULT_CHEER, tagNames)).doesNotThrowAnyException();
+            assertThatCode(() -> cheerTags.setTags(DEFAULT_CHEER, tagNames)).doesNotThrowAnyException();
         }
 
         @Test
         void 태그_이름은_비어있을_수_있다() {
             List<CheerTagName> tagNames = Collections.emptyList();
+            CheerTags cheerTags = new CheerTags();
 
-            assertThatCode(() -> new CheerTags(DEFAULT_CHEER, tagNames)).doesNotThrowAnyException();
+            assertThatCode(() -> cheerTags.setTags(DEFAULT_CHEER, tagNames)).doesNotThrowAnyException();
         }
 
         @Test
         void 카테고리별_태그는_최대_개수를_초과할_수_없다() {
             List<CheerTagName> tagNames = List.of(
                     CheerTagName.OLD_STORE_MOOD, CheerTagName.ENERGETIC, CheerTagName.GOOD_FOR_DATING);
+            CheerTags cheerTags = new CheerTags();
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> new CheerTags(DEFAULT_CHEER, tagNames));
+                    () -> cheerTags.setTags(DEFAULT_CHEER, tagNames));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.EXCEED_CHEER_TAGS_PER_TYPE);
         }
@@ -67,9 +70,10 @@ class CheerTagsTest {
         @Test
         void 태그_이름은_중복될_수_없다() {
             List<CheerTagName> tagNames = List.of(CheerTagName.OLD_STORE_MOOD, CheerTagName.OLD_STORE_MOOD);
+            CheerTags cheerTags = new CheerTags();
 
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> new CheerTags(DEFAULT_CHEER, tagNames));
+                    () -> cheerTags.setTags(DEFAULT_CHEER, tagNames));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.CHEER_TAGS_DUPLICATED);
         }

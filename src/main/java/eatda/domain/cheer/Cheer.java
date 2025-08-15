@@ -58,6 +58,8 @@ public class Cheer extends AuditingEntity {
         this.store = store;
         this.description = description;
         this.imageKey = imageKey;
+        this.cheerTags = new CheerTags();
+
         this.isAdmin = false;
     }
 
@@ -73,7 +75,7 @@ public class Cheer extends AuditingEntity {
     }
 
     public void setCheerTags(List<CheerTagName> cheerTagNames) {
-        this.cheerTags = new CheerTags(this, cheerTagNames);
+        this.cheerTags.setTags(this, cheerTagNames);
     }
 
     public List<CheerTagName> getCheerTagNames() {
