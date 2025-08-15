@@ -156,7 +156,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("cheers[].storeNeighborhood").type(STRING).description("가게 주소 (동)"),
                         fieldWithPath("cheers[].storeCategory").type(STRING).description("가게 카테고리"),
                         fieldWithPath("cheers[].cheerId").type(NUMBER).description("응원 ID"),
-                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용")
+                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("cheers[].memberId").type(NUMBER).description("응원 작성자 회원 ID"),
+                        fieldWithPath("cheers[].memberNickname").type(STRING).description("응원 작성자 닉네임")
                 );
 
         @Test
