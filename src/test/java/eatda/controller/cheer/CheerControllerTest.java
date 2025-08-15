@@ -5,12 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import eatda.controller.BaseControllerTest;
 import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.util.ImageUtils;
 import eatda.util.MappingUtils;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -22,8 +24,9 @@ class CheerControllerTest extends BaseControllerTest {
 
         @Test
         void 응원을_등록한다() {
-            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!",
+                    List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
@@ -36,13 +39,18 @@ class CheerControllerTest extends BaseControllerTest {
                     .statusCode(201)
                     .extract().as(CheerResponse.class);
 
-            assertThat(response.storeId()).isEqualTo(store.getId());
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(store.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
+            );
         }
 
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!",
+                    List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
@@ -54,7 +62,11 @@ class CheerControllerTest extends BaseControllerTest {
                     .statusCode(201)
                     .extract().as(CheerResponse.class);
 
-            assertThat(response.storeId()).isEqualTo(store.getId());
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(store.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
+            );
         }
     }
 
