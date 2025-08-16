@@ -75,12 +75,11 @@ public class CheerService {
 
     @Transactional(readOnly = true)
     public CheersInStoreResponse getCheersByStoreId(Long storeId, int page, int size) {
-        Store store = storeRepository.getById(storeId);
-        List<Cheer> cheers = cheerRepository.findAllByStoreOrderByCreatedAtDesc(store, PageRequest.of(page, size));
+        List<Cheer> cheers = cheerRepository.findAllByStoreIdOrderByCreatedAtDesc(storeId, PageRequest.of(page, size));
 
         List<CheerInStoreResponse> cheersResponse = cheers.stream()
                 .map(CheerInStoreResponse::new)
-                .toList(); // TODO N+1 문제 해결
+                .toList();
         return new CheersInStoreResponse(cheersResponse);
     }
 }
