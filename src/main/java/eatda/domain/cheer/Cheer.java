@@ -16,6 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Collections;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +46,9 @@ public class Cheer extends AuditingEntity {
     @Embedded
     private ImageKey imageKey;
 
+    @Embedded
+    private CheerTags cheerTags;
+
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
@@ -53,6 +58,7 @@ public class Cheer extends AuditingEntity {
         this.store = store;
         this.description = description;
         this.imageKey = imageKey;
+        this.cheerTags = new CheerTags();
 
         this.isAdmin = false;
     }
@@ -66,5 +72,16 @@ public class Cheer extends AuditingEntity {
         if (description == null || description.isBlank()) {
             throw new BusinessException(BusinessErrorCode.INVALID_CHEER_DESCRIPTION);
         }
+    }
+
+    public void setCheerTags(List<CheerTagName> cheerTagNames) {
+        this.cheerTags.setTags(this, cheerTagNames);
+    }
+
+    public List<CheerTagName> getCheerTagNames() {
+        if (cheerTags == null) {
+            return Collections.emptyList();
+        }
+        return cheerTags.getNames();
     }
 }

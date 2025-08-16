@@ -145,6 +145,27 @@ class CheerServiceTest extends BaseServiceTest {
                             CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
+
+        @Test
+        void 해당_응원의_응원_태그가_비어있어도_응원을_저장할_수_있다() {
+            Member member = memberGenerator.generate("123");
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!", List.of());
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
+
+            Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
+                    () -> assertThat(response.imageUrl()).isNotBlank(),
+                    () -> assertThat(response.tags()).isEmpty()
+            );
+        }
     }
 
     @Nested

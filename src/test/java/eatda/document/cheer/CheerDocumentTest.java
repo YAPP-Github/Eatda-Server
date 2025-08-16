@@ -156,7 +156,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("cheers[].storeNeighborhood").type(STRING).description("가게 주소 (동)"),
                         fieldWithPath("cheers[].storeCategory").type(STRING).description("가게 카테고리"),
                         fieldWithPath("cheers[].cheerId").type(NUMBER).description("응원 ID"),
-                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용")
+                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("cheers[].memberId").type(NUMBER).description("응원 작성자 회원 ID"),
+                        fieldWithPath("cheers[].memberNickname").type(STRING).description("응원 작성자 닉네임")
                 );
 
         @Test
@@ -165,9 +167,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
             int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
                     new CheerPreviewResponse(2L, "https://example.image", "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
-                            "너무 맛있어요!"),
+                            "너무 맛있어요!", 5L, "커찬"),
                     new CheerPreviewResponse(1L, null, "석관동떡볶이", "성북구", "석관동", "기타", 1L,
-                            "너무 매워요! 하지만 맛있어요!")
+                            "너무 매워요! 하지만 맛있어요!", 8L, "찬커")
             ));
             doReturn(responses).when(cheerService).getCheers(page, size);
 

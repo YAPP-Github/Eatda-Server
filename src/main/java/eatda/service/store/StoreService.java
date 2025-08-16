@@ -70,7 +70,7 @@ public class StoreService {
         List<Store> stores = storeRepository.findAllByCheeredMemberId(memberId);
         List<StoreInMemberResponse> responses = stores.stream()
                 .map(store -> new StoreInMemberResponse(store, cheerRepository.countByStore(store)))
-                .toList();
+                .toList(); // TODO : N+1 문제 해결 (특정 회원의 가게는 3명 제한이라 중요도 낮음)
         return new StoresInMemberResponse(responses);
     }
 }
