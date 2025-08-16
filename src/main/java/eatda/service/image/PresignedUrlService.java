@@ -33,7 +33,7 @@ public class PresignedUrlService {
                     validateContentType(fileDetail.contentType());
                     validateFileSize(fileDetail.fileSize());
                     String key = generateTempKey(fileDetail.contentType());
-                    String tempUrl = fileClient.generatePresignedUrl(key, PRESIGNED_URL_DURATION);
+                    String tempUrl = fileClient.generateUploadPresignedUrl(key, PRESIGNED_URL_DURATION);
                     return new PresignedUrlInfo(
                             fileDetail.order(),
                             fileDetail.contentType(),
