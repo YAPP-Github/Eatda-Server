@@ -271,7 +271,7 @@ class StoryServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    class GetStoriesByMemberId {
+    class GetPagedStoryByMemberId {
 
         @Test
         void 회원_ID로_스토리_목록을_조회할_수_있다() {
@@ -280,7 +280,7 @@ class StoryServiceTest extends BaseServiceTest {
             Story story1 = storyGenerator.generate(member, "123456", "곱창집", startAt);
             Story story2 = storyGenerator.generate(member, "123457", "순대국밥집", startAt.plusDays(1));
 
-            var response = storyService.getStoriesByMemberId(member.getId(), 0, 5);
+            var response = storyService.getPagedStoryByMemberId(member.getId(), 0, 5);
 
             assertAll(
                     () -> assertThat(response.stories()).hasSize(2),
@@ -299,7 +299,7 @@ class StoryServiceTest extends BaseServiceTest {
             Story story2 = storyGenerator.generate(member, "123457", "순대국밥집", startAt.plusDays(1));
             Story story3 = storyGenerator.generate(member, "123458", "김밥집", startAt.plusDays(2));
 
-            var response = storyService.getStoriesByMemberId(member.getId(), 1, 2);
+            var response = storyService.getPagedStoryByMemberId(member.getId(), 1, 2);
 
             assertAll(
                     () -> assertThat(response.stories()).hasSize(1),
@@ -312,7 +312,7 @@ class StoryServiceTest extends BaseServiceTest {
         void 회원_ID로_스토리_목록을_조회할_때_존재하지_않는_ID를_요청하면_빈_목록을_반환한다() {
             long nonExistentMemberId = 999L;
 
-            var response = storyService.getStoriesByMemberId(nonExistentMemberId, 0, 5);
+            var response = storyService.getPagedStoryByMemberId(nonExistentMemberId, 0, 5);
 
             assertThat(response.stories()).isEmpty();
         }
