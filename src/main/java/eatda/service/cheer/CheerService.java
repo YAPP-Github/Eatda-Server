@@ -8,8 +8,6 @@ import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
-import eatda.domain.cheer.CheerTag;
-import eatda.domain.cheer.CheerTagNames;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
@@ -43,15 +41,15 @@ public class CheerService {
                                        StoreSearchResult result,
                                        ImageKey imageKey,
                                        long memberId) {
-        CheerTagNames cheerTagNames = new CheerTagNames(request.tags());
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
-        Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
-        List<CheerTag> cheerTags = cheerTagRepository.saveAll(cheerTagNames.toCheerTags(cheer));
-        return new CheerResponse(cheer, cheerTags, store, imageStorage.getPreSignedUrl(imageKey));
+        Cheer cheer = new Cheer(member, store, request.description(), imageKey);
+        cheer.setCheerTags(request.tags());
+        Cheer savedCheer = cheerRepository.save(cheer);
+        return new CheerResponse(savedCheer, store, imageStorage.getPreSignedUrl(imageKey));
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
