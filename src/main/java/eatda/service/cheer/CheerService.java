@@ -71,8 +71,7 @@ public class CheerService {
 
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
-                .map(cheer -> new CheerPreviewResponse(cheer, cheer.getStore(),
-                        imageStorage.getPreSignedUrl(cheer.getImageKey())))
+                .map(cheer -> new CheerPreviewResponse(cheer, imageStorage.getPreSignedUrl(cheer.getImageKey())))
                 .toList());
     }
 
