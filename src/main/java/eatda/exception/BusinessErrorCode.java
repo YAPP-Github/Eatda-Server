@@ -49,6 +49,7 @@ public enum BusinessErrorCode {
     PRESIGNED_URL_GENERATION_FAILED("SERVER004", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_MAX_FILE_SIZE("SERVER005", "파일 크기가 최대를 초과했습니다.", HttpStatus.BAD_REQUEST),
     INVALID_EMPTY_FILE_DETAILS("CLIENT011", "파일 상세 정보는 비어있을수 없습니다.", HttpStatus.BAD_REQUEST),
+    FAIL_TEMP_IMAGE_PROCESS("SERVER006", "임시 이미지 파일 이동 및 삭제가 실패했습니다."),
 
     //story
     INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 빈 문자열일 수 없습니다."),
