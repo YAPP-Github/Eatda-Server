@@ -16,7 +16,7 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
     @EntityGraph(attributePaths = {"store", "member", "cheerTags"})
     List<Cheer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"member"})
+    @EntityGraph(attributePaths = {"member", "cheerTags"})
     List<Cheer> findAllByStoreOrderByCreatedAtDesc(Store store, Pageable pageable);
 
     @Query("""

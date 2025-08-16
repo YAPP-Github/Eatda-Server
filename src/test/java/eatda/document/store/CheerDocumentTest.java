@@ -226,7 +226,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("cheers[].id").type(NUMBER).description("응원 ID"),
                         fieldWithPath("cheers[].memberId").type(NUMBER).description("응원 작성자 회원 ID"),
                         fieldWithPath("cheers[].memberNickname").type(STRING).description("응원 작성자 닉네임"),
-                        fieldWithPath("cheers[].description").type(STRING).description("응원 내용")
+                        fieldWithPath("cheers[].description").type(STRING).description("응원 내용"),
+                        fieldWithPath("cheers[].tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         @Test
@@ -235,8 +236,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
             int page = 0;
             int size = 2;
             CheersInStoreResponse responses = new CheersInStoreResponse(List.of(
-                    new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!"),
-                    new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!")
+                    new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!",
+                            List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM, CheerTagName.ENERGETIC)),
+                    new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!", List.of())
             ));
             doReturn(responses).when(cheerService).getCheersByStoreId(storeId, page, size);
 
