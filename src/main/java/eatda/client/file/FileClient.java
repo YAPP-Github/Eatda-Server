@@ -8,10 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 @Component
 public class FileClient {
@@ -46,18 +45,18 @@ public class FileClient {
         // AwsServiceException, SdkClientException, S3Exception
     }
 
-    public String getPreSignedUrl(String fileKey, Duration signatureDuration) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+    public String generatePresignedUrl(String fileKey, Duration signatureDuration) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileKey)
                 .build();
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .getObjectRequest(getObjectRequest)
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .putObjectRequest(putObjectRequest)
                 .signatureDuration(signatureDuration)
                 .build();
 
         try {
-            return s3Presigner.presignGetObject(presignRequest).url().toString();
+            return s3Presigner.presignPutObject(presignRequest).url().toString();
         } catch (Exception exception) {
             throw new BusinessException(BusinessErrorCode.PRESIGNED_URL_GENERATION_FAILED);
         }
