@@ -9,5 +9,7 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
 
     Page<Story> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
+    Page<Story> findAllByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+
     Page<Story> findAllByStoreKakaoIdOrderByCreatedAtDesc(String storeKakaoId, Pageable pageable);
 }

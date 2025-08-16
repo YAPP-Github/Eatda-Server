@@ -1,7 +1,10 @@
 package eatda.service.story;
 
 import eatda.controller.story.StoriesDetailResponse;
+import eatda.controller.story.StoriesInMemberResponse;
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoriesResponse.StoryPreview;
+import eatda.controller.story.StoryInMemberResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
@@ -18,7 +21,6 @@ import eatda.repository.story.StoryRepository;
 import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -103,5 +105,16 @@ public class StoryService {
                         story, imageStorage.getPreSignedUrl(story.getImageKey())))
                 .toList(); // TODO: N+1 문제 해결
         return new StoriesDetailResponse(responses);
+    }
+
+    @Transactional(readOnly = true)
+    public StoriesInMemberResponse getStoriesByMemberId(long memberId, int page, int size) {
+        List<Story> stories = storyRepository
+                .findAllByMemberIdOrderByCreatedAtDesc(memberId, PageRequest.of(page, size))
+                .getContent();
+        List<StoryInMemberResponse> responses = stories.stream()
+                .map(story -> new StoryInMemberResponse(story, imageStorage.getPreSignedUrl(story.getImageKey())))
+                .toList();
+        return new StoriesInMemberResponse(responses);
     }
 }
