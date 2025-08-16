@@ -47,14 +47,31 @@ resource "aws_s3_bucket_cors_configuration" "prod" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "dev" {
+resource "aws_s3_bucket_versioning" "prod" {
   bucket = aws_s3_bucket.prod.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_cloudfront_origin_access_control" "dev_oac" {
+resource "aws_s3_bucket_lifecycle_configuration" "prod_temp" {
+  bucket = aws_s3_bucket.prod.id
+
+  rule {
+    id     = "expire-temp-objects"
+    status = "Enabled"
+
+    filter {
+      prefix = "temp/"
+    }
+
+    expiration {
+      days = 7
+    }
+  }
+}
+
+resource "aws_cloudfront_origin_access_control" "prod_oac" {
   name                              = "oac-for-${aws_s3_bucket.prod.bucket}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -69,7 +86,7 @@ resource "aws_cloudfront_distribution" "prod_cdn" {
     domain_name = aws_s3_bucket.prod.bucket_regional_domain_name
     origin_id   = "S3-${aws_s3_bucket.prod.bucket}"
 
-    origin_access_control_id = aws_cloudfront_origin_access_control.dev_oac.id
+    origin_access_control_id = aws_cloudfront_origin_access_control.prod_oac.id
   }
 
   default_cache_behavior {

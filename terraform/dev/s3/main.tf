@@ -62,6 +62,23 @@ resource "aws_s3_bucket_versioning" "dev" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "dev_temp" {
+  bucket = aws_s3_bucket.dev.id
+
+  rule {
+    id     = "expire-temp-objects"
+    status = "Enabled"
+
+    filter {
+      prefix = "temp/"
+    }
+
+    expiration {
+      days = 7
+    }
+  }
+}
+
 resource "aws_cloudfront_origin_access_control" "dev_oac" {
   name                              = "oac-for-${aws_s3_bucket.dev.bucket}"
   origin_access_control_origin_type = "s3"
