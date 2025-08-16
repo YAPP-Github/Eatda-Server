@@ -133,6 +133,10 @@ public class BaseControllerTest {
         return jwtManager.issueAccessToken(member.getId());
     }
 
+    protected final String accessToken(Member member) {
+        return jwtManager.issueAccessToken(member.getId());
+    }
+
     protected final String refreshToken() {
         Member member = memberGenerator.generateByEmail(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()),
                 "authRefreshToken@example.com");

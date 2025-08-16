@@ -54,6 +54,17 @@ public class StoryController {
                 .body(storyService.getStory(storyId));
     }
 
+    @GetMapping("/api/stories/member")
+    public ResponseEntity<StoriesInMemberResponse> getStoriesByMemberId(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
+            LoginMember member
+    ) {
+        StoriesInMemberResponse response = storyService.getPagedStoryByMemberId(member.id(), page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
     @GetMapping("/api/stories/kakao/{kakaoId}")
     public ResponseEntity<StoriesDetailResponse> getStoriesByKakaoId(
             @PathVariable String kakaoId,

@@ -13,6 +13,7 @@ import eatda.util.MappingUtils;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 
 public class StoryControllerTest extends BaseControllerTest {
 
@@ -109,33 +110,63 @@ public class StoryControllerTest extends BaseControllerTest {
     }
 
     @Nested
-    class GetPagedStoryDetailsByKakaoId {
+    class GetStoriesByMemberId {
 
         @Test
-        void 카카오ID로_스토리_목록을_조회할_수_있다() {
-            String kakaoId = "123456";
+        void 회원의_스토리_목록을_조회할_수_있다() {
+            Member member = memberGenerator.generateRegisteredMember("nickname", "abc@kakao.com", "123", "01012345679");
             LocalDateTime startAt = LocalDateTime.of(2025, 8, 5, 12, 0, 0);
-            Member member = memberGenerator.generateRegisteredMember("test", "test@kakao.com", "812", "01081231234");
-            Story story1 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt);
-            Story story2 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt.plusHours(1));
+            Story story1 = storyGenerator.generate(member, "123456", "진또곱창집", startAt);
+            Story story2 = storyGenerator.generate(member, "654321", "또진곱창집", startAt.plusHours(1));
+            int page = 0;
+            int size = 5;
 
-            StoriesDetailResponse response = given()
-                    .pathParam("kakaoId", kakaoId)
-                    .queryParam("size", 5)
+            StoriesInMemberResponse response = given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken(member))
+                    .queryParam("page", page)
+                    .queryParam("size", size)
                     .when()
-                    .get("/api/stories/kakao/{kakaoId}")
+                    .get("/api/stories/member")
                     .then().statusCode(200)
-                    .extract().as(StoriesDetailResponse.class);
+                    .extract().as(StoriesInMemberResponse.class);
 
             assertAll(
                     () -> assertThat(response.stories()).hasSize(2),
-                    () -> assertThat(response.stories().getFirst().storyId()).isEqualTo(story2.getId()),
-                    () -> assertThat(response.stories().getFirst().memberId()).isEqualTo(member.getId()),
-                    () -> assertThat(response.stories().getFirst().memberNickname()).isEqualTo(member.getNickname()),
-                    () -> assertThat(response.stories().get(1).storyId()).isEqualTo(story1.getId()),
-                    () -> assertThat(response.stories().get(1).memberId()).isEqualTo(member.getId()),
-                    () -> assertThat(response.stories().get(1).memberNickname()).isEqualTo(member.getNickname())
+                    () -> assertThat(response.stories().get(0).id()).isEqualTo(story2.getId()),
+                    () -> assertThat(response.stories().get(1).id()).isEqualTo(story1.getId())
             );
+        }
+
+        @Nested
+        class GetStoriesByKakaoId {
+
+            @Test
+            void 카카오ID로_스토리_목록을_조회할_수_있다() {
+                String kakaoId = "123456";
+                LocalDateTime startAt = LocalDateTime.of(2025, 8, 5, 12, 0, 0);
+                Member member = memberGenerator.generateRegisteredMember("test", "test@kakao.com", "812",
+                        "01081231234");
+                Story story1 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt);
+                Story story2 = storyGenerator.generate(member, kakaoId, "진또곱창집", startAt.plusHours(1));
+
+                StoriesDetailResponse response = given()
+                        .pathParam("kakaoId", kakaoId)
+                        .queryParam("size", 5)
+                        .when()
+                        .get("/api/stories/kakao/{kakaoId}")
+                        .then().statusCode(200)
+                        .extract().as(StoriesDetailResponse.class);
+
+                assertAll(
+                        () -> assertThat(response.stories()).hasSize(2),
+                        () -> assertThat(response.stories().get(0).storyId()).isEqualTo(story2.getId()),
+                        () -> assertThat(response.stories().get(0).memberId()).isEqualTo(member.getId()),
+                        () -> assertThat(response.stories().get(0).memberNickname()).isEqualTo(member.getNickname()),
+                        () -> assertThat(response.stories().get(1).storyId()).isEqualTo(story1.getId()),
+                        () -> assertThat(response.stories().get(1).memberId()).isEqualTo(member.getId()),
+                        () -> assertThat(response.stories().get(1).memberNickname()).isEqualTo(member.getNickname())
+                );
+            }
         }
     }
 }
