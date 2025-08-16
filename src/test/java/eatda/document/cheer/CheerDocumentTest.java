@@ -1,4 +1,4 @@
-package eatda.document.store;
+package eatda.document.cheer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
