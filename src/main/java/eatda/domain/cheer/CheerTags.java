@@ -2,18 +2,29 @@ package eatda.domain.cheer;
 
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CheerTagNames {
+@Embeddable
+public class CheerTags {
 
     private static final int MAX_CHEER_TAGS_PER_TYPE = 2;
 
-    private final List<CheerTagName> cheerTagNames;
+    @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CheerTag> values = new ArrayList<>();
 
-    public CheerTagNames(List<CheerTagName> cheerTagNames) {
+    public void setTags(Cheer cheer, List<CheerTagName> cheerTagNames) {
         validate(cheerTagNames);
-        this.cheerTagNames = List.copyOf(cheerTagNames);
+        List<CheerTag> cheerTags = cheerTagNames.stream()
+                .map(name -> new CheerTag(cheer, name)) // cheer is set later
+                .toList();
+
+        this.values.clear();
+        this.values.addAll(cheerTags);
     }
 
     private void validate(List<CheerTagName> cheerTagNames) {
@@ -41,9 +52,9 @@ public class CheerTagNames {
                 .orElse(0L);
     }
 
-    public List<CheerTag> toCheerTags(Cheer cheer) {
-        return cheerTagNames.stream()
-                .map(name -> new CheerTag(cheer, name))
+    public List<CheerTagName> getNames() {
+        return values.stream()
+                .map(CheerTag::getName)
                 .toList();
     }
 }
