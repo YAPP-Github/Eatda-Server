@@ -2,10 +2,11 @@ package eatda.controller.cheer;
 
 import eatda.domain.cheer.Cheer;
 import eatda.domain.store.Store;
+import java.util.List;
 
 public record CheerPreviewResponse(
         long storeId,
-        String imageUrl,
+        List<CheerImageResponse> images,
         String storeName,
         String storeDistrict,
         String storeNeighborhood,
@@ -14,10 +15,10 @@ public record CheerPreviewResponse(
         String cheerDescription
 ) {
 
-    public CheerPreviewResponse(Cheer cheer, Store store, String imageUrl) {
+    public CheerPreviewResponse(Cheer cheer, Store store, List<CheerImageResponse> images) {
         this(
                 store.getId(),
-                imageUrl,
+                images,
                 store.getName(),
                 store.getAddressDistrict(),
                 store.getAddressNeighborhood(),

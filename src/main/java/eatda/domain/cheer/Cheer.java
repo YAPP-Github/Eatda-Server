@@ -1,13 +1,12 @@
 package eatda.domain.cheer;
 
 import eatda.domain.AuditingEntity;
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,24 +43,23 @@ public class Cheer extends AuditingEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Embedded
-    private ImageKey imageKey;
+    @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CheerImage> images = new ArrayList<>();
 
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
-    public Cheer(Member member, Store store, String description, ImageKey imageKey) {
+    public Cheer(Member member, Store store, String description) {
         validateDescription(description);
         this.member = member;
         this.store = store;
         this.description = description;
-        this.imageKey = imageKey;
 
         this.isAdmin = false;
     }
 
-    public Cheer(Member member, Store store, String description, ImageKey imageKey, boolean isAdmin) {
-        this(member, store, description, imageKey);
+    public Cheer(Member member, Store store, String description, boolean isAdmin) {
+        this(member, store, description);
         this.isAdmin = isAdmin;
     }
 
@@ -66,5 +67,10 @@ public class Cheer extends AuditingEntity {
         if (description == null || description.isBlank()) {
             throw new BusinessException(BusinessErrorCode.INVALID_CHEER_DESCRIPTION);
         }
+    }
+
+    public void addImage(CheerImage image) {
+        images.add(image);
+        image.setCheer(this);
     }
 }

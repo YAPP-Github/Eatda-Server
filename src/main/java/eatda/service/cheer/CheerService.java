@@ -1,23 +1,29 @@
 package eatda.service.cheer;
 
+import eatda.client.file.FileClient;
+import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
-import eatda.domain.ImageKey;
+import eatda.domain.ImageDomain;
 import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerImage;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.repository.cheer.CheerImageRepository;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.storage.image.ImageStorage;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -32,20 +38,29 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
-    private final ImageStorage imageStorage;
+    private final CheerImageRepository cheerImageRepository;
+    private final FileClient fileClient;
 
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request,
                                        StoreSearchResult result,
-                                       ImageKey imageKey,
-                                       long memberId) {
+                                       long memberId,
+                                       ImageDomain domain
+    ) {
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
-        Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description(), imageKey));
-        return new CheerResponse(cheer, imageStorage.getPreSignedUrl(imageKey), store);
+
+        Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description()));
+
+        List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
+        List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
+
+        saveCheerImages(cheer, sortedImages, permanentKeys);
+
+        return new CheerResponse(cheer, store);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
@@ -57,6 +72,40 @@ public class CheerService {
         }
     }
 
+    private List<CheerRegisterRequest.UploadedImageDetail> sortImages(List<CheerRegisterRequest.UploadedImageDetail> images) {
+        return images.stream()
+                .sorted(Comparator.comparingLong(CheerRegisterRequest.UploadedImageDetail::orderIndex))
+                .toList();
+    }
+
+    private List<String> moveImages(ImageDomain domain,
+                                    long cheerId,
+                                    List<CheerRegisterRequest.UploadedImageDetail> sortedImages) {
+        List<String> tempKeys = sortedImages.stream()
+                .map(CheerRegisterRequest.UploadedImageDetail::imageKey)
+                .toList();
+        return fileClient.moveTempFilesToPermanent(domain.getName(), cheerId, tempKeys);
+    }
+
+    private void saveCheerImages(Cheer cheer,
+                                 List<CheerRegisterRequest.UploadedImageDetail> sortedImages,
+                                 List<String> permanentKeys) {
+        IntStream.range(0, sortedImages.size())
+                .forEach(i -> {
+                    var detail = sortedImages.get(i);
+                    CheerImage cheerImage = new CheerImage(
+                            cheer,
+                            permanentKeys.get(i),
+                            detail.orderIndex(),
+                            detail.contentType(),
+                            detail.fileSize()
+                    );
+                    cheer.addImage(cheerImage); // 여기서 양방향 동기화
+                });
+
+        cheerRepository.save(cheer);
+    }
+
     @Transactional(readOnly = true)
     public CheersResponse getCheers(int page, int size) {
         List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
@@ -65,8 +114,14 @@ public class CheerService {
 
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
-                .map(cheer -> new CheerPreviewResponse(cheer, cheer.getStore(),
-                        imageStorage.getPreSignedUrl(cheer.getImageKey())))
+                .map(cheer -> {
+                    Store store = cheer.getStore();
+                    return new CheerPreviewResponse(cheer, store,
+                            cheer.getImages().stream()
+                                    .map(CheerImageResponse::new)
+                                    .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
+                                    .collect(Collectors.toList()));
+                })
                 .toList());
     }
 
