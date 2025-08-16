@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CheerRepository extends JpaRepository<Cheer, Long> {
 
-    @EntityGraph(attributePaths = {"store", "member"})
+    @EntityGraph(attributePaths = {"store", "member", "cheerTags"})
     List<Cheer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     @EntityGraph(attributePaths = {"member"})

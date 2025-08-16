@@ -100,7 +100,8 @@ class CheerControllerTest extends BaseControllerTest {
                     () -> assertThat(firstResponse.storeId()).isEqualTo(store2.getId()),
                     () -> assertThat(firstResponse.storeDistrict()).isEqualTo("성북구"),
                     () -> assertThat(firstResponse.storeNeighborhood()).isEqualTo("석관동"),
-                    () -> assertThat(firstResponse.cheerId()).isEqualTo(cheer3.getId())
+                    () -> assertThat(firstResponse.cheerId()).isEqualTo(cheer3.getId()),
+                    () -> assertThat(firstResponse.tags()).isEmpty()
             );
         }
 
