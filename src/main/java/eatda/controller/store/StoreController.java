@@ -2,7 +2,6 @@ package eatda.controller.store;
 
 import eatda.controller.web.auth.LoginMember;
 import eatda.domain.store.StoreSearchResult;
-import eatda.service.image.ImageService;
 import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
 import jakarta.validation.constraints.Max;
@@ -21,7 +20,6 @@ public class StoreController {
 
     private final StoreService storeService;
     private final StoreSearchService storeSearchService;
-    private final ImageService imageService;
 
     @GetMapping("/api/shops/{storeId}/images")
     public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
