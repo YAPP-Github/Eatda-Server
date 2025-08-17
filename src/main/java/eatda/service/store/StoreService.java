@@ -36,6 +36,7 @@ public class StoreService {
     }
 
     // TODO : N+1 문제 해결
+    @Transactional(readOnly = true)
     public StoresResponse getStores(int page, int size, @Nullable String category) {
         return findStores(page, size, category)
                 .stream()
@@ -51,6 +52,7 @@ public class StoreService {
                 StoreCategory.from(category), PageRequest.of(page, size));
     }
 
+    @Transactional(readOnly = true)
     public ImagesResponse getStoreImages(long storeId) {
         Store store = storeRepository.getById(storeId);
         List<String> imageUrls = cheerRepository.findAllImageKey(store)

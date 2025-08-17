@@ -7,6 +7,7 @@ import eatda.exception.BusinessException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,8 +21,10 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     Optional<Store> findByKakaoId(String kakaoId);
 
+    @EntityGraph(attributePaths = {"cheers"})
     List<Store> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"cheers"})
     List<Store> findAllByCategoryOrderByCreatedAtDesc(StoreCategory category, Pageable pageable);
 
     @Query("""

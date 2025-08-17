@@ -1,6 +1,7 @@
 package eatda.domain.store;
 
 import eatda.domain.AuditingEntity;
+import eatda.domain.cheer.Cheer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -9,7 +10,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +57,9 @@ public class Store extends AuditingEntity {
     @Embedded
     private Coordinates coordinates;
 
+    @OneToMany(mappedBy = "store")
+    private List<Cheer> cheers;
+
     @Builder
     private Store(String kakaoId,
                   StoreCategory category,
@@ -86,5 +92,11 @@ public class Store extends AuditingEntity {
             return "";
         }
         return addressParts[2];
+    }
+
+    public List<String> getCheerDescriptions() {
+        return cheers.stream()
+                .map(Cheer::getDescription)
+                .toList();
     }
 }

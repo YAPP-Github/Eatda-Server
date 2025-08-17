@@ -1,6 +1,7 @@
 package eatda.controller.store;
 
 import eatda.domain.store.Store;
+import java.util.List;
 
 public record StorePreviewResponse(
         long id,
@@ -8,7 +9,8 @@ public record StorePreviewResponse(
         String name,
         String district,
         String neighborhood,
-        String category
+        String category,
+        List<String> cheerDescriptions
 ) {
 
     public StorePreviewResponse(Store store, String imageUrl) {
@@ -18,7 +20,8 @@ public record StorePreviewResponse(
                 store.getName(),
                 store.getAddressDistrict(),
                 store.getAddressNeighborhood(),
-                store.getCategory().getCategoryName()
+                store.getCategory().getCategoryName(),
+                store.getCheerDescriptions()
         );
     }
 }
