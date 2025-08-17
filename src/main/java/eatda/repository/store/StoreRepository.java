@@ -26,10 +26,6 @@ public interface StoreRepository extends JpaRepository<Store, Long>, JpaSpecific
 
     Optional<Store> findByKakaoId(String kakaoId);
 
-    List<Store> findAllByOrderByCreatedAtDesc(Pageable pageable);
-
-    List<Store> findAllByCategoryOrderByCreatedAtDesc(StoreCategory category, Pageable pageable);
-
     @Query("""
             SELECT s FROM Store s
                 JOIN Cheer c ON s.id = c.store.id
