@@ -111,6 +111,14 @@ class StoreControllerTest extends BaseControllerTest {
     }
 
     @Nested
+    class GetNewStores {
+
+        @Test
+        void 최신_음식점_목록을_조회한다() {
+        }
+    }
+
+    @Nested
     class GetStoreImages {
 
         @Test

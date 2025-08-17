@@ -1,5 +1,6 @@
 package eatda.document.store;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -128,7 +129,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
                     new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
             ));
-            doReturn(response).when(storeService).getStores(page, size, category.getCategoryName());
+            doReturn(response).when(storeService).getStores(any());
 
             var document = document("store/get", 200)
                     .request(requestDocument)
@@ -150,8 +151,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
             int page = 0;
             int size = 2;
             StoreCategory category = StoreCategory.CAFE;
-            doThrow(new BusinessException(errorCode))
-                    .when(storeService).getStores(page, size, category.getCategoryName());
+            doThrow(new BusinessException(errorCode)).when(storeService).getStores(any());
 
             var document = document("store/get", errorCode)
                     .request(requestDocument)

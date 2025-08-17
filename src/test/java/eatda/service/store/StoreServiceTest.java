@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoreSearchParameters;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
@@ -69,13 +70,12 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
-            int page = 0;
-            int size = 2;
+            StoreSearchParameters parameters = new StoreSearchParameters(0, 2, null, null, null);
 
-            var response = storeService.getStores(page, size, null);
+            var response = storeService.getStores(parameters);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
             );
@@ -93,14 +93,12 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.KOREAN;
+            StoreSearchParameters parameters = new StoreSearchParameters(0, 2, StoreCategory.KOREAN, null, null);
 
-            var response = storeService.getStores(page, size, category.getCategoryName());
+            var response = storeService.getStores(parameters);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
             );
@@ -118,10 +116,9 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
-            int page = 1;
-            int size = 2;
+            StoreSearchParameters parameters = new StoreSearchParameters(1, 2, null, null, null);
 
-            var response = storeService.getStores(page, size, null);
+            var response = storeService.getStores(parameters);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(1),
@@ -141,11 +138,9 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1, "image-key-1");
             cheerGenerator.generateCommon(member, store2, "image-key-2");
             cheerGenerator.generateCommon(member, store3, "image-key-3");
-            int page = 1;
-            int size = 1;
-            StoreCategory category = StoreCategory.KOREAN;
+            StoreSearchParameters parameters = new StoreSearchParameters(1, 1, StoreCategory.KOREAN, null, null);
 
-            var response = storeService.getStores(page, size, category.getCategoryName());
+            var response = storeService.getStores(parameters);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(1),
