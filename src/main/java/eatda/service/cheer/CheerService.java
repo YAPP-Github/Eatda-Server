@@ -58,6 +58,7 @@ public class CheerService {
 
         Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description()));
 
+        // TODO 트랜잭션 범위 축소
         List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
         List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
 

@@ -7,6 +7,7 @@ import eatda.controller.story.StoryImageResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
@@ -25,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,10 +47,11 @@ public class StoryService {
     @Transactional
     public StoryRegisterResponse registerStory(StoryRegisterRequest request,
                                                StoreSearchResult result,
+                                               ImageDomain domain,
                                                long memberId) {
         Member member = memberRepository.getById(memberId);
 
-        Story story = Story.builder()
+        Story story = storyRepository.save(Story.builder()
                 .member(member)
                 .storeKakaoId(result.kakaoId())
                 .storeName(result.name())
@@ -58,19 +59,36 @@ public class StoryService {
                 .storeLotNumberAddress(result.lotNumberAddress())
                 .storeCategory(result.category())
                 .description(request.description())
-                .build();
-        storyRepository.save(story);
+                .build());
 
-        List<StoryRegisterRequest.UploadedImageDetail> sortedImages = request.images().stream()
+        // TODO 트랜잭션 범위 축소
+        List<StoryRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
+        List<String> permanentKeys = moveImages(domain.getName(), story.getId(), sortedImages);
+
+        saveStoryImages(story, sortedImages, permanentKeys);
+
+        return new StoryRegisterResponse(story.getId());
+    }
+
+    private List<StoryRegisterRequest.UploadedImageDetail> sortImages(
+            List<StoryRegisterRequest.UploadedImageDetail> images) {
+        return images.stream()
                 .sorted(Comparator.comparingLong(StoryRegisterRequest.UploadedImageDetail::orderIndex))
                 .toList();
+    }
 
+    private List<String> moveImages(String domainName,
+                                    long storyId,
+                                    List<StoryRegisterRequest.UploadedImageDetail> sortedImages) {
         List<String> tempKeys = sortedImages.stream()
                 .map(StoryRegisterRequest.UploadedImageDetail::imageKey)
                 .toList();
+        return fileClient.moveTempFilesToPermanent(domainName, storyId, tempKeys);
+    }
 
-        List<String> permanentKeys = fileClient.moveTempFilesToPermanent("story", story.getId(), tempKeys);
-
+    private void saveStoryImages(Story story,
+                                 List<StoryRegisterRequest.UploadedImageDetail> sortedImages,
+                                 List<String> permanentKeys) {
         List<StoryImage> storyImages = IntStream.range(0, sortedImages.size())
                 .mapToObj(i -> {
                     var detail = sortedImages.get(i);
@@ -79,26 +97,28 @@ public class StoryService {
                             permanentKeys.get(i),
                             detail.orderIndex(),
                             detail.contentType(),
-                            detail.fileSize());
+                            detail.fileSize()
+                    );
                 })
                 .toList();
 
         storyImageRepository.saveAll(storyImages);
 
-        return new StoryRegisterResponse(story.getId());
     }
 
     @Transactional(readOnly = true)
     public StoriesResponse getPagedStoryPreviews(int size) {
-        Pageable pageable = PageRequest.of(PAGE_START_NUMBER, size);
-        Page<Story> orderByPage = storyRepository.findAllByOrderByCreatedAtDesc(pageable);
+        Page<Story> page = storyRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(PAGE_START_NUMBER, size));
+        return toStoriesResponse(page.getContent());
+    }
 
+    private StoriesResponse toStoriesResponse(List<Story> stories) {
         return new StoriesResponse(
-                orderByPage.getContent().stream()
+                stories.stream()
                         .map(story -> new StoriesResponse.StoryPreview(
                                 story.getId(),
                                 story.getImages().stream()
-                                        .map(img -> new StoryImageResponse(img, cdnBaseUrl)) // ✅ CDN 포함
+                                        .map(img -> new StoryImageResponse(img, cdnBaseUrl))
                                         .sorted(Comparator.comparingLong(StoryImageResponse::orderIndex))
                                         .toList()
                         ))
@@ -115,11 +135,6 @@ public class StoryService {
                 .map(Store::getId)
                 .orElse(null);
 
-        List<String> imageUrls = story.getImages().stream()
-                .sorted(Comparator.comparingLong(StoryImage::getOrderIndex))
-                .map(StoryImage::getImageKey)
-                .toList();
-
         return new StoryResponse(story, storeId, cdnBaseUrl);
     }
 
@@ -134,10 +149,10 @@ public class StoryService {
                         story,
                         storyImageRepository.findAllByStory_IdOrderByOrderIndexAsc(story.getId())
                                 .stream()
-                                .map(StoryImage::getImageKey)
+                                .map(StoryImage::getImageKey) // TODO: 여기서도 CDN URL 변환 고려
                                 .toList()
                 ))
-                .toList(); // TODO: N+1 문제 해결
+                .toList();
         return new StoriesDetailResponse(responses);
     }
 }
