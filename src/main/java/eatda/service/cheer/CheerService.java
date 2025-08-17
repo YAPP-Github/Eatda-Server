@@ -14,7 +14,6 @@ import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.cheer.CheerRepository;
-import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.storage.image.ImageStorage;
@@ -33,7 +32,6 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
-    private final CheerTagRepository cheerTagRepository;
     private final ImageStorage imageStorage;
 
     @Transactional
