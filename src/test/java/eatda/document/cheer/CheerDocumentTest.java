@@ -172,7 +172,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                     new CheerPreviewResponse(1L, null, "석관동떡볶이", "성북구", "석관동", "기타", 1L,
                             "너무 매워요! 하지만 맛있어요!", List.of(), 8L, "찬커")
             ));
-            doReturn(responses).when(cheerService).getCheers(page, size);
+            doReturn(responses).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", 200)
                     .request(requestDocument)
@@ -191,7 +191,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
             int page = 0;
             int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(page, size);
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", errorCode)
                     .request(requestDocument)

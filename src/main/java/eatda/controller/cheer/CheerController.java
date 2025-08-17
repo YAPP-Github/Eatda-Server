@@ -1,14 +1,18 @@
 package eatda.controller.cheer;
 
+import eatda.controller.store.SearchDistrict;
 import eatda.controller.web.auth.LoginMember;
 import eatda.domain.ImageDomain;
 import eatda.domain.ImageKey;
+import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.service.cheer.CheerService;
 import eatda.service.image.ImageService;
 import eatda.service.store.StoreSearchService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +48,12 @@ public class CheerController {
 
     @GetMapping("/api/cheer")
     public ResponseEntity<CheersResponse> getCheers(@RequestParam(defaultValue = "0") @Min(0) int page,
-                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size) {
-        CheersResponse response = cheerService.getCheers(page, size);
+                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
+                                                    @RequestParam(required = false) StoreCategory category,
+                                                    @RequestParam(required = false) List<CheerTagName> tag,
+                                                    @RequestParam(required = false) List<SearchDistrict> location) {
+        CheerSearchParameters searchParameters = new CheerSearchParameters(page, size, category, tag, location);
+        CheersResponse response = cheerService.getCheers(searchParameters);
         return ResponseEntity.ok(response);
     }
 

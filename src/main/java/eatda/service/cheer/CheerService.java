@@ -4,6 +4,7 @@ import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
+import eatda.controller.cheer.CheerSearchParameters;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
 import eatda.domain.ImageKey;
@@ -21,6 +22,8 @@ import eatda.storage.image.ImageStorage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,8 +65,13 @@ public class CheerService {
     }
 
     @Transactional(readOnly = true)
-    public CheersResponse getCheers(int page, int size) {
-        List<Cheer> cheers = cheerRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
+    public CheersResponse getCheers(CheerSearchParameters parameters) {
+        List<Cheer> cheers = cheerRepository.findAllByConditions(
+                parameters.getCategory(),
+                parameters.getCheerTagNames(),
+                parameters.getDistricts(),
+                PageRequest.of(parameters.getPage(), parameters.getSize(), Sort.by(Direction.DESC, "createdAt"))
+        );
         return toCheersResponse(cheers);
     }
 
