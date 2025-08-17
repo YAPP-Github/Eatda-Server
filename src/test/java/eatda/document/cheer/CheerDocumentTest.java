@@ -19,11 +19,13 @@ import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
+import eatda.controller.store.SearchDistrict;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.util.ImageUtils;
@@ -143,7 +145,12 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .summary("최신 응원 검색")
                 .queryParameter(
                         parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
-                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional(),
+                        parameterWithName("category").description("음식점 카테고리 0~1개(기본값: 전체) (ex. KOREAN)").optional(),
+                        parameterWithName("tag")
+                                .description("응원 태그 이름 0~N개(기본값: 전체) (ex. INSTAGRAMMABLE,ENERGETIC)").optional(),
+                        parameterWithName("location")
+                                .description("음식점 지역 0~N개(기본값: 전체) (ex. GANGNAM,KONDAE)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -164,8 +171,6 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
         @Test
         void 음식점_검색_성공() {
-            int page = 0;
-            int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
                     new CheerPreviewResponse(2L, "https://example.image", "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
                             "너무 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"),
@@ -181,7 +186,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(200);
         }
@@ -189,8 +198,6 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
-            int page = 0;
-            int size = 2;
             doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", errorCode)
@@ -200,7 +207,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(errorCode.getStatus().value());
         }
