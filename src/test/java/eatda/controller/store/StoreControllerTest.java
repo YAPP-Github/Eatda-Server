@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import eatda.controller.BaseControllerTest;
+import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import io.restassured.http.ContentType;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -143,6 +147,30 @@ class StoreControllerTest extends BaseControllerTest {
                     .extract().as(ImagesResponse.class);
 
             assertThat(response.imageUrls()).isEmpty();
+        }
+    }
+
+
+    @Nested
+    class GetStoreTags {
+
+        @Test
+        void 음식점_태그들을_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            Cheer cheer = cheerGenerator.generateCommon(member, store, "image-key");
+            cheerTagGenerator.generate(cheer, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+
+            TagsResponse response = given()
+                    .when()
+                    .contentType(ContentType.JSON)
+                    .get("/api/shops/{storeId}/tags", store.getId())
+                    .then()
+                    .statusCode(200)
+                    .extract().as(TagsResponse.class);
+
+            assertThat(response.tags())
+                    .containsExactlyInAnyOrder(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM);
         }
     }
 
