@@ -27,7 +27,7 @@ public record StoryResponse(
                 story.getAddressNeighborhood(),
                 story.getDescription(),
                 story.getImages().stream()
-                        .map(img -> new StoryImageResponse(img, cdnBaseUrl)) // ✅ CDN 붙이기
+                        .map(img -> new StoryImageResponse(img, cdnBaseUrl))
                         .sorted(Comparator.comparingLong(StoryImageResponse::orderIndex))
                         .toList(),
                 story.getMember().getId(),

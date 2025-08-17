@@ -63,6 +63,7 @@ public class StoreService {
 
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerImageRepository.findFirstByCheer_Store_IdOrderByCreatedAtDesc(store.getId())
-                .map(CheerImage::getImageKey);
+                .map(CheerImage::getImageKey)
+                .map(imageKey -> cdnBaseUrl + "/" + imageKey);
     }
 }
