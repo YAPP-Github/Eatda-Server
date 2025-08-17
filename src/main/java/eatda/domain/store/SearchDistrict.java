@@ -23,8 +23,8 @@ public enum SearchDistrict {
     GURO("구로/서울대입구", List.of(District.GURO, District.GWANAK)),
     ;
 
-    private String displayName;
-    private List<District> districts;
+    private final String displayName;
+    private final List<District> districts;
 
     SearchDistrict(String displayName, List<District> districts) {
         this.displayName = displayName;
