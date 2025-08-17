@@ -4,8 +4,11 @@ import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
 import eatda.fixture.CheerGenerator;
+import eatda.fixture.CheerImageGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
+import eatda.fixture.StoryGenerator;
+import eatda.fixture.StoryImageGenerator;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
@@ -44,6 +47,15 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
+
+    @Autowired
+    protected StoryGenerator storyGenerator;
+
+    @Autowired
+    protected CheerImageGenerator cheerImageGenerator;
+
+    @Autowired
+    protected StoryImageGenerator storyImageGenerator;
 
     @Autowired
     protected MemberRepository memberRepository;

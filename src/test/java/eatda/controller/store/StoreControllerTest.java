@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import eatda.controller.BaseControllerTest;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
@@ -117,9 +118,11 @@ class StoreControllerTest extends BaseControllerTest {
         void 음식점_이미지들을_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateWithImages(member, store, false, 1);
-            cheerGenerator.generateWithImages(member, store, false, 1);
-            cheerGenerator.generateWithImages(member, store, false, 1);
+            Cheer cheer = cheerGenerator.generateCommon(member, store, false);
+
+            cheerImageGenerator.generate(cheer, "image1.png", 1L);
+            cheerImageGenerator.generate(cheer, "image2.png", 2L);
+            cheerImageGenerator.generate(cheer, "image3.png", 3L);
 
             ImagesResponse response = given()
                     .when()
