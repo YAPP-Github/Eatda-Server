@@ -41,7 +41,7 @@ public class StoreService {
                 parameters.getCheerTagNames(),
                 parameters.getDistricts(),
                 PageRequest.of(parameters.getPage(), parameters.getSize(), Sort.by(Direction.DESC, "createdAt"))
-        ).getContent();
+        );
 
         List<StorePreviewResponse> responses = stores.stream()
                 .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))

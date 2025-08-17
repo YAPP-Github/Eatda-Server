@@ -12,11 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
 
-public interface StoreRepository extends JpaRepository<Store, Long>, JpaSpecificationExecutor<Store> {
+public interface StoreRepository extends JpaRepository<Store, Long> {
 
     @Override
     default Store getById(Long id) {
@@ -34,14 +33,15 @@ public interface StoreRepository extends JpaRepository<Store, Long>, JpaSpecific
             """)
     List<Store> findAllByCheeredMemberId(long memberId);
 
-    default Page<Store> findAllByConditions(@Nullable StoreCategory category,
+    default List<Store> findAllByConditions(@Nullable StoreCategory category,
                                             List<CheerTagName> cheerTagNames,
                                             List<District> districts,
                                             Pageable pageable) {
-        Specification<Store> spec = createSpecification(category,
-                cheerTagNames, districts);
+        Specification<Store> spec = createSpecification(category, cheerTagNames, districts);
         return findAll(spec, pageable);
     }
+
+    List<Store> findAll(Specification<Store> spec, Pageable pageable);
 
     private Specification<Store> createSpecification(@Nullable StoreCategory category,
                                                      List<CheerTagName> cheerTagNames,
