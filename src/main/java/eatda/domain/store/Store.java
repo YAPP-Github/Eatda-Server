@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -58,7 +59,7 @@ public class Store extends AuditingEntity {
     private Coordinates coordinates;
 
     @OneToMany(mappedBy = "store")
-    private List<Cheer> cheers;
+    private List<Cheer> cheers = new ArrayList<>();
 
     @Builder
     private Store(String kakaoId,
