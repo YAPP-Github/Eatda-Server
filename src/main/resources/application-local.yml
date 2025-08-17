@@ -15,7 +15,7 @@ spring:
       region:
         static: ap-northeast-2
       s3:
-        bucket: eatda-storage-local
+        bucket: eatda-storage-dev
 
   servlet:
     multipart:
@@ -50,5 +50,5 @@ oauth:
 kakao:
   api-key: ${KAKAO_API_KEY}
 
-cloudfront:
-  url: "http://localhost:8080"
+cdn:
+  base-url: "http://localhost:8080"

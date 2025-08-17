@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +40,9 @@ public class StoryService {
     private final MemberRepository memberRepository;
     private final StoryImageRepository storyImageRepository;
     private final FileClient fileClient;
+
+    @Value("${cdn.base-url}")
+    private String cdnBaseUrl;
 
     @Transactional
     public StoryRegisterResponse registerStory(StoryRegisterRequest request,
@@ -94,7 +98,7 @@ public class StoryService {
                         .map(story -> new StoriesResponse.StoryPreview(
                                 story.getId(),
                                 story.getImages().stream()
-                                        .map(StoryImageResponse::new)
+                                        .map(img -> new StoryImageResponse(img, cdnBaseUrl)) // ✅ CDN 포함
                                         .sorted(Comparator.comparingLong(StoryImageResponse::orderIndex))
                                         .toList()
                         ))
@@ -116,7 +120,7 @@ public class StoryService {
                 .map(StoryImage::getImageKey)
                 .toList();
 
-        return new StoryResponse(story, storeId);
+        return new StoryResponse(story, storeId, cdnBaseUrl);
     }
 
     @Transactional(readOnly = true)

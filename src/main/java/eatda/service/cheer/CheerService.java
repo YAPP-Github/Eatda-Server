@@ -22,9 +22,9 @@ import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +40,9 @@ public class CheerService {
     private final CheerRepository cheerRepository;
     private final CheerImageRepository cheerImageRepository;
     private final FileClient fileClient;
+
+    @Value("${cdn.base-url}")
+    private String cdnBaseUrl;
 
     @Transactional
     public CheerResponse registerCheer(CheerRegisterRequest request,
@@ -60,7 +63,7 @@ public class CheerService {
 
         saveCheerImages(cheer, sortedImages, permanentKeys);
 
-        return new CheerResponse(cheer, store);
+        return new CheerResponse(cheer, store, cdnBaseUrl);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
@@ -118,9 +121,9 @@ public class CheerService {
                     Store store = cheer.getStore();
                     return new CheerPreviewResponse(cheer, store,
                             cheer.getImages().stream()
-                                    .map(CheerImageResponse::new)
+                                    .map(img -> new CheerImageResponse(img, cdnBaseUrl))
                                     .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
-                                    .collect(Collectors.toList()));
+                                    .toList());
                 })
                 .toList());
     }

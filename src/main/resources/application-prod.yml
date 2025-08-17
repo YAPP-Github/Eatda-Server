@@ -55,5 +55,5 @@ oauth:
 kakao:
   api-key: ${KAKAO_API_KEY}
 
-cloudfront:
-  url: ${CLOUDFRONT_URL}
+cdn:
+  base-url: ${CLOUDFRONT_DOMAIN_NAME}

@@ -13,12 +13,12 @@ public record CheerResponse(
         String cheerDescription
 ) {
 
-    public CheerResponse(Cheer cheer, Store store) {
+    public CheerResponse(Cheer cheer, Store store, String cdnBaseUrl) {
         this(
                 store.getId(),
                 cheer.getId(),
                 cheer.getImages().stream()
-                        .map(CheerImageResponse::new)
+                        .map(img -> new CheerImageResponse(img, cdnBaseUrl)) // ✅ CDN 붙여줌
                         .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
                         .collect(Collectors.toList()),
                 cheer.getDescription()

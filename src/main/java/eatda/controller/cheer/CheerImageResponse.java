@@ -6,14 +6,16 @@ public record CheerImageResponse(
         String imageKey,
         long orderIndex,
         String contentType,
-        long fileSize
+        long fileSize,
+        String url
 ) {
-    public CheerImageResponse(CheerImage cheerImage) {
+    public CheerImageResponse(CheerImage cheerImage, String cdnBaseUrl) {
         this(
                 cheerImage.getImageKey(),
                 cheerImage.getOrderIndex(),
                 cheerImage.getContentType(),
-                cheerImage.getFileSize()
+                cheerImage.getFileSize(),
+                cdnBaseUrl + "/" + cheerImage.getImageKey()
         );
     }
 }

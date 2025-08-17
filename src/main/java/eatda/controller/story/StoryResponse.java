@@ -3,7 +3,6 @@ package eatda.controller.story;
 import eatda.domain.story.Story;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 
 public record StoryResponse(
@@ -18,7 +17,7 @@ public record StoryResponse(
         long memberId,
         String memberNickname
 ) {
-    public StoryResponse(Story story, Long storeId) {
+    public StoryResponse(Story story, Long storeId, String cdnBaseUrl) {
         this(
                 storeId,
                 story.getStoreKakaoId(),
@@ -28,9 +27,9 @@ public record StoryResponse(
                 story.getAddressNeighborhood(),
                 story.getDescription(),
                 story.getImages().stream()
-                        .map(StoryImageResponse::new)
+                        .map(img -> new StoryImageResponse(img, cdnBaseUrl)) // ✅ CDN 붙이기
                         .sorted(Comparator.comparingLong(StoryImageResponse::orderIndex))
-                        .collect(Collectors.toList()),
+                        .toList(),
                 story.getMember().getId(),
                 story.getMember().getNickname()
         );
