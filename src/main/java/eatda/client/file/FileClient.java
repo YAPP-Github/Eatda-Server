@@ -60,7 +60,7 @@ public class FileClient {
                         copyObject(tempImageKey, newPermanentKey);
                         deleteObject(tempImageKey);
                         return newPermanentKey;
-                    } catch (Exception e) {
+                    } catch (Exception e) { //TODO 근본 예외 추가 필요
                         throw new BusinessException(BusinessErrorCode.FAIL_TEMP_IMAGE_PROCESS);
                     }
                 }, executorService))
