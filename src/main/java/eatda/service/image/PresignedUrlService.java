@@ -53,7 +53,7 @@ public class PresignedUrlService {
     }
 
     private void validateContentType(String contentType) {
-        if (contentType != null && !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+        if (contentType == null || contentType.isBlank() || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE);
         }
     }
