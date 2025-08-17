@@ -119,7 +119,7 @@ jobs:
       - name: Update CLOUDFRONT_DOMAIN_NAME in Parameter Store
         run: |
           aws ssm put-parameter \
-          --name "/dev/CLOUDFRONT_DOMAIN_NAME" \
+          --name "/prod/CLOUDFRONT_DOMAIN_NAME" \
           --type "SecureString" \
           --value "$CLOUDFRONT_DOMAIN_NAME" \
           --overwrite
