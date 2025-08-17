@@ -16,6 +16,7 @@ import eatda.repository.store.StoreRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
     private final CheerImageRepository cheerImageRepository;
+
+    @Value("${cdn.base-url}")
+    private String cdnBaseUrl;
 
     public StoreResponse getStore(long storeId) {
         Store store = storeRepository.getById(storeId);
@@ -50,11 +54,11 @@ public class StoreService {
     }
 
     public ImagesResponse getStoreImages(long storeId) {
-        List<String> imageKeys = cheerImageRepository.findAllByCheer_Store_IdOrderByOrderIndexAsc(storeId)
+        List<String> urls = cheerImageRepository.findAllByCheer_Store_IdOrderByOrderIndexAsc(storeId)
                 .stream()
-                .map(CheerImage::getImageKey)
+                .map(img -> cdnBaseUrl + "/" + img.getImageKey())
                 .toList();
-        return new ImagesResponse(imageKeys);
+        return new ImagesResponse(urls);
     }
 
     private Optional<String> getStoreImageUrl(Store store) {

@@ -8,9 +8,8 @@ import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -23,13 +22,12 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getName(), store.getKakaoId(), "맛있어요!", new ArrayList<>());
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType("application/json")
+                    .body(request)
                     .when()
                     .post("/api/cheer")
                     .then()
@@ -42,12 +40,12 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getName(), store.getKakaoId(), "맛있어요!", new ArrayList<>());
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .contentType("application/json")
+                    .body(request)
                     .when()
                     .post("/api/cheer")
                     .then()

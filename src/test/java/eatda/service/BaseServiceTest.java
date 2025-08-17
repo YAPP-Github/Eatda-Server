@@ -1,8 +1,5 @@
 package eatda.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
@@ -17,8 +14,6 @@ import eatda.repository.story.StoryRepository;
 import eatda.service.auth.AuthService;
 import eatda.service.auth.OauthService;
 import eatda.service.store.StoreSearchService;
-import eatda.storage.image.ExternalImageStorage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,9 +31,6 @@ public abstract class BaseServiceTest {
 
     @MockitoBean
     protected MapClient mapClient;
-
-    @MockitoBean
-    protected ExternalImageStorage externalImageStorage;
 
     @Autowired
     protected OauthService oauthService;
@@ -70,9 +62,4 @@ public abstract class BaseServiceTest {
     @Autowired
     protected StoryRepository storyRepository;
 
-    @BeforeEach
-    void mockingImageService() {
-        doReturn(MOCKED_IMAGE_URL).when(externalImageStorage).getPreSignedUrl(any());
-        doReturn(MOCKED_IMAGE_KEY).when(externalImageStorage).upload(any());
-    }
 }

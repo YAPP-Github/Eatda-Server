@@ -21,7 +21,7 @@ class StoreControllerTest extends BaseControllerTest {
         void 음식점_정보를_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key");
+            cheerGenerator.generateCommon(member, store, false);
 
             StoreResponse response = given()
                     .pathParam("storeId", store.getId())
@@ -52,9 +52,9 @@ class StoreControllerTest extends BaseControllerTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1, false);
+            cheerGenerator.generateCommon(member, store2, false);
+            cheerGenerator.generateCommon(member, store3, false);
 
             int page = 0;
             int size = 2;
@@ -84,9 +84,9 @@ class StoreControllerTest extends BaseControllerTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1, false);
+            cheerGenerator.generateCommon(member, store2, false);
+            cheerGenerator.generateCommon(member, store3, false);
 
             int page = 0;
             int size = 2;
@@ -117,9 +117,9 @@ class StoreControllerTest extends BaseControllerTest {
         void 음식점_이미지들을_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key-1");
-            cheerGenerator.generateCommon(member, store, "image-key-2");
-            cheerGenerator.generateCommon(member, store, "image-key-3");
+            cheerGenerator.generateWithImages(member, store, false, 1);
+            cheerGenerator.generateWithImages(member, store, false, 1);
+            cheerGenerator.generateWithImages(member, store, false, 1);
 
             ImagesResponse response = given()
                     .when()

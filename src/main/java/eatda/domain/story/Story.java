@@ -161,4 +161,9 @@ public class Story extends AuditingEntity {
         }
         return addressParts[2];
     }
+
+    public void addImage(StoryImage image) {
+        images.add(image);
+        image.setStory(this);
+    }
 }

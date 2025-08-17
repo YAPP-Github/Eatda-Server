@@ -1,6 +1,8 @@
 package eatda.domain.story;
 
 import eatda.domain.BaseImageEntity;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +30,37 @@ public class StoryImage extends BaseImageEntity {
     private Story story;
 
     public StoryImage(Story story, String imageKey, long orderIndex, String contentType, Long fileSize) {
-        super(imageKey, orderIndex, contentType, fileSize);
+        super(
+                validateImageKey(imageKey),
+                orderIndex,
+                validateContentType(contentType),
+                validateFileSize(fileSize)
+        );
+        this.story = story;
+    }
+
+    private static String validateImageKey(String imageKey) {
+        if (imageKey == null || imageKey.trim().isEmpty()) {
+            throw new BusinessException(BusinessErrorCode.INVALID_EMPTY_FILE_DETAILS);
+        }
+        return imageKey;
+    }
+
+    private static String validateContentType(String contentType) {
+        if (contentType == null || contentType.trim().isEmpty()) {
+            throw new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE);
+        }
+        return contentType;
+    }
+
+    private static Long validateFileSize(Long fileSize) {
+        if (fileSize == null || fileSize <= 0) {
+            throw new BusinessException(BusinessErrorCode.INVALID_MAX_FILE_SIZE);
+        }
+        return fileSize;
+    }
+
+    protected void setStory(Story story) {
         this.story = story;
     }
 }

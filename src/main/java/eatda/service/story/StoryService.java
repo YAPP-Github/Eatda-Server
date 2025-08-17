@@ -89,21 +89,20 @@ public class StoryService {
     private void saveStoryImages(Story story,
                                  List<StoryRegisterRequest.UploadedImageDetail> sortedImages,
                                  List<String> permanentKeys) {
-        List<StoryImage> storyImages = IntStream.range(0, sortedImages.size())
-                .mapToObj(i -> {
+        IntStream.range(0, sortedImages.size())
+                .forEach(i -> {
                     var detail = sortedImages.get(i);
-                    return new StoryImage(
+                    StoryImage storyImage = new StoryImage(
                             story,
                             permanentKeys.get(i),
                             detail.orderIndex(),
                             detail.contentType(),
                             detail.fileSize()
                     );
-                })
-                .toList();
+                    story.addImage(storyImage);
+                });
 
-        storyImageRepository.saveAll(storyImages);
-
+        storyRepository.save(story);
     }
 
     @Transactional(readOnly = true)
@@ -149,10 +148,11 @@ public class StoryService {
                         story,
                         storyImageRepository.findAllByStory_IdOrderByOrderIndexAsc(story.getId())
                                 .stream()
-                                .map(StoryImage::getImageKey) // TODO: 여기서도 CDN URL 변환 고려
+                                .map(img -> new StoryImageResponse(img, cdnBaseUrl))
                                 .toList()
                 ))
                 .toList();
+
         return new StoriesDetailResponse(responses);
     }
 }
