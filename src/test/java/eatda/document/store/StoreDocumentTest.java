@@ -22,7 +22,9 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.District;
+import eatda.domain.store.SearchDistrict;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
@@ -106,7 +108,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
                         parameterWithName("page").description("조회할 음식점 페이지 (기본 값 0,시작 값 0)").optional(),
                         parameterWithName("size").description("조회할 음식점 개수 (기본 값 5, 최소 1, 최대 50)").optional(),
                         parameterWithName("category")
-                                .description("음식점 카테고리(기본값: 전체) (한식,중식,일식,양식,카페/디저트,기타)").optional()
+                                .description("음식점 카테고리 0~1개(기본값: 전체) (ex. KOREAN)").optional(),
+                        parameterWithName("tag")
+                                .description("응원 태그 이름 0~N개(기본값: 전체) (ex. INSTAGRAMMABLE,ENERGETIC)").optional(),
+                        parameterWithName("location")
+                                .description("음식점 지역 0~N개(기본값: 전체) (ex. GANGNAM,KONDAE)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -122,9 +128,6 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
         @Test
         void 음식점_목록_최신순으로_조회() {
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
             StoresResponse response = new StoresResponse(List.of(
                     new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
                     new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
@@ -138,9 +141,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("page", page)
-                    .queryParam("size", size)
-                    .queryParam("category", category.getCategoryName())
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.CAFE)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.KONDAE)
                     .when().get("/api/shops")
                     .then().statusCode(200);
         }
@@ -148,9 +153,6 @@ public class StoreDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_목록_조회_실패(BusinessErrorCode errorCode) {
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
             doThrow(new BusinessException(errorCode)).when(storeService).getStores(any());
 
             var document = document("store/get", errorCode)
@@ -160,9 +162,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("page", page)
-                    .queryParam("size", size)
-                    .queryParam("category", category.getCategoryName())
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.CAFE)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.KONDAE)
                     .when().get("/api/shops")
                     .then().statusCode(errorCode.getStatus().value());
         }
