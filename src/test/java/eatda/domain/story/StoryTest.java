@@ -3,7 +3,6 @@ package eatda.domain.story;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
@@ -30,8 +29,7 @@ class StoryTest {
                 .storeRoadAddress("서울시 성동구 왕십리로 1길 12")
                 .storeLotNumberAddress("서울시 성동구 성수동1가 685-12")
                 .storeCategory(StoreCategory.KOREAN)
-                .description("정말 맛있어요")
-                .imageKey(new ImageKey("story/image.jpg"));
+                .description("정말 맛있어요");
     }
 
     @Nested

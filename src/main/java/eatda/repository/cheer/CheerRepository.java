@@ -15,19 +15,6 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
     @EntityGraph(attributePaths = "images")
     List<Cheer> findAllByStoreOrderByCreatedAtDesc(Store store, Pageable pageable);
 
-//    @Query("""
-//            SELECT c.imageKey FROM Cheer c
-//                WHERE c.store = :store AND c.imageKey IS NOT NULL
-//                ORDER BY c.createdAt DESC
-//                LIMIT 1""")
-//    Optional<ImageKey> findRecentImageKey(Store store);
-//
-//    @Query("""
-//            SELECT c.imageKey FROM Cheer c
-//                WHERE c.store = :store AND c.imageKey IS NOT NULL
-//                ORDER BY c.createdAt DESC""")
-//    List<ImageKey> findAllImageKey(Store store);
-
     int countByMember(Member member);
 
     boolean existsByMemberAndStoreKakaoId(Member member, String storeKakaoId);

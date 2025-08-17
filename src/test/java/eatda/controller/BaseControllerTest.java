@@ -1,6 +1,5 @@
 package eatda.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
@@ -11,7 +10,6 @@ import eatda.client.oauth.OauthClient;
 import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
@@ -46,7 +44,6 @@ public class BaseControllerTest {
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
             new OauthMemberInformation(314159248183772L, "constant@kakao.com", "nickname");
-    private static final ImageKey MOCKED_IMAGE_KEY = new ImageKey("mocked-image-path");
     private static final String MOCKED_IMAGE_URL = "https://example.com/image.jpg";
 
     @Autowired

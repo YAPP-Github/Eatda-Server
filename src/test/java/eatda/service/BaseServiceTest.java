@@ -3,7 +3,6 @@ package eatda.service;
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
-import eatda.domain.ImageKey;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
@@ -23,7 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public abstract class BaseServiceTest {
 
-    private static final ImageKey MOCKED_IMAGE_KEY = new ImageKey("mocked-image-key");
     private static final String MOCKED_IMAGE_URL = "https://example.com/image.jpg";
 
     @MockitoBean

@@ -3,7 +3,6 @@ package eatda.service.story;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import eatda.client.file.FileClient;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse;
 import eatda.controller.story.StoryRegisterRequest;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 class StoryServiceTest extends BaseServiceTest {
 
@@ -32,9 +30,6 @@ class StoryServiceTest extends BaseServiceTest {
 
     @Autowired
     private StoryRepository storyRepository;
-
-    @MockBean
-    private FileClient fileClient;
 
     @BeforeEach
     void setUp() {

@@ -1,7 +1,6 @@
 package eatda.domain.story;
 
 import eatda.domain.AuditingEntity;
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
@@ -70,12 +69,11 @@ public class Story extends AuditingEntity {
             String storeName,
             String storeRoadAddress,
             String storeLotNumberAddress,
-            String description,
-            ImageKey imageKey
+            String description
     ) {
         validateMember(member);
         validateStore(storeKakaoId, storeCategory, storeName, storeRoadAddress, storeLotNumberAddress);
-        validateStory(description, imageKey);
+        validateStory(description);
 
         this.member = member;
         this.storeKakaoId = storeKakaoId;
@@ -106,7 +104,7 @@ public class Story extends AuditingEntity {
         validateStoreLotNumberAddress(lotNumberAddress);
     }
 
-    private void validateStory(String description, ImageKey imageKey) {
+    private void validateStory(String description) {
         validateDescription(description);
     }
 
