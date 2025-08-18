@@ -42,45 +42,10 @@ public class StoryDocumentTest extends BaseDocumentTest {
     @Nested
     class RegisterStory {
 
-        private static final String REQUEST_DESCRIPTION_MARKDOWN = """
-                - 요청 형식 : application/json
-                - 요청 body 필드
-                  - storeName : 가게 이름 (필수)
-                  - storeKakaoId : 가게 카카오 ID (필수)
-                  - description : 스토리 내용 (선택, null 허용)
-                  - images : 업로드된 이미지 정보 리스트 (선택)
-                    - imageKey : S3 임시 업로드 키
-                    - orderIndex : 노출 순서
-                    - contentType : 이미지 MIME 타입
-                    - fileSize : 파일 크기 (byte 단위)
-                - request body 예시
-                    ```json
-                    {
-                        "storeKakaoId": "123",
-                        "storeName": "농민백암순대 본점",
-                        "description": "너무 맛있어요! 준환님 추천 맛집!",
-                        "images": [
-                          {
-                            "imageKey": "temp/1.png",
-                            "orderIndex": 0,
-                            "contentType": "image/png",
-                            "fileSize": 12345
-                          },
-                          {
-                            "imageKey": "temp/2.png",
-                            "orderIndex": 1,
-                            "contentType": "image/png",
-                            "fileSize": 67890
-                          }
-                        ]
-                    }
-                    ```
-                """;
 
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORY_API)
                 .summary("스토리 등록")
-                .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
                 ).requestBodyField(
