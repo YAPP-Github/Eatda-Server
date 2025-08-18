@@ -59,7 +59,7 @@ public class StoreService {
     public ImagesResponse getStoreImages(long storeId) {
         List<String> urls = cheerImageRepository.findAllByCheer_Store_IdOrderByOrderIndexAsc(storeId)
                 .stream()
-                .map(img -> cdnBaseUrl + "/" + img.getImageKey())
+                .map(img -> "https://" + cdnBaseUrl + "/" + img.getImageKey())
                 .toList();
         return new ImagesResponse(urls);
     }
@@ -67,7 +67,7 @@ public class StoreService {
     private Optional<String> getStoreImageUrl(Store store) {
         return cheerImageRepository.findFirstByCheer_Store_IdOrderByCreatedAtDesc(store.getId())
                 .map(CheerImage::getImageKey)
-                .map(imageKey -> cdnBaseUrl + "/" + imageKey);
+                .map(imageKey -> "https://" + cdnBaseUrl + "/" + imageKey);
     }
 
     @Transactional(readOnly = true)

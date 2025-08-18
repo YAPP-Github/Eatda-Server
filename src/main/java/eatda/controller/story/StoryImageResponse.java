@@ -15,7 +15,7 @@ public record StoryImageResponse(
                 storyImage.getOrderIndex(),
                 storyImage.getContentType(),
                 storyImage.getFileSize(),
-                cdnBaseUrl + "/" + storyImage.getImageKey()
+                "https://" + cdnBaseUrl + "/" + storyImage.getImageKey()
         );
     }
 }

@@ -15,7 +15,7 @@ public record CheerImageResponse(
                 cheerImage.getOrderIndex(),
                 cheerImage.getContentType(),
                 cheerImage.getFileSize(),
-                cdnBaseUrl + "/" + cheerImage.getImageKey()
+                "https://" + cdnBaseUrl + "/" + cheerImage.getImageKey()
         );
     }
 }
