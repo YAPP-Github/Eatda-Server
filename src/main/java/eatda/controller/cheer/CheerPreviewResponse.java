@@ -1,8 +1,6 @@
 package eatda.controller.cheer;
 
 import eatda.domain.cheer.Cheer;
-import eatda.domain.store.Store;
-import java.util.List;
 import eatda.domain.cheer.CheerTagName;
 import java.util.List;
 

@@ -39,7 +39,7 @@ locals {
   vpc_id                    = data.terraform_remote_state.common.outputs.vpc_id
   vpc_cidr                  = data.terraform_remote_state.common.outputs.vpc_cidr_block
   availability_zones        = data.terraform_remote_state.common.outputs.availability_zones
-  vpc_security_group_ids = [data.terraform_remote_state.common.outputs.security_group_ids["rds"]]
+  vpc_security_group_ids    = [data.terraform_remote_state.common.outputs.security_group_ids["rds"]]
 
   common_tags = {
     Project   = local.project_name
@@ -69,7 +69,7 @@ locals {
         execution_role_arn = data.terraform_remote_state.common.outputs.role_arn["ecsTaskExecutionRole"],
         task_role_arn      = data.terraform_remote_state.common.outputs.role_arn["ecsAppTaskRole"]
       },
-        k == "api-prod" ? {
+      k == "api-prod" ? {
         container_image = "${data.terraform_remote_state.bootstrap.outputs.ecr_repo_urls["prod"]}:placeholder"
       } : {},
     )

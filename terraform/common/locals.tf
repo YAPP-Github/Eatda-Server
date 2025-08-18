@@ -119,8 +119,8 @@ locals {
 
   frontend_domains = {
     "eatda.net" = { type = "A", value = "76.76.21.21" }
-    "www" = { type = "CNAME", value = "cname.vercel-dns.com" }
-    "dev" = { type = "CNAME", value = "cname.vercel-dns.com" }
+    "www"       = { type = "CNAME", value = "cname.vercel-dns.com" }
+    "dev"       = { type = "CNAME", value = "cname.vercel-dns.com" }
   }
 }
 
@@ -161,7 +161,7 @@ locals {
       from_port          = 80
       to_port            = 80
       protocol           = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "HTTP"
     }
     alb_https = {
@@ -169,7 +169,7 @@ locals {
       from_port          = 443
       to_port            = 443
       protocol           = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "HTTPS"
     }
     ec2_ssh = {
@@ -177,7 +177,7 @@ locals {
       from_port          = 22
       to_port            = 22
       protocol           = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "SSH"
     }
   }
@@ -188,7 +188,7 @@ locals {
       from_port          = 0
       to_port            = 0
       protocol           = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "Allow all"
     }
     ec2_egress = {
@@ -196,7 +196,7 @@ locals {
       from_port          = 0
       to_port            = 0
       protocol           = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "Allow all"
     }
     rds_egress = {
@@ -204,7 +204,7 @@ locals {
       from_port          = 0
       to_port            = 0
       protocol           = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks        = ["0.0.0.0/0"]
       description        = "Allow all"
     }
   }

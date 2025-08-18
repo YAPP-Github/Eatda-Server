@@ -3,7 +3,7 @@ variable "vpc_id" {
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 
@@ -11,7 +11,7 @@ variable "security_groups" {
   type = map(object({
     name        = string
     description = string
-    tags = map(string)
+    tags        = map(string)
   }))
 }
 
@@ -21,7 +21,7 @@ variable "ingress_rules" {
     from_port          = number
     to_port            = number
     protocol           = string
-    cidr_blocks = list(string)
+    cidr_blocks        = list(string)
     description        = string
   }))
 }
@@ -32,7 +32,7 @@ variable "egress_rules" {
     from_port          = number
     to_port            = number
     protocol           = string
-    cidr_blocks = list(string)
+    cidr_blocks        = list(string)
     description        = string
   }))
 }
