@@ -10,6 +10,7 @@ import eatda.exception.EtcErrorCode;
 import eatda.service.auth.AuthService;
 import eatda.service.auth.OauthService;
 import eatda.service.cheer.CheerService;
+import eatda.service.image.PresignedUrlService;
 import eatda.service.member.MemberService;
 import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
@@ -61,6 +62,9 @@ public abstract class BaseDocumentTest {
 
     @MockitoBean
     protected CheerService cheerService;
+
+    @MockitoBean
+    protected PresignedUrlService presignedUrlService;
 
     @MockitoBean
     protected JwtManager jwtManager;
