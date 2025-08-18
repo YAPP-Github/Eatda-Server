@@ -1,6 +1,5 @@
 package eatda.fixture;
 
-import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CheerGenerator {
 
-    private static final String DEFAULT_IMAGE_KEY = "generator-cheer-image-key";
     private static final String DEFAULT_DESCRIPTION = "응원합니다!";
 
     private final CheerRepository cheerRepository;
@@ -22,22 +20,32 @@ public class CheerGenerator {
     }
 
     public Cheer generateAdmin(Member member, Store store, LocalDateTime createdAt) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(DEFAULT_IMAGE_KEY), true);
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, true);
         DomainUtils.setCreatedAt(cheer, createdAt);
         return cheerRepository.save(cheer);
     }
 
     public Cheer generateCommon(Member member, Store store) {
-        return generateCommon(member, store, DEFAULT_IMAGE_KEY);
+        return generateCommon(member, store, false, DEFAULT_DESCRIPTION);
     }
 
-    public Cheer generateCommon(Member member, Store store, String imageKey) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(imageKey), false);
+    public Cheer generateCommon(Member member, Store store, boolean isAdmin) {
+        return generateCommon(member, store, isAdmin, DEFAULT_DESCRIPTION);
+    }
+
+    public Cheer generateCommon(Member member, Store store, LocalDateTime createdAt) {
+        Cheer cheer = generateCommon(member, store, false, DEFAULT_DESCRIPTION);
+        DomainUtils.setCreatedAt(cheer, createdAt);
+        return cheerRepository.save(cheer);
+    }
+
+    public Cheer generateCommon(Member member, Store store, boolean isAdmin, String description) {
+        Cheer cheer = new Cheer(member, store, description, isAdmin);
         return cheerRepository.save(cheer);
     }
 
     public Cheer generate(Member member, Store store, LocalDateTime createdAt) {
-        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(DEFAULT_IMAGE_KEY), false);
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, false);
         DomainUtils.setCreatedAt(cheer, createdAt);
         return cheerRepository.save(cheer);
     }
