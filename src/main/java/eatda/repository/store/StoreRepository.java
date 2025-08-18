@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
@@ -22,4 +23,12 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<Store> findAllByCategoryOrderByCreatedAtDesc(StoreCategory category, Pageable pageable);
+
+    @Query("""
+            SELECT s FROM Store s
+                JOIN Cheer c ON s.id = c.store.id
+                WHERE c.member.id = :memberId
+                ORDER BY c.createdAt DESC
+            """)
+    List<Store> findAllByCheeredMemberId(long memberId);
 }

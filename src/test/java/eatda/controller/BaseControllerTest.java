@@ -18,6 +18,7 @@ import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
 import eatda.fixture.StoryImageGenerator;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
@@ -76,6 +77,9 @@ public class BaseControllerTest {
     protected CheerRepository cheerRepository;
 
     @Autowired
+    protected CheerTagRepository cheerTagRepository;
+
+    @Autowired
     protected StoryRepository storyRepository;
 
     @Autowired
@@ -124,6 +128,10 @@ public class BaseControllerTest {
     protected final String accessToken() {
         Member member = memberGenerator.generateByEmail(Long.toString(DEFAULT_OAUTH_MEMBER_INFO.socialId()),
                 "authAccessToken@example.com");
+        return jwtManager.issueAccessToken(member.getId());
+    }
+
+    protected final String accessToken(Member member) {
         return jwtManager.issueAccessToken(member.getId());
     }
 

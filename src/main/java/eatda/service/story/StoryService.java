@@ -1,31 +1,26 @@
 package eatda.service.story;
 
-import eatda.client.file.FileClient;
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesResponse;
-import eatda.controller.story.StoryImageResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
-import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.domain.story.Story;
-import eatda.domain.story.StoryImage;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
-import eatda.repository.story.StoryImageRepository;
 import eatda.repository.story.StoryRepository;
-import java.util.Comparator;
+import eatda.storage.image.ImageStorage;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,5 +149,16 @@ public class StoryService {
                 .toList();
 
         return new StoriesDetailResponse(responses);
+    }
+
+    @Transactional(readOnly = true)
+    public StoriesInMemberResponse getPagedStoryByMemberId(long memberId, int page, int size) {
+        List<Story> stories = storyRepository
+                .findAllByMemberIdOrderByCreatedAtDesc(memberId, PageRequest.of(page, size))
+                .getContent();
+        List<StoryInMemberResponse> responses = stories.stream()
+                .map(story -> new StoryInMemberResponse(story, imageStorage.getPreSignedUrl(story.getImageKey())))
+                .toList();
+        return new StoriesInMemberResponse(responses);
     }
 }

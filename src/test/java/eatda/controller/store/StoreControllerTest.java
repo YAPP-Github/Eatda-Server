@@ -150,6 +150,34 @@ class StoreControllerTest extends BaseControllerTest {
     }
 
     @Nested
+    class GetStoresByCheeredMember {
+
+        @Test
+        void 회원이_응원한_음식점_목록을_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            Store store2 = storeGenerator.generate("홍콩반점", "서울 강남구 역삼동 123-45");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            cheerGenerator.generate(member, store1, startAt);
+            cheerGenerator.generate(member, store2, startAt.plusHours(1));
+
+            StoresInMemberResponse response = given()
+                    .header(HttpHeaders.AUTHORIZATION, accessToken(member))
+                    .when()
+                    .get("/api/shops/cheered-member")
+                    .then()
+                    .statusCode(200)
+                    .extract().as(StoresInMemberResponse.class);
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(2),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store2.getId()),
+                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
+            );
+        }
+    }
+
+    @Nested
     class SearchStores {
 
         @Test

@@ -3,19 +3,14 @@ package eatda.service.story;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-import eatda.client.file.FileClient;
 import eatda.controller.story.StoriesDetailResponse;
-import eatda.controller.story.StoriesResponse;
-import eatda.controller.story.StoryImageResponse;
+import eatda.controller.story.StoriesResponse.StoryPreview;
 import eatda.controller.story.StoryRegisterRequest;
-import eatda.controller.story.StoryRegisterRequest.UploadedImageDetail;
+import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
-import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -24,18 +19,11 @@ import eatda.domain.store.StoreSearchResult;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.store.StoreRepository;
-import eatda.repository.story.StoryImageRepository;
-import eatda.repository.story.StoryRepository;
 import eatda.service.BaseServiceTest;
-import jakarta.transaction.Transactional;
-import java.util.Comparator;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 class StoryServiceTest extends BaseServiceTest {
 
@@ -53,13 +41,6 @@ class StoryServiceTest extends BaseServiceTest {
 
     @MockBean
     private FileClient fileClient;
-
-    @BeforeEach
-    void setUp() {
-        storyImageRepository.deleteAll();
-        storyRepository.deleteAll();
-        storeRepository.deleteAll();
-    }
 
     @Nested
     class RegisterStory {
@@ -232,6 +213,54 @@ class StoryServiceTest extends BaseServiceTest {
                     .filter(d -> d.storyId() == story2.getId())
                     .findFirst().orElseThrow();
             assertThat(detailResponse2.images()).isEmpty();
+        }
+    }
+
+    @Nested
+    class GetPagedStoryByMemberId {
+
+        @Test
+        void 회원_ID로_스토리_목록을_조회할_수_있다() {
+            Member member = memberGenerator.generate("12345");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 23, 10, 0);
+            Story story1 = storyGenerator.generate(member, "123456", "곱창집", startAt);
+            Story story2 = storyGenerator.generate(member, "123457", "순대국밥집", startAt.plusDays(1));
+
+            var response = storyService.getPagedStoryByMemberId(member.getId(), 0, 5);
+
+            assertAll(
+                    () -> assertThat(response.stories()).hasSize(2),
+                    () -> assertThat(response.stories().get(0).id()).isEqualTo(story2.getId()),
+                    () -> assertThat(response.stories().get(0).storeName()).isEqualTo(story2.getStoreName()),
+                    () -> assertThat(response.stories().get(1).id()).isEqualTo(story1.getId()),
+                    () -> assertThat(response.stories().get(1).storeName()).isEqualTo(story1.getStoreName())
+            );
+        }
+
+        @Test
+        void 회원_ID로_스토리_목록을_페이지네이션할_수_있다() {
+            Member member = memberGenerator.generate("12345");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 23, 10, 0);
+            Story story1 = storyGenerator.generate(member, "123456", "곱창집", startAt);
+            Story story2 = storyGenerator.generate(member, "123457", "순대국밥집", startAt.plusDays(1));
+            Story story3 = storyGenerator.generate(member, "123458", "김밥집", startAt.plusDays(2));
+
+            var response = storyService.getPagedStoryByMemberId(member.getId(), 1, 2);
+
+            assertAll(
+                    () -> assertThat(response.stories()).hasSize(1),
+                    () -> assertThat(response.stories().get(0).id()).isEqualTo(story1.getId()),
+                    () -> assertThat(response.stories().get(0).storeName()).isEqualTo(story1.getStoreName())
+            );
+        }
+
+        @Test
+        void 회원_ID로_스토리_목록을_조회할_때_존재하지_않는_ID를_요청하면_빈_목록을_반환한다() {
+            long nonExistentMemberId = 999L;
+
+            var response = storyService.getPagedStoryByMemberId(nonExistentMemberId, 0, 5);
+
+            assertThat(response.stories()).isEmpty();
         }
     }
 }

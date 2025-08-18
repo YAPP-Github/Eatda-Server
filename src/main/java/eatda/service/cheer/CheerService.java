@@ -1,30 +1,24 @@
 package eatda.service.cheer;
 
-import eatda.client.file.FileClient;
-import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
-import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
-import eatda.domain.cheer.CheerImage;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.cheer.CheerImageRepository;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
-import java.util.Comparator;
+import eatda.storage.image.ImageStorage;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +32,7 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
+    private final CheerTagRepository cheerTagRepository;
     private final CheerImageRepository cheerImageRepository;
     private final FileClient fileClient;
 
@@ -55,8 +50,9 @@ public class CheerService {
 
         Store store = storeRepository.findByKakaoId(result.kakaoId())
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
-
-        Cheer cheer = cheerRepository.save(new Cheer(member, store, request.description()));
+        Cheer cheer = new Cheer(member, store, request.description(), imageKey);
+        cheer.setCheerTags(request.tags());
+        Cheer savedCheer = cheerRepository.save(cheer);
 
         // TODO 트랜잭션 범위 축소
         List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
@@ -64,7 +60,7 @@ public class CheerService {
 
         saveCheerImages(cheer, sortedImages, permanentKeys);
 
-        return new CheerResponse(cheer, store, cdnBaseUrl);
+        return new CheerResponse(savedCheer, store, cdnBaseUrl);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {

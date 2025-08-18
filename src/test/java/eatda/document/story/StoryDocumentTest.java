@@ -11,11 +11,11 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
 import eatda.controller.story.StoriesResponse;
-import eatda.controller.story.StoryImageResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
@@ -25,16 +25,16 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import io.restassured.http.ContentType;
+import eatda.util.ImageUtils;
+import eatda.util.MappingUtils;
 import io.restassured.response.Response;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 public class StoryDocumentTest extends BaseDocumentTest {
@@ -58,7 +58,6 @@ public class StoryDocumentTest extends BaseDocumentTest {
                         fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입"),
                         fieldWithPath("images[].fileSize").type(NUMBER).description("파일 크기 (byte)")
                 );
-
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
@@ -231,6 +230,76 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .statusCode(BusinessErrorCode.STORY_NOT_FOUND.getStatus().value())
                     .body("errorCode", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getCode()))
                     .body("message", equalTo(BusinessErrorCode.STORY_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Nested
+    class GetStoriesByMemberId {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORY_API)
+                .summary("회원 ID로 스토리 목록 조회")
+                .requestHeader(
+                        headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                )
+                .queryParameter(
+                        parameterWithName("page").description("페이지 번호 (기본값: 0) (최소값: 0)").optional(),
+                        parameterWithName("size").description("스토리 개수 (기본값: 5) (최소값: 1, 최대값: 50)").optional()
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("stories").type(ARRAY).description("스토리 리스트"),
+                        fieldWithPath("stories[].id").type(NUMBER).description("스토리 ID"),
+                        fieldWithPath("stories[].imageUrl").type(STRING).description("스토리 이미지 URL"),
+                        fieldWithPath("stories[].storeName").type(STRING).description("가게 이름")
+                );
+
+        @Test
+        void 회원_ID로_스토리_목록_조회_성공() {
+            int page = 0;
+            int size = 5;
+            StoriesInMemberResponse response = new StoriesInMemberResponse(List.of(
+                    new StoryInMemberResponse(1L, "https://dummy-s3.com/story1.png", "백암순대"),
+                    new StoryInMemberResponse(2L, "https://dummy-s3.com/story2.png", "맥도날드")
+            ));
+            doReturn(response).when(storyService).getPagedStoryByMemberId(anyLong(), eq(page), eq(size));
+
+            var document = document("story/get-stories-by-member-id", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/stories/member")
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {
+                "UNAUTHORIZED_MEMBER",
+                "EXPIRED_TOKEN",
+                "INVALID_MEMBER_ID"})
+        @ParameterizedTest
+        void 회원_ID로_스토리_목록_조회_실패(BusinessErrorCode errorCode) {
+            int page = 0;
+            int size = 5;
+            doThrow(new BusinessException(errorCode))
+                    .when(storyService).getPagedStoryByMemberId(anyLong(), eq(page), eq(size));
+
+            var document = document("story/get-stories-by-member-id", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken())
+                    .when().get("/api/stories/member")
+                    .then().statusCode(errorCode.getStatus().value());
         }
     }
 

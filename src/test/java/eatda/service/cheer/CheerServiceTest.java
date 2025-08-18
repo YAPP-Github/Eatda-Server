@@ -1,23 +1,15 @@
 package eatda.service.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import eatda.client.file.FileClient;
-import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
-import eatda.controller.cheer.CheerRegisterRequest.UploadedImageDetail;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
-import eatda.domain.ImageDomain;
+import eatda.domain.ImageKey;
 import eatda.domain.cheer.Cheer;
-import eatda.domain.cheer.CheerImage;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -25,63 +17,37 @@ import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.fixture.CheerImageGenerator;
-import eatda.repository.cheer.CheerRepository;
 import eatda.service.BaseServiceTest;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 class CheerServiceTest extends BaseServiceTest {
 
     @Autowired
     private CheerService cheerService;
 
-    @Autowired
-    private CheerRepository cheerRepository;
-
-    @Autowired
-    private CheerImageGenerator cheerImageGenerator;
-
-    @MockBean
-    private FileClient fileClient;
-
-    @BeforeEach
-    void setUp() {
-        cheerRepository.deleteAll();
-    }
-
     @Nested
     class RegisterCheer {
 
-        private Member member;
-        private StoreSearchResult storeSearchResult;
-
-        @BeforeEach
-        void setUp() {
-            member = memberGenerator.generate("123");
-            storeSearchResult = new StoreSearchResult(
-                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
-                    "서울시 강남구 역삼동 123-45",
-                    "서울시 강남구 사사로 3길 12-24",
-                    District.GANGNAM, 37.5665, 126.9780);
-        }
-
         @Test
         void 응원_개수가_최대_개수를_초과하면_예외가_발생한다() {
+            Member member = memberGenerator.generate("123");
             Store store1 = storeGenerator.generate("124", "서울시 강남구 역삼동 123-45");
             Store store2 = storeGenerator.generate("125", "서울시 강남구 역삼동 123-45");
             Store store3 = storeGenerator.generate("126", "서울시 강남구 역삼동 123-45");
             cheerGenerator.generateCommon(member, store1);
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
-            CheerRegisterRequest request = new CheerRegisterRequest("농민백암순대 본점", "123", "추가 응원", List.of());
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원",
+                    List.of(),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
             assertThatThrownBy(() -> cheerService.registerCheer(request, storeSearchResult, member.getId(), ImageDomain.CHEER))
                     .isInstanceOf(BusinessException.class)
@@ -90,9 +56,16 @@ class CheerServiceTest extends BaseServiceTest {
 
         @Test
         void 이미_응원한_가게에_대해_응원하면_예외가_발생한다() {
+            Member member = memberGenerator.generate("123");
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
             cheerGenerator.generateCommon(member, store);
-            CheerRegisterRequest request = new CheerRegisterRequest("농민백암순대 본점", "123", "추가 응원", List.of());
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "추가 응원",
+                    List.of(),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
             assertThatThrownBy(() -> cheerService.registerCheer(request, storeSearchResult, member.getId(), ImageDomain.CHEER))
                     .isInstanceOf(BusinessException.class)
@@ -101,51 +74,92 @@ class CheerServiceTest extends BaseServiceTest {
 
         @Test
         void 해당_응원의_가게가_저장되어_있지_않다면_가게와_응원을_저장한다() {
-            CheerRegisterRequest request = new CheerRegisterRequest("농민백암순대 본점", "123", "맛있어요!", List.of());
+            Member member = memberGenerator.generate("123");
 
-            CheerResponse response = cheerService.registerCheer(request, storeSearchResult, member.getId(), ImageDomain.CHEER);
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(cheerRepository.count()).isEqualTo(1)
+                    () -> assertThat(cheerRepository.count()).isEqualTo(1),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
 
         @Test
         void 해당_응원의_가게가_저장되어_있다면_응원만_저장한다() {
+            Member member = memberGenerator.generate("123");
             Store store = storeGenerator.generate("123", "서울시 강남구 역삼동 123-45");
-            long initialStoreCount = storeRepository.count();
-            CheerRegisterRequest request = new CheerRegisterRequest("농민백암순대 본점", "123", "맛있어요!", List.of());
 
-            CheerResponse response = cheerService.registerCheer(request, storeSearchResult, member.getId(), ImageDomain.CHEER);
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
+
+            Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
                     () -> assertThat(storeRepository.count()).isEqualTo(initialStoreCount),
                     () -> assertThat(response.storeId()).isEqualTo(store.getId()),
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
-                    () -> assertThat(cheerRepository.count()).isEqualTo(1)
+                    () -> assertThat(cheerRepository.count()).isEqualTo(1),
+            () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
         }
 
         @Test
-        @Transactional
-        void 이미지를_포함한_응원을_등록할_수_있다() {
-            UploadedImageDetail image2 = new UploadedImageDetail("temp-key-2", 2L, "image/jpeg", 2000L);
-            UploadedImageDetail image1 = new UploadedImageDetail("temp-key-1", 1L, "image/jpeg", 1000L);
-            CheerRegisterRequest request = new CheerRegisterRequest("농민백암순대 본점", "123", "맛있어요!", List.of(image2, image1));
-            List<String> permanentKeys = List.of("permanent/path/1", "permanent/path/2");
-            given(fileClient.moveTempFilesToPermanent(any(String.class), anyLong(), anyList()))
-                    .willReturn(permanentKeys);
+        void 해당_응원의_이미지가_비어있어도_응원을_저장할_수_있다() {
+            Member member = memberGenerator.generate("123");
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!",
+                    List.of(),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM));
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
             CheerResponse response = cheerService.registerCheer(request, storeSearchResult, member.getId(), ImageDomain.CHEER);
 
             Cheer savedCheer = cheerRepository.findById(response.cheerId()).orElseThrow();
             assertAll(
-                    () -> assertThat(response.images()).hasSize(2),
-                    () -> assertThat(response.images()).isSortedAccordingTo(Comparator.comparingLong(CheerImageResponse::orderIndex)),
-                    () -> assertThat(savedCheer.getImages()).extracting(CheerImage::getImageKey).containsExactlyElementsOf(permanentKeys)
+                    () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrder(
+                            CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
+            );
+        }
+
+        @Test
+        void 해당_응원의_응원_태그가_비어있어도_응원을_저장할_수_있다() {
+            Member member = memberGenerator.generate("123");
+
+            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "맛있어요!", List.of());
+            StoreSearchResult result = new StoreSearchResult(
+                    "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
+                    "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
+            ImageKey imageKey = new ImageKey("image-key");
+
+            CheerResponse response = cheerService.registerCheer(request, result, imageKey, member.getId());
+
+            Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(foundStore.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
+                    () -> assertThat(response.imageUrl()).isNotBlank(),
+                    () -> assertThat(response.tags()).isEmpty()
             );
         }
     }

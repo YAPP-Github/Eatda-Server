@@ -4,8 +4,10 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import eatda.controller.store.ImagesResponse;
+import eatda.controller.store.StoreInMemberResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.cheer.CheerImage;
 import eatda.domain.store.Store;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +68,14 @@ public class StoreService {
         return cheerImageRepository.findFirstByCheer_Store_IdOrderByCreatedAtDesc(store.getId())
                 .map(CheerImage::getImageKey)
                 .map(imageKey -> cdnBaseUrl + "/" + imageKey);
+    }
+
+    @Transactional(readOnly = true)
+    public StoresInMemberResponse getStoresByCheeredMember(long memberId) {
+        List<Store> stores = storeRepository.findAllByCheeredMemberId(memberId);
+        List<StoreInMemberResponse> responses = stores.stream()
+                .map(store -> new StoreInMemberResponse(store, cheerRepository.countByStore(store)))
+                .toList(); // TODO : N+1 문제 해결 (특정 회원의 가게는 3명 제한이라 중요도 낮음)
+        return new StoresInMemberResponse(responses);
     }
 }

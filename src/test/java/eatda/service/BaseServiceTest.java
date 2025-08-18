@@ -1,14 +1,15 @@
 package eatda.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+
 import eatda.DatabaseCleaner;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
+import eatda.domain.ImageKey;
 import eatda.fixture.CheerGenerator;
-import eatda.fixture.CheerImageGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
-import eatda.fixture.StoryGenerator;
-import eatda.fixture.StoryImageGenerator;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
@@ -16,6 +17,8 @@ import eatda.repository.story.StoryRepository;
 import eatda.service.auth.AuthService;
 import eatda.service.auth.OauthService;
 import eatda.service.store.StoreSearchService;
+import eatda.storage.image.ExternalImageStorage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +71,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected CheerRepository cheerRepository;
+
+    @Autowired
+    protected CheerTagRepository cheerTagRepository;
 
     @Autowired
     protected StoryRepository storyRepository;

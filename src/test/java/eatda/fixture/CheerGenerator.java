@@ -43,4 +43,10 @@ public class CheerGenerator {
         Cheer cheer = new Cheer(member, store, description, isAdmin);
         return cheerRepository.save(cheer);
     }
+
+    public Cheer generate(Member member, Store store, LocalDateTime createdAt) {
+        Cheer cheer = new Cheer(member, store, DEFAULT_DESCRIPTION, new ImageKey(DEFAULT_IMAGE_KEY), false);
+        DomainUtils.setCreatedAt(cheer, createdAt);
+        return cheerRepository.save(cheer);
+    }
 }

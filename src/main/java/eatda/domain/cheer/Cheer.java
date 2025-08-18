@@ -1,12 +1,13 @@
 package eatda.domain.cheer;
 
 import eatda.domain.AuditingEntity;
+import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,10 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +44,9 @@ public class Cheer extends AuditingEntity {
     @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CheerImage> images = new ArrayList<>();
 
+    @Embedded
+    private CheerTags cheerTags;
+
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
@@ -54,6 +55,7 @@ public class Cheer extends AuditingEntity {
         this.member = member;
         this.store = store;
         this.description = description;
+        this.cheerTags = new CheerTags();
 
         this.isAdmin = false;
     }
@@ -72,5 +74,16 @@ public class Cheer extends AuditingEntity {
     public void addImage(CheerImage image) {
         images.add(image);
         image.setCheer(this);
+    }
+
+    public void setCheerTags(List<CheerTagName> cheerTagNames) {
+        this.cheerTags.setTags(this, cheerTagNames);
+    }
+
+    public List<CheerTagName> getCheerTagNames() {
+        if (cheerTags == null) {
+            return Collections.emptyList();
+        }
+        return cheerTags.getNames();
     }
 }
