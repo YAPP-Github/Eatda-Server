@@ -23,8 +23,8 @@ import software.amazon.awssdk.services.s3.model.CopyObjectResponse;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 class FileClientTest {
 
@@ -82,7 +82,7 @@ class FileClientTest {
             String domainName = "cheer";
             long domainId = 123L;
             List<String> tempImageKeys = List.of("temp1.jpg", "temp2.jpg");
-            
+
             doReturn(CopyObjectResponse.builder().build()).when(s3Client).copyObject(any(CopyObjectRequest.class));
             doReturn(DeleteObjectResponse.builder().build()).when(s3Client).deleteObject(any(DeleteObjectRequest.class));
 

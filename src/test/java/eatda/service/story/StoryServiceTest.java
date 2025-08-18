@@ -3,14 +3,17 @@ package eatda.service.story;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 
 import eatda.controller.story.StoriesDetailResponse;
-import eatda.controller.story.StoriesResponse.StoryPreview;
+import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryImageResponse;
 import eatda.controller.story.StoryRegisterRequest;
-import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
-import eatda.domain.ImageKey;
+import eatda.domain.ImageDomain;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -20,29 +23,18 @@ import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
+import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class StoryServiceTest extends BaseServiceTest {
 
-    @Autowired
-    private StoryService storyService;
-
-    @Autowired
-    private StoryRepository storyRepository;
-
-    @Autowired
-    private StoreRepository storeRepository;
-
-    @Autowired
-    private StoryImageRepository storyImageRepository;
-
-    @MockBean
-    private FileClient fileClient;
-
     @Nested
+    @Transactional
     class RegisterStory {
 
         private Member member;
@@ -59,7 +51,6 @@ class StoryServiceTest extends BaseServiceTest {
         }
 
         @Test
-        @Transactional
         void 스토리_등록에_성공한다() {
             StoryRegisterRequest request =
                     new StoryRegisterRequest("곱창", "123", "미쳤다 여기", List.of());
@@ -81,12 +72,11 @@ class StoryServiceTest extends BaseServiceTest {
         }
 
         @Test
-        @Transactional
         void 스토리_등록_시_이미지도_함께_저장된다() {
-            UploadedImageDetail image2 =
-                    new UploadedImageDetail("temp-key-2", 2L, "image/jpeg", 2000L);
-            UploadedImageDetail image1 =
-                    new UploadedImageDetail("temp-key-1", 1L, "image/jpeg", 1000L);
+            StoryRegisterRequest.UploadedImageDetail image2 =
+                    new StoryRegisterRequest.UploadedImageDetail("temp-key-2", 2L, "image/jpeg", 2000L);
+            StoryRegisterRequest.UploadedImageDetail image1 =
+                    new StoryRegisterRequest.UploadedImageDetail("temp-key-1", 1L, "image/jpeg", 1000L);
             StoryRegisterRequest request =
                     new StoryRegisterRequest("곱창", "123", "미쳤다 여기", List.of(image2, image1));
 

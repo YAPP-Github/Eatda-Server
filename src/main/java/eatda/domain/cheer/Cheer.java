@@ -1,11 +1,11 @@
 package eatda.domain.cheer;
 
 import eatda.domain.AuditingEntity;
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -15,7 +15,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +47,7 @@ public class Cheer extends AuditingEntity {
     private String description;
 
     @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CheerImage> images = new ArrayList<>();
+    private Set<CheerImage> images = new HashSet<>();
 
     @Embedded
     private CheerTags cheerTags;

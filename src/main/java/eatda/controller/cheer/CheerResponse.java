@@ -3,7 +3,9 @@ package eatda.controller.cheer;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.Store;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record CheerResponse(
         long storeId,

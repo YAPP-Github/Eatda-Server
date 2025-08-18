@@ -3,6 +3,7 @@ package eatda.document.story;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -11,11 +12,13 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
+import eatda.controller.story.StoriesInMemberResponse;
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryImageResponse;
+import eatda.controller.story.StoryInMemberResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
 import eatda.controller.story.StoryResponse;
@@ -25,16 +28,16 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 public class StoryDocumentTest extends BaseDocumentTest {
@@ -251,8 +254,13 @@ public class StoryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("stories").type(ARRAY).description("스토리 리스트"),
                         fieldWithPath("stories[].id").type(NUMBER).description("스토리 ID"),
-                        fieldWithPath("stories[].imageUrl").type(STRING).description("스토리 이미지 URL"),
-                        fieldWithPath("stories[].storeName").type(STRING).description("가게 이름")
+                        fieldWithPath("stories[].storeName").type(STRING).description("가게 이름"),
+                        fieldWithPath("stories[].images").type(ARRAY).description("스토리 이미지 리스트"),
+                        fieldWithPath("stories[].images[].imageKey").type(STRING).description("스토리 이미지 키"),
+                        fieldWithPath("stories[].images[].orderIndex").type(NUMBER).description("스토리 이미지 순서"),
+                        fieldWithPath("stories[].images[].contentType").type(STRING).description("스토리 이미지 타입"),
+                        fieldWithPath("stories[].images[].fileSize").type(NUMBER).description("스토리 이미지 파일 크기"),
+                        fieldWithPath("stories[].images[].url").type(STRING).description("스토리 이미지 접근 URL")
                 );
 
         @Test
@@ -260,8 +268,16 @@ public class StoryDocumentTest extends BaseDocumentTest {
             int page = 0;
             int size = 5;
             StoriesInMemberResponse response = new StoriesInMemberResponse(List.of(
-                    new StoryInMemberResponse(1L, "https://dummy-s3.com/story1.png", "백암순대"),
-                    new StoryInMemberResponse(2L, "https://dummy-s3.com/story2.png", "맥도날드")
+                    new StoryInMemberResponse(
+                            1L,
+                            List.of(new StoryImageResponse("story1.png", 0L, "image/png", 12345L, "https://dummy-s3.com/story1.png")),
+                            "백암순대"
+                    ),
+                    new StoryInMemberResponse(
+                            2L,
+                            List.of(new StoryImageResponse("story2.png", 0L, "image/png", 23456L, "https://dummy-s3.com/story2.png")),
+                            "맥도날드"
+                    )
             ));
             doReturn(response).when(storyService).getPagedStoryByMemberId(anyLong(), eq(page), eq(size));
 

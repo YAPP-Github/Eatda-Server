@@ -10,8 +10,8 @@ import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +24,7 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getName(), store.getKakaoId(), "맛있어요!", new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!", new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
@@ -46,7 +46,7 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getName(), store.getKakaoId(), "맛있어요!", new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!", new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())

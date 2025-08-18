@@ -6,7 +6,6 @@ import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.repository.BaseRepositoryTest;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             Member member = memberGenerator.generate("111");
             Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
             Store store2 = storeGenerator.generate("순대국밥", "서울 강남구 역삼동 123-45");
-            
+
             cheerGenerator.generateCommon(member, store1);
             cheerGenerator.generateCommon(member, store2);
 

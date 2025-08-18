@@ -1,24 +1,24 @@
 package eatda.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-
 import eatda.DatabaseCleaner;
+import eatda.client.file.FileClient;
 import eatda.client.map.MapClient;
 import eatda.client.oauth.OauthClient;
-import eatda.domain.ImageKey;
 import eatda.fixture.CheerGenerator;
+import eatda.fixture.CheerImageGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
+import eatda.fixture.StoryGenerator;
+import eatda.fixture.StoryImageGenerator;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
 import eatda.service.auth.AuthService;
 import eatda.service.auth.OauthService;
 import eatda.service.store.StoreSearchService;
-import eatda.storage.image.ExternalImageStorage;
-import org.junit.jupiter.api.BeforeEach;
+import eatda.service.story.StoryService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +35,9 @@ public abstract class BaseServiceTest {
 
     @MockitoBean
     protected MapClient mapClient;
+
+    @MockitoBean
+    protected FileClient fileClient;
 
     @Autowired
     protected OauthService oauthService;
@@ -65,6 +68,9 @@ public abstract class BaseServiceTest {
 
     @Autowired
     protected StoreRepository storeRepository;
+
+    @Autowired
+    protected StoryService storyService;
 
     @Autowired
     protected StoreSearchService storeSearchService;

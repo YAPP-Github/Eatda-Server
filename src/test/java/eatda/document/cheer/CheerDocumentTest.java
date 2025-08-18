@@ -1,4 +1,4 @@
-package eatda.document.store;
+package eatda.document.cheer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -11,8 +11,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
+import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
@@ -23,11 +23,11 @@ import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
 import io.restassured.http.ContentType;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,12 +49,12 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .requestBodyField(
                         fieldWithPath("storeKakaoId").type(STRING).description("가게 카카오 ID"),
                         fieldWithPath("storeName").type(STRING).description("가게 이름"),
-                        fieldWithPath("cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("description").type(STRING).description("응원 내용"),
                         fieldWithPath("images").type(ARRAY).description("응원 이미지 리스트").optional(),
                         fieldWithPath("images[].imageKey").type(STRING).description("이미지 key"),
                         fieldWithPath("images[].orderIndex").type(NUMBER).description("이미지 순서 인덱스"),
                         fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입"),
-                        fieldWithPath("images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)")
+                        fieldWithPath("images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)"),
                         fieldWithPath("tags").type(ARRAY).description("응원 태그 목록")
                 );
 
@@ -189,10 +189,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
             int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
                     new CheerPreviewResponse(2L, new ArrayList<>(), "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
-                            "너무 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬")),
+                            "너무 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"),
                     new CheerPreviewResponse(1L, new ArrayList<>(), "석관동떡볶이", "성북구", "석관동", "기타", 1L,
                             "너무 매워요! 하지만 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"))
-            ));
+            );
+
             doReturn(responses).when(cheerService).getCheers(page, size);
 
             var document = document("cheer/get-many", 200)

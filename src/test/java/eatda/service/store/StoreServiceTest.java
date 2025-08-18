@@ -2,15 +2,14 @@ package eatda.service.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoresInMemberResponse;
+import eatda.controller.store.StoresResponse;
 import eatda.domain.member.Member;
+import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
-import eatda.exception.BusinessErrorCode;
-import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
