@@ -22,7 +22,7 @@ public class PresignedUrlService {
     private static final Duration PRESIGNED_URL_DURATION = Duration.ofMinutes(10);
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 10;
     private static final String EXTENSION_DELIMITER = ".";
-    private static final String FILE_PATH = "/temp/";
+    private static final String FILE_PATH = "temp/";
 
     private final FileClient fileClient;
 
