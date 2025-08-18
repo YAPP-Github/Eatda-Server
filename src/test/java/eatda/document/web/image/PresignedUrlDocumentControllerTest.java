@@ -58,9 +58,9 @@ public class PresignedUrlDocumentControllerTest extends BaseDocumentTest {
         void 프리사인드_URL_발급_성공() {
             PresignedUrlResponse response = new PresignedUrlResponse(
                     List.of(
-                            new PresignedUrlInfo(1, "image/png", "story/123/image1.png",
+                            new PresignedUrlInfo(1, "image/png", "temp/HASH.png",
                                     "https://cdn.example.com/story/123/image1.png", 3600L),
-                            new PresignedUrlInfo(2, "image/jpeg", "story/123/image2.jpg",
+                            new PresignedUrlInfo(2, "image/jpeg", "temp/HASH.jpg",
                                     "https://cdn.example.com/story/123/image2.jpg", 3600L)
                     )
             );
