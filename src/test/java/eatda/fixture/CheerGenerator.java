@@ -29,10 +29,6 @@ public class CheerGenerator {
         return generateCommon(member, store, false, DEFAULT_DESCRIPTION);
     }
 
-    public Cheer generateCommon(Member member, Store store, boolean isAdmin) {
-        return generateCommon(member, store, isAdmin, DEFAULT_DESCRIPTION);
-    }
-
     public Cheer generateCommon(Member member, Store store, LocalDateTime createdAt) {
         Cheer cheer = generateCommon(member, store, false, DEFAULT_DESCRIPTION);
         DomainUtils.setCreatedAt(cheer, createdAt);

@@ -2,14 +2,19 @@ package eatda.service.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import eatda.exception.BusinessErrorCode;
+import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +33,7 @@ class StoreServiceTest extends BaseServiceTest {
         void 가게_정보를_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, false);
+            cheerGenerator.generateCommon(member, store);
 
             StoreResponse response = storeService.getStore(store.getId());
 
@@ -40,24 +45,35 @@ class StoreServiceTest extends BaseServiceTest {
                     () -> assertThat(response.neighborhood()).isEqualTo(store.getAddressNeighborhood())
             );
         }
+
+        @Test
+        void 해당_음식점이_없을_경우_예외를_던진다() {
+            long nonExistentStoreId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> storeService.getStore(nonExistentStoreId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
+        }
     }
 
     @Nested
     class GetStores {
 
         @Test
-        void 음식점_목록을_최신순으로_조회한다() {
-            Member member = memberGenerator.generate("111");
+        void 모든_카테고리의_음식점_목록을_최신순으로_조회한다() {
+            Member member1 = memberGenerator.generate("111", "ac@kakao.com", "nickname1");
+            Member member2 = memberGenerator.generate("113", "ad@kakao.com", "nickname2");
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
-            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
-            Store store2 = storeGenerator.generate("113", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
                     startAt.plusHours(1));
-            Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, false);
-            cheerGenerator.generateCommon(member, store2, false);
-            cheerGenerator.generateCommon(member, store3, false);
-
+            cheerGenerator.generateCommon(member1, store1);
+            cheerGenerator.generateCommon(member1, store2);
+            cheerGenerator.generateCommon(member2, store2);
+            cheerGenerator.generateCommon(member1, store3);
             int page = 0;
             int size = 2;
 
@@ -66,7 +82,11 @@ class StoreServiceTest extends BaseServiceTest {
             assertAll(
                     () -> assertThat(response.stores()).hasSize(size),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
-                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
+                    () -> assertThat(response.stores().get(0).name()).isEqualTo(store3.getName()),
+                    () -> assertThat(response.stores().get(0).cheerDescriptions()).hasSize(1),
+                    () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId()),
+                    () -> assertThat(response.stores().get(1).name()).isEqualTo(store2.getName()),
+                    () -> assertThat(response.stores().get(1).cheerDescriptions()).hasSize(2)
             );
         }
 
@@ -79,9 +99,9 @@ class StoreServiceTest extends BaseServiceTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, false);
-            cheerGenerator.generateCommon(member, store2, false);
-            cheerGenerator.generateCommon(member, store3, false);
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
 
             int page = 0;
             int size = 2;
@@ -94,6 +114,90 @@ class StoreServiceTest extends BaseServiceTest {
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
             );
+        }
+
+        @Test
+        void 음식점_목록을_페이지네이션하여_조회한다() {
+            Member member = memberGenerator.generate("111");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+                    startAt.plusHours(2));
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
+            int page = 1;
+            int size = 2;
+
+            var response = storeService.getStores(page, size, null);
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(1),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
+            );
+        }
+
+        @Test
+        void 특정_카테고리의_음식점_목록을_페이지네이션하여_조회한다() {
+            Member member = memberGenerator.generate("111");
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Store store1 = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store2 = storeGenerator.generate("석관동떡볶이", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
+                    startAt.plusHours(1));
+            Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+                    startAt.plusHours(2));
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
+            int page = 1;
+            int size = 1;
+            StoreCategory category = StoreCategory.KOREAN;
+
+            var response = storeService.getStores(page, size, category.getCategoryName());
+
+            assertAll(
+                    () -> assertThat(response.stores()).hasSize(1),
+                    () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
+            );
+        }
+    }
+
+    @Nested
+    class GetStoreImages {
+
+        @Test
+        void 음식점_이미지들을_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            Cheer cheer1 = cheerGenerator.generateCommon(member, store);
+            Cheer cheer2 = cheerGenerator.generateCommon(member, store);
+            cheerImageGenerator.generate(cheer1);
+            cheerImageGenerator.generate(cheer2);
+
+            ImagesResponse response = storeService.getStoreImages(store.getId());
+
+            assertThat(response.imageUrls()).hasSize(2);
+        }
+
+        @Test
+        void 음식점_이미지가_없다면_빈_리스트를_반환한다() {
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+
+            ImagesResponse response = storeService.getStoreImages(store.getId());
+
+            assertThat(response.imageUrls()).isEmpty();
+        }
+
+        @Test
+        void 음식점이_존재하지_않으면_예외를_발생시킨다() {
+            long nonExistentStoreId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> storeService.getStoreImages(nonExistentStoreId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
         }
     }
 
@@ -135,5 +239,4 @@ class StoreServiceTest extends BaseServiceTest {
             assertThat(response.stores()).isEmpty();
         }
     }
-
 }

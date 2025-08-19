@@ -1,9 +1,11 @@
 package eatda.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.DatabaseCleaner;
+import eatda.client.file.FileClient;
 import eatda.client.map.MapClient;
 import eatda.client.map.MapClientStoreSearchResult;
 import eatda.client.oauth.OauthClient;
@@ -86,6 +88,9 @@ public class BaseControllerTest {
     protected JwtManager jwtManager;
 
     @MockitoBean
+    private FileClient fileClient;
+
+    @MockitoBean
     private OauthClient oauthClient;
 
     @MockitoBean
@@ -119,6 +124,8 @@ public class BaseControllerTest {
                         "서울 중구 북창동 19-4", null, 37.0d, 128.0d)
         );
         doReturn(searchResults).when(mapClient).searchStores(anyString());
+
+        doReturn(MOCKED_IMAGE_URL).when(fileClient).generateUploadPresignedUrl(anyString(), any());
     }
 
     protected final RequestSpecification given() {
