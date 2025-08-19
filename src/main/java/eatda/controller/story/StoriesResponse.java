@@ -7,7 +7,7 @@ public record StoriesResponse(
 ) {
     public record StoryPreview(
             Long storyId,
-            String imageUrl
+            List<StoryImageResponse> images
     ) {
     }
 }

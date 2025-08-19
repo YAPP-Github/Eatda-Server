@@ -20,7 +20,7 @@ public class CheerTags {
     public void setTags(Cheer cheer, List<CheerTagName> cheerTagNames) {
         validate(cheerTagNames);
         List<CheerTag> cheerTags = cheerTagNames.stream()
-                .map(name -> new CheerTag(cheer, name)) // cheer is set later
+                .map(name -> new CheerTag(cheer, name))
                 .toList();
 
         this.values.clear();

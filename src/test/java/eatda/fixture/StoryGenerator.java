@@ -1,6 +1,5 @@
 package eatda.fixture;
 
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.story.Story;
@@ -16,7 +15,6 @@ public class StoryGenerator {
     private static final String DEFAULT_DESCRIPTION = "이곳은 정말 맛있어요!";
     private static final String DEFAULT_ROAD_ADDRESS = "서울시 강남구 준비로 11길 123";
     private static final String DEFAULT_LOT_NUMBER_ADDRESS = "서울시 강남구 역삼동 123-45";
-    private static final ImageKey DEFAULT_IMAGE_KEY = new ImageKey("default-story-image.jpg");
 
     private final StoryRepository storyRepository;
 
@@ -50,7 +48,6 @@ public class StoryGenerator {
                 .storeRoadAddress(DEFAULT_ROAD_ADDRESS)
                 .storeLotNumberAddress(lotNumberAddress)
                 .description(description)
-                .imageKey(DEFAULT_IMAGE_KEY)
                 .build();
     }
 }

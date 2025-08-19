@@ -5,12 +5,12 @@ variable "group_name" {
 
 variable "user_names" {
   description = "IAM user name"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "policy_arns" {
   description = "List of IAM Policy ARNs to attach to the group"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "enable_mfa_enforcement" {
@@ -21,6 +21,6 @@ variable "enable_mfa_enforcement" {
 
 variable "tags" {
   description = "Tags for the IAM user"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

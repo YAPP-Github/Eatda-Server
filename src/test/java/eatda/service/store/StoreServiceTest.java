@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
+import eatda.controller.store.StoresResponse;
+import eatda.domain.cheer.Cheer;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -28,18 +30,19 @@ class StoreServiceTest extends BaseServiceTest {
     class GetStore {
 
         @Test
-        void 음식점_정보를_조회한다() {
+        void 가게_정보를_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key");
+            cheerGenerator.generateCommon(member, store);
 
             StoreResponse response = storeService.getStore(store.getId());
 
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(store.getId()),
                     () -> assertThat(response.name()).isEqualTo(store.getName()),
-                    () -> assertThat(response.district()).isEqualTo("강남구"),
-                    () -> assertThat(response.neighborhood()).isEqualTo("대치동")
+                    () -> assertThat(response.category()).isEqualTo(store.getCategory().getCategoryName()),
+                    () -> assertThat(response.district()).isEqualTo(store.getDistrict().getName()),
+                    () -> assertThat(response.neighborhood()).isEqualTo(store.getAddressNeighborhood())
             );
         }
 
@@ -67,14 +70,14 @@ class StoreServiceTest extends BaseServiceTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member1, store1, "image-key-1");
-            cheerGenerator.generateCommon(member1, store2, "image-key-2");
-            cheerGenerator.generateCommon(member2, store2, "image-key-3");
-            cheerGenerator.generateCommon(member1, store3, "image-key-4");
+            cheerGenerator.generateCommon(member1, store1);
+            cheerGenerator.generateCommon(member1, store2);
+            cheerGenerator.generateCommon(member2, store2);
+            cheerGenerator.generateCommon(member1, store3);
             int page = 0;
             int size = 2;
 
-            var response = storeService.getStores(page, size, null);
+            StoresResponse response = storeService.getStores(page, size, null);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(2),
@@ -91,19 +94,20 @@ class StoreServiceTest extends BaseServiceTest {
         void 특정_카테고리의_음식점_목록을_최신순으로_조회한다() {
             Member member = memberGenerator.generate("111");
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
-            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.KOREAN, startAt);
+            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.CAFE, startAt);
             Store store2 = storeGenerator.generate("113", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
                     startAt.plusHours(1));
-            Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
+            Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
+
             int page = 0;
             int size = 2;
-            StoreCategory category = StoreCategory.KOREAN;
+            StoreCategory category = StoreCategory.CAFE;
 
-            var response = storeService.getStores(page, size, category.getCategoryName());
+            StoresResponse response = storeService.getStores(page, size, category.getCategoryName());
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(size),
@@ -121,9 +125,9 @@ class StoreServiceTest extends BaseServiceTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
             int page = 1;
             int size = 2;
 
@@ -144,9 +148,9 @@ class StoreServiceTest extends BaseServiceTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("강남순대국", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
             int page = 1;
             int size = 1;
             StoreCategory category = StoreCategory.KOREAN;
@@ -167,13 +171,14 @@ class StoreServiceTest extends BaseServiceTest {
         void 음식점_이미지들을_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key-1");
-            cheerGenerator.generateCommon(member, store, "image-key-2");
-            cheerGenerator.generateCommon(member, store, "image-key-3");
+            Cheer cheer1 = cheerGenerator.generateCommon(member, store);
+            Cheer cheer2 = cheerGenerator.generateCommon(member, store);
+            cheerImageGenerator.generate(cheer1);
+            cheerImageGenerator.generate(cheer2);
 
             ImagesResponse response = storeService.getStoreImages(store.getId());
 
-            assertThat(response.imageUrls()).hasSize(3);
+            assertThat(response.imageUrls()).hasSize(2);
         }
 
         @Test
@@ -234,5 +239,4 @@ class StoreServiceTest extends BaseServiceTest {
             assertThat(response.stores()).isEmpty();
         }
     }
-
 }
