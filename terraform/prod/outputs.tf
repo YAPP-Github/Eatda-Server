@@ -30,3 +30,13 @@ output "cloudfront_domain_name" {
   value     = module.s3.cloudfront_domain_name
   sensitive = true
 }
+
+output "rds_instance_identifier" {
+  description = "The identifier of the production RDS instance."
+  value       = module.rds.rds_instance_identifier
+}
+
+output "rds_instance_id" {
+  value     = module.rds.rds_instance_id
+  sensitive = true
+}
