@@ -80,7 +80,7 @@ class StoreServiceTest extends BaseServiceTest {
             StoresResponse response = storeService.getStores(page, size, null);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(2),
+                    () -> assertThat(response.stores()).hasSize(size),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(0).name()).isEqualTo(store3.getName()),
                     () -> assertThat(response.stores().get(0).cheerDescriptions()).hasSize(1),
