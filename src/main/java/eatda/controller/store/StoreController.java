@@ -1,6 +1,9 @@
 package eatda.controller.store;
 
 import eatda.controller.web.auth.LoginMember;
+import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.SearchDistrict;
+import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
@@ -32,8 +35,11 @@ public class StoreController {
     @GetMapping("/api/shops")
     public ResponseEntity<StoresResponse> getStores(@RequestParam(defaultValue = "0") @Min(0) int page,
                                                     @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
-                                                    @RequestParam(required = false) String category) {
-        StoresResponse response = storeService.getStores(page, size, category);
+                                                    @RequestParam(required = false) StoreCategory category,
+                                                    @RequestParam(required = false) List<CheerTagName> tag,
+                                                    @RequestParam(required = false) List<SearchDistrict> location) {
+        StoreSearchParameters parameters = new StoreSearchParameters(page, size, category, tag, location);
+        StoresResponse response = storeService.getStores(parameters);
         return ResponseEntity.ok(response);
     }
 

@@ -60,12 +60,9 @@ class StoreControllerTest extends BaseControllerTest {
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
 
-            int page = 0;
-            int size = 2;
-
             StoresResponse response = given()
-                    .queryParam("page", page)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
                     .when()
                     .get("/api/shops")
                     .then()
@@ -73,33 +70,34 @@ class StoreControllerTest extends BaseControllerTest {
                     .extract().as(StoresResponse.class);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store2.getId())
             );
         }
 
         @Test
-        void 특정_카테고리의_음식점_목록을_최신순으로_조회한다() {
+        void 음식점_목록을_필터링하여_최신순으로_조회한다() {
             Member member = memberGenerator.generate("111");
             LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
-            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.CAFE, startAt);
+            Store store1 = storeGenerator.generate("112", "서울 강남구 대치동 896-33", StoreCategory.CAFE,
+                    startAt);
             Store store2 = storeGenerator.generate("113", "서울 성북구 석관동 123-45", StoreCategory.OTHER,
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1);
-            cheerGenerator.generateCommon(member, store2);
-            cheerGenerator.generateCommon(member, store3);
-
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
+            Cheer cheer1 = cheerGenerator.generateCommon(member, store1);
+            Cheer cheer2 = cheerGenerator.generateCommon(member, store2);
+            Cheer cheer3 = cheerGenerator.generateCommon(member, store3);
+            cheerTagGenerator.generate(cheer1, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC));
+            cheerTagGenerator.generate(cheer3, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             StoresResponse response = given()
-                    .queryParam("page", page)
-                    .queryParam("size", size)
-                    .queryParam("category", category.getCategoryName())
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.CAFE)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE)
+                    .queryParam("location", "")
                     .when()
                     .get("/api/shops")
                     .then()
@@ -107,7 +105,7 @@ class StoreControllerTest extends BaseControllerTest {
                     .extract().as(StoresResponse.class);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
             );

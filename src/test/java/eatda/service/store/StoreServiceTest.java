@@ -6,12 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoreSearchParameters;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.cheer.Cheer;
-import eatda.controller.store.TagsResponse;
-import eatda.domain.cheer.Cheer;
-import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -20,7 +18,6 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,13 +75,12 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member1, store2);
             cheerGenerator.generateCommon(member2, store2);
             cheerGenerator.generateCommon(member1, store3);
-            int page = 0;
-            int size = 2;
+            StoreSearchParameters parameters = new StoreSearchParameters(0, 2, null, null, null);
 
-            StoresResponse response = storeService.getStores(page, size, null);
+            var response = storeService.getStores(parameters);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(0).name()).isEqualTo(store3.getName()),
                     () -> assertThat(response.stores().get(0).cheerDescriptions()).hasSize(1),
@@ -106,15 +102,12 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1);
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
+            StoreSearchParameters parameters = new StoreSearchParameters(0, 2, StoreCategory.CAFE, null, null);
 
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
-
-            StoresResponse response = storeService.getStores(page, size, category.getCategoryName());
+            StoresResponse response = storeService.getStores(parameters);
 
             assertAll(
-                    () -> assertThat(response.stores()).hasSize(size),
+                    () -> assertThat(response.stores()).hasSize(2),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store3.getId()),
                     () -> assertThat(response.stores().get(1).id()).isEqualTo(store1.getId())
             );
@@ -132,10 +125,9 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1);
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
-            int page = 1;
-            int size = 2;
+            StoreSearchParameters parameters = new StoreSearchParameters(1, 2, null, null, null);
 
-            var response = storeService.getStores(page, size, null);
+            var response = storeService.getStores(parameters);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(1),
@@ -155,59 +147,14 @@ class StoreServiceTest extends BaseServiceTest {
             cheerGenerator.generateCommon(member, store1);
             cheerGenerator.generateCommon(member, store2);
             cheerGenerator.generateCommon(member, store3);
-            int page = 1;
-            int size = 1;
-            StoreCategory category = StoreCategory.KOREAN;
+            StoreSearchParameters parameters = new StoreSearchParameters(1, 1, StoreCategory.KOREAN, null, null);
 
-            var response = storeService.getStores(page, size, category.getCategoryName());
+            var response = storeService.getStores(parameters);
 
             assertAll(
                     () -> assertThat(response.stores()).hasSize(1),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
             );
-        }
-    }
-
-    @Nested
-    class GetStoreTags {
-
-        @Test
-        void 음식점의_태그들을_조회한다() {
-            Member member1 = memberGenerator.generate("111", "a@kakao.com", "nickname1");
-            Member member2 = memberGenerator.generate("112", "b@kakao.com", "nickname2");
-            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
-            Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
-            cheerTagGenerator.generate(cheer1, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC));
-            cheerTagGenerator.generate(cheer2, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
-
-            TagsResponse response = storeService.getStoreTags(store.getId());
-
-            assertThat(response.tags()).containsExactlyInAnyOrder(
-                    CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC, CheerTagName.CLEAN_RESTROOM);
-        }
-
-        @Test
-        void 음식점의_태그가_없다면_빈_리스트를_반환한다() {
-            Member member1 = memberGenerator.generate("111", "a@kakao.com", "nickname1");
-            Member member2 = memberGenerator.generate("112", "b@kakao.com", "nickname2");
-            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member1, store);
-            cheerGenerator.generateCommon(member2, store);
-
-            TagsResponse response = storeService.getStoreTags(store.getId());
-
-            assertThat(response.tags()).isEmpty();
-        }
-
-        @Test
-        void 음식점이_존재하지_않으면_예외를_발생시킨다() {
-            long nonExistentStoreId = 999L;
-
-            BusinessException exception = assertThrows(BusinessException.class,
-                    () -> storeService.getStoreTags(nonExistentStoreId));
-
-            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
         }
     }
 

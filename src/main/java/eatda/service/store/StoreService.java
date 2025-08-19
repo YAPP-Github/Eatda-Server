@@ -1,19 +1,16 @@
 package eatda.service.store;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
-
 import eatda.controller.store.ImagesResponse;
 import eatda.controller.store.StoreInMemberResponse;
 import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
+import eatda.controller.store.StoreSearchParameters;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.controller.store.TagsResponse;
 import eatda.domain.cheer.CheerImage;
 import eatda.domain.cheer.CheerTag;
 import eatda.domain.store.Store;
-import eatda.domain.store.StoreCategory;
 import eatda.repository.cheer.CheerImageRepository;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.cheer.CheerTagRepository;
@@ -23,7 +20,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.Nullable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,19 +44,18 @@ public class StoreService {
 
     // TODO : N+1 문제 해결
     @Transactional(readOnly = true)
-    public StoresResponse getStores(int page, int size, @Nullable String category) {
-        return findStores(page, size, category)
-                .stream()
-                .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))
-                .collect(collectingAndThen(toList(), StoresResponse::new));
-    }
+    public StoresResponse getStores(StoreSearchParameters parameters) {
+        List<Store> stores = storeRepository.findAllByConditions(
+                parameters.getCategory(),
+                parameters.getCheerTagNames(),
+                parameters.getDistricts(),
+                PageRequest.of(parameters.getPage(), parameters.getSize(), Sort.by(Direction.DESC, "createdAt"))
+        );
 
-    private List<Store> findStores(int page, int size, @Nullable String category) {
-        if (category == null || category.isBlank()) {
-            return storeRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
-        }
-        return storeRepository.findAllByCategoryOrderByCreatedAtDesc(
-                StoreCategory.from(category), PageRequest.of(page, size));
+        List<StorePreviewResponse> responses = stores.stream()
+                .map(store -> new StorePreviewResponse(store, getStoreImageUrl(store).orElse(null)))
+                .toList();
+        return new StoresResponse(responses);
     }
 
     @Transactional(readOnly = true)

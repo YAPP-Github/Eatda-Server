@@ -54,7 +54,6 @@ public class Store extends AuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "district", nullable = false, length = 31)
     private District district;
-
     @Embedded
     private Coordinates coordinates;
 
