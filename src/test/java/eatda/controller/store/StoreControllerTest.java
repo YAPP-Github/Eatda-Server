@@ -9,6 +9,7 @@ import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
+import io.restassured.http.ContentType;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +25,7 @@ class StoreControllerTest extends BaseControllerTest {
         void 음식점_정보를_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key");
+            cheerGenerator.generateCommon(member, store);
 
             StoreResponse response = given()
                     .pathParam("storeId", store.getId())
@@ -55,9 +56,9 @@ class StoreControllerTest extends BaseControllerTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.KOREAN,
                     startAt.plusHours(2));
-            cheerGenerator.generateCommon(member, store1, "image-key-1");
-            cheerGenerator.generateCommon(member, store2, "image-key-2");
-            cheerGenerator.generateCommon(member, store3, "image-key-3");
+            cheerGenerator.generateCommon(member, store1);
+            cheerGenerator.generateCommon(member, store2);
+            cheerGenerator.generateCommon(member, store3);
 
             StoresResponse response = given()
                     .queryParam("page", 0)
@@ -85,9 +86,9 @@ class StoreControllerTest extends BaseControllerTest {
                     startAt.plusHours(1));
             Store store3 = storeGenerator.generate("114", "서울 강남구 역삼동 678-90", StoreCategory.CAFE,
                     startAt.plusHours(2));
-            Cheer cheer1 = cheerGenerator.generateCommon(member, store1, "image-key-1");
-            Cheer cheer2 = cheerGenerator.generateCommon(member, store2, "image-key-2");
-            Cheer cheer3 = cheerGenerator.generateCommon(member, store3, "image-key-3");
+            Cheer cheer1 = cheerGenerator.generateCommon(member, store1);
+            Cheer cheer2 = cheerGenerator.generateCommon(member, store2);
+            Cheer cheer3 = cheerGenerator.generateCommon(member, store3);
             cheerTagGenerator.generate(cheer1, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC));
             cheerTagGenerator.generate(cheer3, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
@@ -118,9 +119,11 @@ class StoreControllerTest extends BaseControllerTest {
         void 음식점_이미지들을_조회한다() {
             Member member = memberGenerator.generate("111");
             Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
-            cheerGenerator.generateCommon(member, store, "image-key-1");
-            cheerGenerator.generateCommon(member, store, "image-key-2");
-            cheerGenerator.generateCommon(member, store, "image-key-3");
+            Cheer cheer = cheerGenerator.generateCommon(member, store);
+
+            cheerImageGenerator.generate(cheer, "image1.png", 1L);
+            cheerImageGenerator.generate(cheer, "image2.png", 2L);
+            cheerImageGenerator.generate(cheer, "image3.png", 3L);
 
             ImagesResponse response = given()
                     .when()
@@ -144,6 +147,30 @@ class StoreControllerTest extends BaseControllerTest {
                     .extract().as(ImagesResponse.class);
 
             assertThat(response.imageUrls()).isEmpty();
+        }
+    }
+
+
+    @Nested
+    class GetStoreTags {
+
+        @Test
+        void 음식점_태그들을_조회한다() {
+            Member member = memberGenerator.generate("111");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            Cheer cheer = cheerGenerator.generateCommon(member, store);
+            cheerTagGenerator.generate(cheer, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+
+            TagsResponse response = given()
+                    .when()
+                    .contentType(ContentType.JSON)
+                    .get("/api/shops/{storeId}/tags", store.getId())
+                    .then()
+                    .statusCode(200)
+                    .extract().as(TagsResponse.class);
+
+            assertThat(response.tags())
+                    .containsExactlyInAnyOrder(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM);
         }
     }
 

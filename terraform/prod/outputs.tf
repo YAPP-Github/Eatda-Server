@@ -25,3 +25,8 @@ output "rds_arn" {
   value       = module.rds.arn
   sensitive   = true
 }
+
+output "cloudfront_domain_name" {
+  value     = module.s3.cloudfront_domain_name
+  sensitive = true
+}

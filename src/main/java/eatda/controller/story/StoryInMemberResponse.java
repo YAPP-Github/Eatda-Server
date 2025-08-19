@@ -1,14 +1,15 @@
 package eatda.controller.story;
 
 import eatda.domain.story.Story;
+import java.util.List;
 
 public record StoryInMemberResponse(
         Long id,
-        String imageUrl,
+        List<StoryImageResponse> images,
         String storeName
 ) {
 
-    public StoryInMemberResponse(Story story, String imageUrl) {
+    public StoryInMemberResponse(Story story, List<StoryImageResponse> imageUrl) {
         this(story.getId(), imageUrl, story.getStoreName());
     }
 }

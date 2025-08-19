@@ -8,9 +8,9 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
@@ -41,6 +41,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         return findAll(spec, pageable);
     }
 
+    @EntityGraph(attributePaths = {"cheers"})
     List<Store> findAll(Specification<Store> spec, Pageable pageable);
 
     private Specification<Store> createSpecification(@Nullable StoreCategory category,

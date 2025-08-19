@@ -18,6 +18,7 @@ import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
+import eatda.controller.store.TagsResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
@@ -123,14 +124,17 @@ public class StoreDocumentTest extends BaseDocumentTest {
                         fieldWithPath("stores[].name").type(STRING).description("음식점 이름"),
                         fieldWithPath("stores[].district").type(STRING).description("음식점 주소 (구)"),
                         fieldWithPath("stores[].neighborhood").type(STRING).description("음식점 주소 (동)"),
-                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리")
+                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리"),
+                        fieldWithPath("stores[].cheerDescriptions").type(ARRAY).description("음식점에 달린 응원 메시지")
                 );
 
         @Test
         void 음식점_목록_최신순으로_조회() {
             StoresResponse response = new StoresResponse(List.of(
-                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
-                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
+                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식",
+                            List.of("응원해요!", "순대가 맛돌이!")),
+                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식",
+                            List.of("응원해요!", "떡볶이가 맛있게 매워요~", "매운 떡볶이 최고!"))
             ));
             doReturn(response).when(storeService).getStores(any());
 
@@ -227,6 +231,57 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .then().statusCode(errorCode.getStatus().value());
         }
 
+    }
+
+    @Nested
+    class GetStoreTags {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("음식점 태그 조회")
+                .pathParameter(
+                        parameterWithName("storeId").description("음식점 ID")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("tags").type(ARRAY).description("음식점 태그 목록")
+                );
+
+        @Test
+        void 음식점_태그_조회_성공() {
+            long storeId = 7L;
+            TagsResponse response = new TagsResponse(List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            doReturn(response).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .when().get("/api/shops/{storeId}/tags", storeId)
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
+        @ParameterizedTest
+        void 음식점_태그_조회_실패(BusinessErrorCode errorCode) {
+            long storeId = 1L;
+            doThrow(new BusinessException(errorCode)).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}/tags")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
     }
 
     @Nested

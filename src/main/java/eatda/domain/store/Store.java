@@ -54,12 +54,11 @@ public class Store extends AuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "district", nullable = false, length = 31)
     private District district;
+    @Embedded
+    private Coordinates coordinates;
 
     @OneToMany(mappedBy = "store")
     private List<Cheer> cheers = new ArrayList<>();
-
-    @Embedded
-    private Coordinates coordinates;
 
     @Builder
     private Store(String kakaoId,
@@ -93,5 +92,11 @@ public class Store extends AuditingEntity {
             return "";
         }
         return addressParts[2];
+    }
+
+    public List<String> getCheerDescriptions() {
+        return cheers.stream()
+                .map(Cheer::getDescription)
+                .toList();
     }
 }

@@ -21,11 +21,11 @@ public enum BusinessErrorCode {
     INVALID_STORE_COORDINATES_NULL("STO007", "좌표 값은 필수입니다."),
     OUT_OF_SEOUL_LATITUDE_RANGE("STO010", "서비스 지역(서울)을 벗어난 위도 값입니다."),
     OUT_OF_SEOUL_LONGITUDE_RANGE("STO011", "서비스 지역(서울)을 벗어난 경도 값입니다."),
-    STORE_NOT_FOUND("ST0012", "해당 가게 정보를 찾을수 없습니다."),
+    STORE_NOT_FOUND("STO012", "해당 가게 정보를 찾을 수 없습니다."),
 
     // Cheer
     INVALID_CHEER_DESCRIPTION("CHE001", "응원 메시지는 필수입니다."),
-    INVALID_CHEER_IMAGE_KEY("CHE002", "응원 이미지 키가 비어 있습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_CHEER_IMAGE_KEY("CHE002", "응원 이미지 키가 비어 있습니다.", HttpStatus.BAD_REQUEST),
     FULL_CHEER_SIZE_PER_MEMBER("CHE003", "회원당 응원 한도가 넘었습니다."),
     ALREADY_CHEERED("CHE004", "이미 응원한 가게입니다."),
 
@@ -39,16 +39,22 @@ public enum BusinessErrorCode {
     // Auth
     UNAUTHORIZED_MEMBER("AUTH001", "인증되지 않은 회원입니다.", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN("AUTH002", "이미 만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
-    UNAUTHORIZED_ORIGIN("AUTH003", "허용되지 않은 오리진입니다."),
-    OAUTH_SERVER_ERROR("AUTH003", "OAuth 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNAUTHORIZED_ORIGIN("AUTH003", "허용되지 않은 오리진입니다.", HttpStatus.FORBIDDEN),
+    OAUTH_SERVER_ERROR("AUTH004", "OAuth 서버와의 통신 오류입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    // image
-    INVALID_IMAGE_TYPE("CLIENT010", "지원하지 않는 이미지 형식입니다.", HttpStatus.BAD_REQUEST),
-    FILE_UPLOAD_FAILED("SERVER002", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    FILE_URL_GENERATION_FAILED("SERVER003", "파일 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    PRESIGNED_URL_GENERATION_FAILED("SERVER004", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    // Image (공통)
+    INVALID_IMAGE_KEY("IMG001", "이미지 키는 비어 있을 수 없습니다."),
+    INVALID_IMAGE_CONTENT_TYPE("IMG002", "이미지 Content-Type은 필수입니다."),
+    INVALID_IMAGE_FILE_SIZE("IMG003", "이미지 파일 크기는 0보다 커야 합니다."),
+    INVALID_IMAGE_TYPE("IMG004", "지원하지 않는 이미지 형식입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_MAX_FILE_SIZE("IMG005", "파일 크기가 최대를 초과했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_EMPTY_FILE_DETAILS("IMG006", "파일 상세 정보는 비어있을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    FILE_UPLOAD_FAILED("IMG007", "파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_URL_GENERATION_FAILED("IMG008", "파일 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    PRESIGNED_URL_GENERATION_FAILED("IMG009", "Presigned URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FAIL_TEMP_IMAGE_PROCESS("IMG010", "임시 이미지 파일 이동 및 삭제가 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    //story
+    // Story
     INVALID_STORY_DESCRIPTION("STY001", "스토리 본문은 빈 문자열일 수 없습니다."),
     INVALID_STORY_IMAGE_KEY("STY002", "스토리 이미지 Key는 필수입니다."),
     STORY_MEMBER_REQUIRED("STY003", "스토리 작성 시 회원 정보는 필수입니다."),

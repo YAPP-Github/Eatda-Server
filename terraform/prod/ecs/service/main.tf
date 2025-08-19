@@ -1,10 +1,10 @@
 resource "aws_ecs_service" "prod" {
   for_each = var.ecs_services
 
-  name            = each.key
-  cluster         = var.cluster_id
-  launch_type = lookup(each.value, "launch_type", var.launch_type)
-  task_definition = var.task_definition_arn[each.key]
+  name                = each.key
+  cluster             = var.cluster_id
+  launch_type         = lookup(each.value, "launch_type", var.launch_type)
+  task_definition     = var.task_definition_arn[each.key]
   scheduling_strategy = lookup(each.value, "scheduling_strategy", var.scheduling_strategy)
 
   dynamic "load_balancer" {

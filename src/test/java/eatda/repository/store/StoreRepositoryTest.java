@@ -96,7 +96,6 @@ class StoreRepositoryTest extends BaseRepositoryTest {
 
         @Test
         void 지역구를_필터링하여_조회할_수_있다() {
-            LocalDateTime startAt = LocalDateTime.of(2023, 10, 1, 12, 0);
             Store store1 = storeGenerator.generate("1235", "서울시 강남구 역삼동 123-45", District.GANGNAM);
             Store store2 = storeGenerator.generate("1236", "서울시 강남구 역삼동 123-45", District.GANGNAM);
             Store store3 = storeGenerator.generate("1237", "서울시 성북구 석관동 123-45", District.SEONGBUK);

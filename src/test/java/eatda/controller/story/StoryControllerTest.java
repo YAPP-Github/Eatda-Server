@@ -8,9 +8,8 @@ import eatda.domain.member.Member;
 import eatda.domain.story.Story;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.ErrorResponse;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -22,13 +21,13 @@ public class StoryControllerTest extends BaseControllerTest {
 
         @Test
         void 스토리를_등록할_수_있다() {
-            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!", new ArrayList<>());
 
             StoryRegisterResponse response = given()
                     .contentType("multipart/form-data")
                     .header("Authorization", accessToken())
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType("application/json")
+                    .body(request)
                     .when()
                     .post("/api/stories")
                     .then()
