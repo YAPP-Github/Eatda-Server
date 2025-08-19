@@ -2,11 +2,11 @@ variable "ecs_task_definitions" {
   description = "A strictly-typed, unified map for all task definition properties."
 
   type = map(object({
-    cpu                = number
-    memory             = number
-    network_mode       = string
-    task_role_arn      = string
-    execution_role_arn = string
+    cpu                      = number
+    memory                   = number
+    network_mode             = string
+    task_role_arn            = string
+    execution_role_arn       = string
     requires_compatibilities = list(string)
     volumes = optional(list(object({
       name      = string
@@ -50,6 +50,6 @@ variable "ecs_task_definitions" {
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }

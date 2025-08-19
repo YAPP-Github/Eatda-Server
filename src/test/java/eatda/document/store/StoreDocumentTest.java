@@ -118,7 +118,8 @@ public class StoreDocumentTest extends BaseDocumentTest {
                         fieldWithPath("stores[].name").type(STRING).description("음식점 이름"),
                         fieldWithPath("stores[].district").type(STRING).description("음식점 주소 (구)"),
                         fieldWithPath("stores[].neighborhood").type(STRING).description("음식점 주소 (동)"),
-                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리")
+                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리"),
+                        fieldWithPath("stores[].cheerDescriptions").type(ARRAY).description("음식점에 달린 응원 메시지")
                 );
 
         @Test
@@ -127,8 +128,10 @@ public class StoreDocumentTest extends BaseDocumentTest {
             int size = 2;
             StoreCategory category = StoreCategory.CAFE;
             StoresResponse response = new StoresResponse(List.of(
-                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
-                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
+                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식",
+                            List.of("응원해요!", "순대가 맛돌이!")),
+                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식",
+                            List.of("응원해요!", "떡볶이가 맛있게 매워요~", "매운 떡볶이 최고!"))
             ));
             doReturn(response).when(storeService).getStores(page, size, category.getCategoryName());
 

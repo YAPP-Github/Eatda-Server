@@ -12,12 +12,12 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
 import eatda.controller.story.StoriesDetailResponse;
 import eatda.controller.story.StoriesDetailResponse.StoryDetailResponse;
 import eatda.controller.story.StoriesInMemberResponse;
 import eatda.controller.story.StoriesResponse;
+import eatda.controller.story.StoryImageResponse;
 import eatda.controller.story.StoryInMemberResponse;
 import eatda.controller.story.StoryRegisterRequest;
 import eatda.controller.story.StoryRegisterResponse;
@@ -28,16 +28,16 @@ import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 public class StoryDocumentTest extends BaseDocumentTest {
@@ -45,34 +45,21 @@ public class StoryDocumentTest extends BaseDocumentTest {
     @Nested
     class RegisterStory {
 
-        private static final String REQUEST_DESCRIPTION_MARKDOWN = """
-                - 요청 형식 : multipart/form-data
-                - 요청 field
-                  - image : 스토리 이미지 (필수, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png
-                  - request : 스토리 등록 요청 정보 (필수, 허용 타입 : application/json)
-                - request body 예시
-                    ```json
-                    {
-                        "storeKakaoId": "123", // 가게 카카오 ID (필수)
-                        "storeName": "농민백암순대 본점", // 가게 이름 (필수)
-                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 스토리 내용 (null 허용)
-                    }
-                    ```
-                """;
 
         RestDocsRequest requestDocument = request()
                 .tag(Tag.STORY_API)
                 .summary("스토리 등록")
-                .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
                         headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
-                ).multipartField(
-                        partWithName("image").description("스토리 이미지 (필수)"),
-                        partWithName("request").description("스토리 등록 요청 정보")
-                ).requestBodyField("request",
+                ).requestBodyField(
                         fieldWithPath("storeName").description("가게 이름"),
                         fieldWithPath("storeKakaoId").description("가게의 카카오 ID"),
-                        fieldWithPath("description").description("스토리 내용 (필수)").optional()
+                        fieldWithPath("description").description("스토리 내용 (선택)").optional(),
+                        fieldWithPath("images").type(ARRAY).description("업로드된 이미지 리스트").optional(),
+                        fieldWithPath("images[].imageKey").type(STRING).description("S3 임시 업로드 키"),
+                        fieldWithPath("images[].orderIndex").type(NUMBER).description("노출 순서"),
+                        fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입"),
+                        fieldWithPath("images[].fileSize").type(NUMBER).description("파일 크기 (byte)")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -82,7 +69,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         @Test
         void 스토리_등록_성공() {
-            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!", new ArrayList<>());
             StoryRegisterResponse response = new StoryRegisterResponse(1L);
             doReturn(response).when(storyService).registerStory(any(), any(), any(), anyLong());
 
@@ -93,17 +80,15 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType(ContentType.JSON)
+                    .body(request)
                     .when().post("/api/stories")
                     .then().statusCode(201);
         }
 
         @Test
         void 스토리_등록_실패_이미지_형식_오류() {
-            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!");
-            byte[] invalidImage = "not an image".getBytes(StandardCharsets.UTF_8);
+            StoryRegisterRequest request = new StoryRegisterRequest("농민백암순대", "123", "여기 진짜 맛있어요!", new ArrayList<>());
             doThrow(new BusinessException(BusinessErrorCode.INVALID_IMAGE_TYPE))
                     .when(storyService).registerStory(any(), any(), any(), anyLong());
 
@@ -113,10 +98,9 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
-                    .contentType("multipart/form-data")
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", "image.txt", invalidImage, "text/plain")
+                    .contentType(ContentType.JSON)
+                    .body(request)
                     .when().post("/api/stories")
                     .then().statusCode(BusinessErrorCode.INVALID_IMAGE_TYPE.getStatus().value());
         }
@@ -135,17 +119,28 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
-                        fieldWithPath("stories").description("스토리 프리뷰 리스트"),
-                        fieldWithPath("stories[].storyId").description("스토리 ID"),
-                        fieldWithPath("stories[].imageUrl").description("스토리 이미지 URL")
+                        fieldWithPath("stories").type(JsonFieldType.ARRAY).description("스토리 리스트"),
+                        fieldWithPath("stories[].storyId").type(JsonFieldType.NUMBER).description("스토리 ID"),
+                        fieldWithPath("stories[].images").type(JsonFieldType.ARRAY).description("스토리 이미지 리스트"),
+                        fieldWithPath("stories[].images[].imageKey").type(JsonFieldType.STRING).description("이미지 S3 키"),
+                        fieldWithPath("stories[].images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 노출 순서"),
+                        fieldWithPath("stories[].images[].contentType").type(JsonFieldType.STRING).description("이미지 MIME 타입"),
+                        fieldWithPath("stories[].images[].fileSize").type(JsonFieldType.NUMBER).description("이미지 파일 크기 (byte)"),
+                        fieldWithPath("stories[].images[].url").type(JsonFieldType.STRING).description("이미지 CDN URL")
                 );
 
         @Test
         void 스토리_목록_조회_성공() {
             int size = 5;
             StoriesResponse response = new StoriesResponse(List.of(
-                    new StoriesResponse.StoryPreview(1L, "https://dummy-s3.com/story1.png"),
-                    new StoriesResponse.StoryPreview(2L, "https://dummy-s3.com/story2.png")
+                    new StoriesResponse.StoryPreview(
+                            1L,
+                            List.of(new StoryImageResponse("1.png", 0, "image/png", 12345L, "https://cdn.test/1.png"))
+                    ),
+                    new StoriesResponse.StoryPreview(
+                            2L,
+                            List.of(new StoryImageResponse("2.png", 1, "image/png", 67890L, "https://cdn.test/2.png"))
+                    )
             ));
             doReturn(response).when(storyService).getPagedStoryPreviews(size);
 
@@ -155,7 +150,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     .build();
 
             given(document)
-                    .queryParam("size", 5)
+                    .queryParam("size", size)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
                     .when().get("/api/stories")
                     .then().statusCode(200);
@@ -172,14 +167,19 @@ public class StoryDocumentTest extends BaseDocumentTest {
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
-                        fieldWithPath("storeId").type(NUMBER).description("가게의 카카오 ID (nullable)").optional(),
+                        fieldWithPath("storeId").type(NUMBER).description("가게 ID (nullable)").optional(),
                         fieldWithPath("storeKakaoId").type(STRING).description("가게의 카카오 ID"),
                         fieldWithPath("category").type(STRING).description("가게 카테고리"),
                         fieldWithPath("storeName").type(STRING).description("가게 이름"),
                         fieldWithPath("storeDistrict").type(STRING).description("가게 주소의 구"),
                         fieldWithPath("storeNeighborhood").type(STRING).description("가게 주소의 동"),
                         fieldWithPath("description").type(STRING).description("스토리 내용"),
-                        fieldWithPath("imageUrl").type(STRING).description("스토리 이미지 URL"),
+                        fieldWithPath("images").type(ARRAY).description("스토리 이미지 리스트"),
+                        fieldWithPath("images[].imageKey").type(STRING).description("이미지 S3 키"),
+                        fieldWithPath("images[].orderIndex").type(NUMBER).description("노출 순서"),
+                        fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입"),
+                        fieldWithPath("images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte)"),
+                        fieldWithPath("images[].url").type(STRING).description("스토리 이미지 CDN URL"),
                         fieldWithPath("memberId").type(NUMBER).description("회원 ID"),
                         fieldWithPath("memberNickname").type(STRING).description("회원 닉네임")
                 );
@@ -195,7 +195,7 @@ public class StoryDocumentTest extends BaseDocumentTest {
                     "성동구",
                     "성수동",
                     "곱창은 여기",
-                    "https://s3.bucket.com/story1.jpg",
+                    List.of(new StoryImageResponse("1.png", 0, "image/png", 12345, "https://cdn.test/1.png")),
                     1L,
                     "커찬"
             );
@@ -254,8 +254,13 @@ public class StoryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("stories").type(ARRAY).description("스토리 리스트"),
                         fieldWithPath("stories[].id").type(NUMBER).description("스토리 ID"),
-                        fieldWithPath("stories[].imageUrl").type(STRING).description("스토리 이미지 URL"),
-                        fieldWithPath("stories[].storeName").type(STRING).description("가게 이름")
+                        fieldWithPath("stories[].storeName").type(STRING).description("가게 이름"),
+                        fieldWithPath("stories[].images").type(ARRAY).description("스토리 이미지 리스트"),
+                        fieldWithPath("stories[].images[].imageKey").type(STRING).description("스토리 이미지 키"),
+                        fieldWithPath("stories[].images[].orderIndex").type(NUMBER).description("스토리 이미지 순서"),
+                        fieldWithPath("stories[].images[].contentType").type(STRING).description("스토리 이미지 타입"),
+                        fieldWithPath("stories[].images[].fileSize").type(NUMBER).description("스토리 이미지 파일 크기"),
+                        fieldWithPath("stories[].images[].url").type(STRING).description("스토리 이미지 접근 URL")
                 );
 
         @Test
@@ -263,8 +268,16 @@ public class StoryDocumentTest extends BaseDocumentTest {
             int page = 0;
             int size = 5;
             StoriesInMemberResponse response = new StoriesInMemberResponse(List.of(
-                    new StoryInMemberResponse(1L, "https://dummy-s3.com/story1.png", "백암순대"),
-                    new StoryInMemberResponse(2L, "https://dummy-s3.com/story2.png", "맥도날드")
+                    new StoryInMemberResponse(
+                            1L,
+                            List.of(new StoryImageResponse("story1.png", 0L, "image/png", 12345L, "https://dummy-s3.com/story1.png")),
+                            "백암순대"
+                    ),
+                    new StoryInMemberResponse(
+                            2L,
+                            List.of(new StoryImageResponse("story2.png", 0L, "image/png", 23456L, "https://dummy-s3.com/story2.png")),
+                            "맥도날드"
+                    )
             ));
             doReturn(response).when(storyService).getPagedStoryByMemberId(anyLong(), eq(page), eq(size));
 
@@ -324,7 +337,12 @@ public class StoryDocumentTest extends BaseDocumentTest {
                 .responseBodyField(
                         fieldWithPath("stories").type(ARRAY).description("스토리 상세 리스트"),
                         fieldWithPath("stories[].storyId").type(NUMBER).description("스토리 ID"),
-                        fieldWithPath("stories[].imageUrl").type(STRING).description("스토리 이미지 URL"),
+                        fieldWithPath("stories[].images").type(ARRAY).description("스토리 이미지 리스트"),
+                        fieldWithPath("stories[].images[].imageKey").type(STRING).description("이미지 S3 키"),
+                        fieldWithPath("stories[].images[].orderIndex").type(NUMBER).description("이미지 노출 순서"),
+                        fieldWithPath("stories[].images[].contentType").type(STRING).description("이미지 MIME 타입"),
+                        fieldWithPath("stories[].images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte)"),
+                        fieldWithPath("stories[].images[].url").type(STRING).description("스토리 이미지 CDN URL"),
                         fieldWithPath("stories[].memberId").type(NUMBER).description("회원 ID"),
                         fieldWithPath("stories[].memberNickname").type(STRING).description("회원 닉네임")
                 );
@@ -334,8 +352,18 @@ public class StoryDocumentTest extends BaseDocumentTest {
             String kakaoId = "123456";
             int size = 5;
             StoriesDetailResponse response = new StoriesDetailResponse(List.of(
-                    new StoryDetailResponse(1L, "https://dummy-s3.com/story1.png", 1L, "커찬"),
-                    new StoryDetailResponse(2L, "https://dummy-s3.com/story2.png", 2L, "준환")
+                    new StoryDetailResponse(
+                            1L,
+                            List.of(new StoryImageResponse("1.png", 0, "image/png", 12345, "https://cdn.test/1.png")),
+                            1L,
+                            "커찬"
+                    ),
+                    new StoryDetailResponse(
+                            2L,
+                            List.of(new StoryImageResponse("2.png", 1, "image/png", 67890, "https://cdn.test/2.png")),
+                            2L,
+                            "준환"
+                    )
             ));
             doReturn(response).when(storyService).getPagedStoryDetails(kakaoId, size);
 

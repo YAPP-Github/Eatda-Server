@@ -1,12 +1,12 @@
 variable "instance_definitions" {
   description = "EC2 instance definitions for different roles including AMI and instance type"
   type = object({
-    role          = string
-    ami           = string
-    instance_type = string
+    role                 = string
+    ami                  = string
+    instance_type        = string
     iam_instance_profile = optional(string)
-    key_name      = string
-    user_data = optional(string)
+    key_name             = string
+    user_data            = optional(string)
   })
 }
 
@@ -25,6 +25,6 @@ variable "ec2_sg_id" {
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
