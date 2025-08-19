@@ -53,7 +53,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         }
         if (!cheerTagNames.isEmpty()) {
             spec = spec.and(((root, query, cb) ->
-                    root.join("cheers").get("cheerTags").get("values").get("name").in(cheerTagNames)));
+                    root.join("cheers").join("cheerTags").join("values").get("name").in(cheerTagNames)));
         }
         if (!districts.isEmpty()) {
             spec = spec.and((root, query, cb) -> root.get("district").in(districts));

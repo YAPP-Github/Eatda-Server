@@ -19,15 +19,17 @@ import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
+import eatda.controller.store.SearchDistrict;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
 import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import io.restassured.http.ContentType;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -159,7 +161,12 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .summary("최신 응원 검색")
                 .queryParameter(
                         parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
-                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional(),
+                        parameterWithName("category").description("음식점 카테고리 0~1개(기본값: 전체) (ex. KOREAN)").optional(),
+                        parameterWithName("tag")
+                                .description("응원 태그 이름 0~N개(기본값: 전체) (ex. INSTAGRAMMABLE,ENERGETIC)").optional(),
+                        parameterWithName("location")
+                                .description("음식점 지역 0~N개(기본값: 전체) (ex. GANGNAM,KONDAE)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -169,8 +176,10 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("cheers[].images").type(ARRAY).description("응원 이미지 리스트").optional(),
                         fieldWithPath("cheers[].images[].imageKey").type(STRING).description("이미지 key").optional(),
                         fieldWithPath("cheers[].images[].orderIndex").type(NUMBER).description("이미지 순서 인덱스").optional(),
-                        fieldWithPath("cheers[].images[].contentType").type(STRING).description("이미지 MIME 타입").optional(),
-                        fieldWithPath("cheers[].images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)").optional(),
+                        fieldWithPath("cheers[].images[].contentType").type(STRING).description("이미지 MIME 타입")
+                                .optional(),
+                        fieldWithPath("cheers[].images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)")
+                                .optional(),
                         fieldWithPath("cheers[].images[].url").type(STRING).description("이미지 접근 URL").optional(),
                         fieldWithPath("cheers[].storeName").type(STRING).description("가게 이름"),
                         fieldWithPath("cheers[].storeDistrict").type(STRING).description("가게 주소 (구)"),
@@ -185,16 +194,13 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
         @Test
         void 음식점_검색_성공() {
-            int page = 0;
-            int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
-                    new CheerPreviewResponse(2L, new ArrayList<>(), "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
+                    new CheerPreviewResponse(2L, Collections.emptyList(), "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
                             "너무 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"),
-                    new CheerPreviewResponse(1L, new ArrayList<>(), "석관동떡볶이", "성북구", "석관동", "기타", 1L,
-                            "너무 매워요! 하지만 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"))
-            );
-
-            doReturn(responses).when(cheerService).getCheers(page, size);
+                    new CheerPreviewResponse(1L, Collections.emptyList(), "석관동떡볶이", "성북구", "석관동", "기타", 1L,
+                            "너무 매워요! 하지만 맛있어요!", List.of(), 8L, "찬커")
+            ));
+            doReturn(responses).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", 200)
                     .request(requestDocument)
@@ -203,7 +209,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(200);
         }
@@ -211,9 +221,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
-            int page = 0;
-            int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(page, size);
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", errorCode)
                     .request(requestDocument)
@@ -222,7 +230,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(errorCode.getStatus().value());
         }
