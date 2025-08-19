@@ -9,11 +9,14 @@ import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
+import eatda.controller.store.TagsResponse;
 import eatda.domain.cheer.CheerImage;
+import eatda.domain.cheer.CheerTag;
 import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import eatda.repository.cheer.CheerImageRepository;
 import eatda.repository.cheer.CheerRepository;
+import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.store.StoreRepository;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
+    private final CheerTagRepository cheerTagRepository;
     private final CheerImageRepository cheerImageRepository;
 
     @Value("${cdn.base-url}")
@@ -55,6 +59,13 @@ public class StoreService {
         }
         return storeRepository.findAllByCategoryOrderByCreatedAtDesc(
                 StoreCategory.from(category), PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
+    public TagsResponse getStoreTags(long storeId) {
+        Store store = storeRepository.getById(storeId);
+        List<CheerTag> cheerTags = cheerTagRepository.findAllByCheerStore(store);
+        return TagsResponse.from(cheerTags);
     }
 
     @Transactional(readOnly = true)

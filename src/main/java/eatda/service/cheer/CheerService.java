@@ -16,9 +16,7 @@ import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.repository.cheer.CheerImageRepository;
 import eatda.repository.cheer.CheerRepository;
-import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import java.util.Comparator;
@@ -39,8 +37,6 @@ public class CheerService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
-    private final CheerTagRepository cheerTagRepository;
-    private final CheerImageRepository cheerImageRepository;
     private final FileClient fileClient;
 
     @Value("${cdn.base-url}")
@@ -79,7 +75,8 @@ public class CheerService {
         }
     }
 
-    private List<CheerRegisterRequest.UploadedImageDetail> sortImages(List<CheerRegisterRequest.UploadedImageDetail> images) {
+    private List<CheerRegisterRequest.UploadedImageDetail> sortImages(
+            List<CheerRegisterRequest.UploadedImageDetail> images) {
         return images.stream()
                 .sorted(Comparator.comparingLong(CheerRegisterRequest.UploadedImageDetail::orderIndex))
                 .toList();

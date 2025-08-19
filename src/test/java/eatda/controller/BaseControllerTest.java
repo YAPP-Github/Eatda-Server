@@ -15,6 +15,7 @@ import eatda.controller.web.jwt.JwtManager;
 import eatda.domain.member.Member;
 import eatda.fixture.CheerGenerator;
 import eatda.fixture.CheerImageGenerator;
+import eatda.fixture.CheerTagGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
@@ -59,6 +60,9 @@ public class BaseControllerTest {
 
     @Autowired
     protected CheerGenerator cheerGenerator;
+
+    @Autowired
+    protected CheerTagGenerator cheerTagGenerator;
 
     @Autowired
     protected StoryGenerator storyGenerator;

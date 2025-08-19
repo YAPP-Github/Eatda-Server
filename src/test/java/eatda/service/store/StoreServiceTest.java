@@ -9,6 +9,9 @@ import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
 import eatda.domain.cheer.Cheer;
+import eatda.controller.store.TagsResponse;
+import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -17,6 +20,7 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,6 +165,49 @@ class StoreServiceTest extends BaseServiceTest {
                     () -> assertThat(response.stores()).hasSize(1),
                     () -> assertThat(response.stores().get(0).id()).isEqualTo(store1.getId())
             );
+        }
+    }
+
+    @Nested
+    class GetStoreTags {
+
+        @Test
+        void 음식점의_태그들을_조회한다() {
+            Member member1 = memberGenerator.generate("111", "a@kakao.com", "nickname1");
+            Member member2 = memberGenerator.generate("112", "b@kakao.com", "nickname2");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            Cheer cheer1 = cheerGenerator.generateCommon(member1, store);
+            Cheer cheer2 = cheerGenerator.generateCommon(member2, store);
+            cheerTagGenerator.generate(cheer1, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC));
+            cheerTagGenerator.generate(cheer2, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+
+            TagsResponse response = storeService.getStoreTags(store.getId());
+
+            assertThat(response.tags()).containsExactlyInAnyOrder(
+                    CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC, CheerTagName.CLEAN_RESTROOM);
+        }
+
+        @Test
+        void 음식점의_태그가_없다면_빈_리스트를_반환한다() {
+            Member member1 = memberGenerator.generate("111", "a@kakao.com", "nickname1");
+            Member member2 = memberGenerator.generate("112", "b@kakao.com", "nickname2");
+            Store store = storeGenerator.generate("농민백암순대", "서울 강남구 대치동 896-33");
+            cheerGenerator.generateCommon(member1, store);
+            cheerGenerator.generateCommon(member2, store);
+
+            TagsResponse response = storeService.getStoreTags(store.getId());
+
+            assertThat(response.tags()).isEmpty();
+        }
+
+        @Test
+        void 음식점이_존재하지_않으면_예외를_발생시킨다() {
+            long nonExistentStoreId = 999L;
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> storeService.getStoreTags(nonExistentStoreId));
+
+            assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.STORE_NOT_FOUND);
         }
     }
 

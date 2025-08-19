@@ -23,9 +23,10 @@ public class StoreController {
     private final StoreService storeService;
     private final StoreSearchService storeSearchService;
 
-    @GetMapping("/api/shops/{storeId}/images")
-    public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
-        return ResponseEntity.ok(storeService.getStoreImages(storeId));
+    @GetMapping("/api/shops/{storeId}")
+    public ResponseEntity<StoreResponse> getStore(@PathVariable long storeId) {
+        StoreResponse response = storeService.getStore(storeId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/shops")
@@ -36,9 +37,14 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/shops/{storeId}")
-    public ResponseEntity<StoreResponse> getStore(@PathVariable long storeId) {
-        StoreResponse response = storeService.getStore(storeId);
+    @GetMapping("/api/shops/{storeId}/images")
+    public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
+        return ResponseEntity.ok(storeService.getStoreImages(storeId));
+    }
+
+    @GetMapping("/api/shops/{storeId}/tags")
+    public ResponseEntity<TagsResponse> getStoreTags(@PathVariable long storeId) {
+        TagsResponse response = storeService.getStoreTags(storeId);
         return ResponseEntity.ok(response);
     }
 

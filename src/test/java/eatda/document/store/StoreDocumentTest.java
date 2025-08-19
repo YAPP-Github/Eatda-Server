@@ -17,10 +17,12 @@ import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
+import eatda.controller.store.TagsResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.District;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
@@ -226,6 +228,57 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .then().statusCode(errorCode.getStatus().value());
         }
 
+    }
+
+    @Nested
+    class GetStoreTags {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("음식점 태그 조회")
+                .pathParameter(
+                        parameterWithName("storeId").description("음식점 ID")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("tags").type(ARRAY).description("음식점 태그 목록")
+                );
+
+        @Test
+        void 음식점_태그_조회_성공() {
+            long storeId = 7L;
+            TagsResponse response = new TagsResponse(List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            doReturn(response).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .when().get("/api/shops/{storeId}/tags", storeId)
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
+        @ParameterizedTest
+        void 음식점_태그_조회_실패(BusinessErrorCode errorCode) {
+            long storeId = 1L;
+            doThrow(new BusinessException(errorCode)).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}/tags")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
     }
 
     @Nested
