@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -31,8 +30,7 @@ class CheerTagsTest {
             .latitude(37.5665)
             .longitude(126.978)
             .build();
-    private static final Cheer DEFAULT_CHEER = new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!",
-            new ImageKey("imageKey"));
+    private static final Cheer DEFAULT_CHEER = new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!");
 
     @Nested
     class SetTags {

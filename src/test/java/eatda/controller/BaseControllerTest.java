@@ -5,25 +5,27 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import eatda.DatabaseCleaner;
+import eatda.client.file.FileClient;
 import eatda.client.map.MapClient;
 import eatda.client.map.MapClientStoreSearchResult;
 import eatda.client.oauth.OauthClient;
 import eatda.client.oauth.OauthMemberInformation;
 import eatda.client.oauth.OauthToken;
 import eatda.controller.web.jwt.JwtManager;
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.fixture.CheerGenerator;
+import eatda.fixture.CheerImageGenerator;
+import eatda.fixture.CheerTagGenerator;
 import eatda.fixture.CheerTagGenerator;
 import eatda.fixture.MemberGenerator;
 import eatda.fixture.StoreGenerator;
 import eatda.fixture.StoryGenerator;
+import eatda.fixture.StoryImageGenerator;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.cheer.CheerTagRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
 import eatda.repository.story.StoryRepository;
-import eatda.storage.image.ImageStorage;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.Filter;
@@ -49,7 +51,6 @@ public class BaseControllerTest {
     private static final OauthToken DEFAULT_OAUTH_TOKEN = new OauthToken("oauth-access-token");
     private static final OauthMemberInformation DEFAULT_OAUTH_MEMBER_INFO =
             new OauthMemberInformation(314159248183772L, "constant@kakao.com", "nickname");
-    private static final ImageKey MOCKED_IMAGE_KEY = new ImageKey("mocked-image-path");
     private static final String MOCKED_IMAGE_URL = "https://example.com/image.jpg";
 
     @Autowired
@@ -66,6 +67,12 @@ public class BaseControllerTest {
 
     @Autowired
     protected StoryGenerator storyGenerator;
+
+    @Autowired
+    protected CheerImageGenerator cheerImageGenerator;
+
+    @Autowired
+    protected StoryImageGenerator storyImageGenerator;
 
     @Autowired
     protected MemberRepository memberRepository;
@@ -86,13 +93,13 @@ public class BaseControllerTest {
     protected JwtManager jwtManager;
 
     @MockitoBean
+    private FileClient fileClient;
+
+    @MockitoBean
     private OauthClient oauthClient;
 
     @MockitoBean
     private MapClient mapClient;
-
-    @MockitoBean
-    private ImageStorage imageStorage;
 
     @LocalServerPort
     private int port;
@@ -123,8 +130,7 @@ public class BaseControllerTest {
         );
         doReturn(searchResults).when(mapClient).searchStores(anyString());
 
-        doReturn(MOCKED_IMAGE_URL).when(imageStorage).getPreSignedUrl(any());
-        doReturn(MOCKED_IMAGE_KEY).when(imageStorage).upload(any());
+        doReturn(MOCKED_IMAGE_URL).when(fileClient).generateUploadPresignedUrl(anyString(), any());
     }
 
     protected final RequestSpecification given() {

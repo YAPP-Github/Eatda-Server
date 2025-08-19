@@ -1,5 +1,6 @@
 package eatda.document.store;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -17,11 +18,14 @@ import eatda.controller.store.StorePreviewResponse;
 import eatda.controller.store.StoreResponse;
 import eatda.controller.store.StoresInMemberResponse;
 import eatda.controller.store.StoresResponse;
+import eatda.controller.store.TagsResponse;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.District;
+import eatda.domain.store.SearchDistrict;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
@@ -105,7 +109,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
                         parameterWithName("page").description("조회할 음식점 페이지 (기본 값 0,시작 값 0)").optional(),
                         parameterWithName("size").description("조회할 음식점 개수 (기본 값 5, 최소 1, 최대 50)").optional(),
                         parameterWithName("category")
-                                .description("음식점 카테고리(기본값: 전체) (한식,중식,일식,양식,카페/디저트,기타)").optional()
+                                .description("음식점 카테고리 0~1개(기본값: 전체) (ex. KOREAN)").optional(),
+                        parameterWithName("tag")
+                                .description("응원 태그 이름 0~N개(기본값: 전체) (ex. INSTAGRAMMABLE,ENERGETIC)").optional(),
+                        parameterWithName("location")
+                                .description("음식점 지역 0~N개(기본값: 전체) (ex. GANGNAM,KONDAE)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
@@ -116,19 +124,19 @@ public class StoreDocumentTest extends BaseDocumentTest {
                         fieldWithPath("stores[].name").type(STRING).description("음식점 이름"),
                         fieldWithPath("stores[].district").type(STRING).description("음식점 주소 (구)"),
                         fieldWithPath("stores[].neighborhood").type(STRING).description("음식점 주소 (동)"),
-                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리")
+                        fieldWithPath("stores[].category").type(STRING).description("음식점 카테고리"),
+                        fieldWithPath("stores[].cheerDescriptions").type(ARRAY).description("음식점에 달린 응원 메시지")
                 );
 
         @Test
         void 음식점_목록_최신순으로_조회() {
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
             StoresResponse response = new StoresResponse(List.of(
-                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식"),
-                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식")
+                    new StorePreviewResponse(2L, "https://example.image", "농민백암순대", "강남구", "대치동", "한식",
+                            List.of("응원해요!", "순대가 맛돌이!")),
+                    new StorePreviewResponse(1L, "https://example.image", "석관동떡볶이", "성북구", "석관동", "한식",
+                            List.of("응원해요!", "떡볶이가 맛있게 매워요~", "매운 떡볶이 최고!"))
             ));
-            doReturn(response).when(storeService).getStores(page, size, category.getCategoryName());
+            doReturn(response).when(storeService).getStores(any());
 
             var document = document("store/get", 200)
                     .request(requestDocument)
@@ -137,9 +145,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("page", page)
-                    .queryParam("size", size)
-                    .queryParam("category", category.getCategoryName())
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.CAFE)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.KONDAE)
                     .when().get("/api/shops")
                     .then().statusCode(200);
         }
@@ -147,11 +157,7 @@ public class StoreDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_목록_조회_실패(BusinessErrorCode errorCode) {
-            int page = 0;
-            int size = 2;
-            StoreCategory category = StoreCategory.CAFE;
-            doThrow(new BusinessException(errorCode))
-                    .when(storeService).getStores(page, size, category.getCategoryName());
+            doThrow(new BusinessException(errorCode)).when(storeService).getStores(any());
 
             var document = document("store/get", errorCode)
                     .request(requestDocument)
@@ -160,9 +166,11 @@ public class StoreDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("page", page)
-                    .queryParam("size", size)
-                    .queryParam("category", category.getCategoryName())
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.CAFE)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.ENERGETIC)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.KONDAE)
                     .when().get("/api/shops")
                     .then().statusCode(errorCode.getStatus().value());
         }
@@ -223,6 +231,57 @@ public class StoreDocumentTest extends BaseDocumentTest {
                     .then().statusCode(errorCode.getStatus().value());
         }
 
+    }
+
+    @Nested
+    class GetStoreTags {
+
+        RestDocsRequest requestDocument = request()
+                .tag(Tag.STORE_API)
+                .summary("음식점 태그 조회")
+                .pathParameter(
+                        parameterWithName("storeId").description("음식점 ID")
+                );
+
+        RestDocsResponse responseDocument = response()
+                .responseBodyField(
+                        fieldWithPath("tags").type(ARRAY).description("음식점 태그 목록")
+                );
+
+        @Test
+        void 음식점_태그_조회_성공() {
+            long storeId = 7L;
+            TagsResponse response = new TagsResponse(List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            doReturn(response).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", 200)
+                    .request(requestDocument)
+                    .response(responseDocument)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .when().get("/api/shops/{storeId}/tags", storeId)
+                    .then().statusCode(200);
+        }
+
+        @EnumSource(value = BusinessErrorCode.class, names = {"STORE_NOT_FOUND"})
+        @ParameterizedTest
+        void 음식점_태그_조회_실패(BusinessErrorCode errorCode) {
+            long storeId = 1L;
+            doThrow(new BusinessException(errorCode)).when(storeService).getStoreTags(storeId);
+
+            var document = document("store/get-tags", errorCode)
+                    .request(requestDocument)
+                    .response(ERROR_RESPONSE)
+                    .build();
+
+            given(document)
+                    .contentType(ContentType.JSON)
+                    .pathParam("storeId", storeId)
+                    .when().get("/api/shops/{storeId}/tags")
+                    .then().statusCode(errorCode.getStatus().value());
+        }
     }
 
     @Nested

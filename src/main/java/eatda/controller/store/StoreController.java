@@ -1,8 +1,10 @@
 package eatda.controller.store;
 
 import eatda.controller.web.auth.LoginMember;
+import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.SearchDistrict;
+import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
-import eatda.service.image.ImageService;
 import eatda.service.store.StoreSearchService;
 import eatda.service.store.StoreService;
 import jakarta.validation.constraints.Max;
@@ -23,24 +25,32 @@ public class StoreController {
 
     private final StoreService storeService;
     private final StoreSearchService storeSearchService;
-    private final ImageService imageService;
+
+    @GetMapping("/api/shops/{storeId}")
+    public ResponseEntity<StoreResponse> getStore(@PathVariable long storeId) {
+        StoreResponse response = storeService.getStore(storeId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/shops")
+    public ResponseEntity<StoresResponse> getStores(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
+                                                    @RequestParam(required = false) StoreCategory category,
+                                                    @RequestParam(required = false) List<CheerTagName> tag,
+                                                    @RequestParam(required = false) List<SearchDistrict> location) {
+        StoreSearchParameters parameters = new StoreSearchParameters(page, size, category, tag, location);
+        StoresResponse response = storeService.getStores(parameters);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/api/shops/{storeId}/images")
     public ResponseEntity<ImagesResponse> getStoreImages(@PathVariable long storeId) {
         return ResponseEntity.ok(storeService.getStoreImages(storeId));
     }
 
-    @GetMapping("/api/shops")
-    public ResponseEntity<StoresResponse> getStores(@RequestParam(defaultValue = "0") @Min(0) int page,
-                                                    @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
-                                                    @RequestParam(required = false) String category) {
-        StoresResponse response = storeService.getStores(page, size, category);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/api/shops/{storeId}")
-    public ResponseEntity<StoreResponse> getStore(@PathVariable long storeId) {
-        StoreResponse response = storeService.getStore(storeId);
+    @GetMapping("/api/shops/{storeId}/tags")
+    public ResponseEntity<TagsResponse> getStoreTags(@PathVariable long storeId) {
+        TagsResponse response = storeService.getStoreTags(storeId);
         return ResponseEntity.ok(response);
     }
 

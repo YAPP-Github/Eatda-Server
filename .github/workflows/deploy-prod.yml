@@ -107,6 +107,7 @@ jobs:
           echo "ECS_SERVICE=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_service_name.value')" >> $GITHUB_ENV
           echo "CONTAINER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.ecs_api_container_name.value')" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(echo "$TF_OUTPUTS" | jq -r '.rds_endpoint.value')" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DOMAIN_NAME=$(echo "$TF_OUTPUTS" | jq -r '.cloudfront_domain_name.value')" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -114,6 +115,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update CLOUDFRONT_DOMAIN_NAME in Parameter Store
+        run: |
+          aws ssm put-parameter \
+          --name "/prod/CLOUDFRONT_DOMAIN_NAME" \
+          --type "SecureString" \
+          --value "$CLOUDFRONT_DOMAIN_NAME" \
+          --overwrite
 
       - name: Update DB URL in Parameter Store
         run: |

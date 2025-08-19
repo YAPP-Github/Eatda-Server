@@ -54,7 +54,7 @@ public class StoreGenerator {
         return storeRepository.save(store);
     }
 
-    private Store create(String kakaoId, String lotNumberAddress, District district, StoreCategory category) {
+    public Store create(String kakaoId, String lotNumberAddress, District district, StoreCategory category) {
         return Store.builder()
                 .kakaoId(kakaoId)
                 .category(category)

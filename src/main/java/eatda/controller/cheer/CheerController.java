@@ -3,12 +3,10 @@ package eatda.controller.cheer;
 import eatda.controller.store.SearchDistrict;
 import eatda.controller.web.auth.LoginMember;
 import eatda.domain.ImageDomain;
-import eatda.domain.ImageKey;
 import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
 import eatda.service.cheer.CheerService;
-import eatda.service.image.ImageService;
 import eatda.service.store.StoreSearchService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,10 +18,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @Validated
 @RestController
@@ -31,17 +28,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class CheerController {
 
     private final CheerService cheerService;
-    private final ImageService imageService;
     private final StoreSearchService storeSearchService;
 
     @PostMapping("/api/cheer")
-    public ResponseEntity<CheerResponse> registerCheer(@RequestPart("request") CheerRegisterRequest request,
-                                                       @RequestPart(value = "image", required = false) MultipartFile image,
+    public ResponseEntity<CheerResponse> registerCheer(@RequestBody CheerRegisterRequest request,
                                                        LoginMember member) {
-        ImageKey imageKey = imageService.uploadImage(ImageDomain.CHEER, image);
         StoreSearchResult searchResult = storeSearchService.searchStoreByKakaoId(
                 request.storeName(), request.storeKakaoId());
-        CheerResponse response = cheerService.registerCheer(request, searchResult, imageKey, member.id());
+        CheerResponse response = cheerService.registerCheer(request, searchResult, member.id(), ImageDomain.CHEER);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }

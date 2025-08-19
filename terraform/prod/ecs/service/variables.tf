@@ -33,6 +33,6 @@ variable "alb_target_group_arns" {
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
