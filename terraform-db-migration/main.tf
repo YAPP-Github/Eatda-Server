@@ -79,7 +79,7 @@ resource "aws_vpc_endpoint" "ssm_interface" {
   service_name      = "com.amazonaws.${data.aws_region.current.name}.ssm"
   vpc_endpoint_type = "Interface"
 
-  subnet_ids = data.terraform_remote_state.common_infra.outputs.private_subnet_ids
+  subnet_ids = values(data.terraform_remote_state.common_infra.outputs.private_subnet_ids)
 
   security_group_ids = [module.migration_sg.security_group_ids["lambda-migration"]]
 
@@ -103,7 +103,7 @@ resource "aws_lambda_function" "migration_task" {
   role = module.migration_iam_role["db-migration-lambda-role"].role_arn
 
   vpc_config {
-    subnet_ids         = data.terraform_remote_state.common_infra.outputs.private_subnet_ids
+    subnet_ids         = values(data.terraform_remote_state.common_infra.outputs.private_subnet_ids)
     security_group_ids = [module.migration_sg.security_group_ids["lambda-migration"]]
   }
 
@@ -131,7 +131,7 @@ resource "aws_lambda_function" "migration_task" {
 resource "aws_db_subnet_group" "migration_rds_subnet_group" {
   name = "db-migration-subnet-group-temporary"
 
-  subnet_ids = data.terraform_remote_state.common_infra.outputs.private_subnet_ids
+  subnet_ids = values(data.terraform_remote_state.common_infra.outputs.private_subnet_ids)
 
   tags = {
     Name    = "db-migration-subnet-group-temporary"
@@ -140,10 +140,10 @@ resource "aws_db_subnet_group" "migration_rds_subnet_group" {
 }
 
 resource "aws_db_instance" "cloned_rds_for_migration" {
-  identifier                = "eatda-rds-clone-for-migration"
-  final_snapshot_identifier = data.aws_db_snapshot.latest_prod_snapshot.id
-  instance_class            = "db.t3.medium"
-  db_subnet_group_name      = aws_db_subnet_group.migration_rds_subnet_group.name
+  identifier           = "eatda-rds-clone-for-migration"
+  snapshot_identifier  = data.aws_db_snapshot.latest_prod_snapshot.id
+  instance_class       = "db.t3.medium"
+  db_subnet_group_name = aws_db_subnet_group.migration_rds_subnet_group.name
 
   vpc_security_group_ids = [module.migration_sg.security_group_ids["cloned-rds"]]
 
