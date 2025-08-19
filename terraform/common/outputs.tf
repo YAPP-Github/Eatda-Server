@@ -70,3 +70,15 @@ output "instance_profile_name" {
     k => mod.instance_profile_name
   }
 }
+
+output "public_route_table_id" {
+  description = "ID of the public route table"
+  value       = module.vpc.public_route_table_id
+  sensitive   = true
+}
+
+output "private_route_table_ids" {
+  description = "List of IDs of private route tables"
+  value       = module.vpc.private_route_table_ids
+  sensitive   = true
+}
