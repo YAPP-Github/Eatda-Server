@@ -25,3 +25,13 @@ output "rds_arn" {
   value       = module.rds.arn
   sensitive   = true
 }
+
+output "rds_instance_identifier" {
+  description = "The identifier of the production RDS instance."
+  value       = module.rds.rds_instance_identifier
+}
+
+output "rds_instance_id" {
+  value     = module.rds.rds_instance_id
+  sensitive = true
+}
