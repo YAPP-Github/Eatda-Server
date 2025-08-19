@@ -32,16 +32,20 @@ locals {
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
       ]
       custom_inline_policies = {
-        ssm_mysql_url_access = {
-          name        = "ssm-mysql-url-access"
-          description = "Allow reading MySQL URL parameter from SSM"
+        ssm_mysql_params_access = {
+          name        = "ssm-mysql-params-access"
+          description = "Allow reading MySQL params from SSM"
           policy_document = {
             Version = "2012-10-17"
             Statement = [
               {
-                Effect   = "Allow"
-                Action   = ["ssm:GetParameter"]
-                Resource = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_URL"
+                Effect = "Allow"
+                Action = ["ssm:GetParameter", "ssm:GetParametersByPath"]
+                Resource = [
+                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_URL",
+                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_USER_NAME",
+                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_PASSWORD"
+                ]
               }
             ]
           }
