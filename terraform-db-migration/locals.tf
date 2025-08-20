@@ -2,11 +2,6 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  group_name   = "power"
-  project_name = "eatda"
-}
-
-locals {
   iam_roles = {
     "db-migration-lambda-role" = {
       assume_role_services = ["lambda.amazonaws.com"]
@@ -46,7 +41,6 @@ locals {
   }
 }
 
-
 locals {
   security_groups = {
     "lambda-migration" = {
@@ -58,6 +52,11 @@ locals {
       name        = "eatda-cloned-rds-sg-temp"
       description = "Temporary SG for Cloned RDS instance"
       tags        = { Name = "eatda-cloned-rds-sg-temp", Purpose = "Ephemeral" }
+    }
+    "jump-host" = {
+      name        = "eatda-jump-host-sg-temp"
+      description = "Temporary SG for Jump Host EC2"
+      tags        = { Name = "eatda-jump-host-sg-temp", Purpose = "Ephemeral" }
     }
   }
 
@@ -78,6 +77,14 @@ locals {
       cidr_blocks        = ["0.0.0.0/0"]
       description        = "Allow all outbound traffic from Cloned RDS"
     }
+    "jump_host_allow_all_outbound" = {
+      security_group_key = "jump-host"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "Allow all outbound traffic from Jump Host"
+    }
   }
 
   cross_reference_rules = {
@@ -89,6 +96,14 @@ locals {
       protocol                  = "tcp"
       description               = "Allow MySQL from Migration Lambda to Cloned RDS"
     }
+    "cloned_rds_from_jump_host" = {
+      source_security_group_key = "jump-host"
+      target_security_group_key = "cloned-rds"
+      from_port                 = 3306
+      to_port                   = 3306
+      protocol                  = "tcp"
+      description               = "Allow MySQL from Jump Host to Cloned RDS"
+    }
   }
 }
 
@@ -96,4 +111,12 @@ locals {
   cloned_s3_bucket_prefix   = "eatda-dev-clone"
   cloned_s3_environment     = "migration-test"
   cloned_s3_allowed_origins = ["https://*.example.com"]
+}
+
+locals {
+  jump_host = {
+    key_name      = "eatda-dev-jump-key"
+    instance_type = "t2.nano"
+    ami_id        = "ami-012ea6058806ff688"
+  }
 }

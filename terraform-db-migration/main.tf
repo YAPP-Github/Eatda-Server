@@ -150,6 +150,7 @@ resource "aws_db_instance" "cloned_rds_for_migration" {
   storage_type      = "gp3"
   allocated_storage = 20
   multi_az          = false
+  storage_encrypted = true
 
   skip_final_snapshot = true
   deletion_protection = false
@@ -158,4 +159,30 @@ resource "aws_db_instance" "cloned_rds_for_migration" {
     Name    = "eatda-rds-clone-for-migration"
     Purpose = "Ephemeral"
   }
+}
+
+resource "aws_instance" "jump_host" {
+  ami           = local.jump_host.ami_id
+  instance_type = local.jump_host.instance_type
+  key_name      = local.jump_host.key_name
+
+  subnet_id = data.terraform_remote_state.common_infra.outputs.public_subnet_ids["dev"]
+
+  vpc_security_group_ids      = [module.migration_sg.security_group_ids["jump-host"]]
+  associate_public_ip_address = true
+
+  tags = {
+    Name    = "eatda-jump-host-for-migration"
+    Purpose = "Ephemeral"
+  }
+}
+
+resource "aws_security_group_rule" "allow_ssh_to_jump_host" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.migration_sg.security_group_ids["jump-host"]
+  description       = "Allow SSH from anywhere for temporary access"
 }
