@@ -117,6 +117,7 @@ def postprocess_realign_data_from_db(event):
                                  JOIN cheer_image ci ON c.id = ci.cheer_id
                         WHERE c._deprecated_image_key IS NOT NULL
                           AND c._deprecated_image_key != ''
+                          AND ci.order_index = 1
                         """
             cursor.execute(sql_cheer)
             cheer_tasks = cursor.fetchall()
@@ -132,6 +133,7 @@ def postprocess_realign_data_from_db(event):
                                  JOIN story_image si ON s.id = si.story_id
                         WHERE s._deprecated_image_key IS NOT NULL
                           AND s._deprecated_image_key != ''
+                          AND si.order_index = 1
                         """
             cursor.execute(sql_story)
             story_tasks = cursor.fetchall()
