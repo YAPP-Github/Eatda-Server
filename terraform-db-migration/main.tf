@@ -59,6 +59,7 @@ module "cloned_s3_bucket" {
   bucket_name_prefix = local.cloned_s3_bucket_prefix
   environment        = local.cloned_s3_environment
   allowed_origins    = local.cloned_s3_allowed_origins
+  force_destroy      = true
 }
 
 resource "aws_vpc_endpoint" "s3_gateway" {
@@ -119,7 +120,8 @@ resource "aws_lambda_function" "migration_task" {
 
   depends_on = [
     aws_vpc_endpoint.s3_gateway,
-    aws_vpc_endpoint.ssm_interface
+    aws_vpc_endpoint.ssm_interface,
+    aws_cloudwatch_log_group.migration_lambda_log_group
   ]
 
   tags = {
@@ -185,4 +187,33 @@ resource "aws_security_group_rule" "allow_ssh_to_jump_host" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = module.migration_sg.security_group_ids["jump-host"]
   description       = "Allow SSH from anywhere for temporary access"
+}
+
+resource "aws_ssm_parameter" "temp_migration_rds_url" {
+  name  = "/prod/MIGRATION_RDS_URL"
+  type  = "SecureString"
+  value = "jdbc:mysql://${aws_db_instance.cloned_rds_for_migration.address}/eatda?useUnicode=true&characterEncoding=UTF-8"
+
+  tags = {
+    Purpose = "Ephemeral"
+  }
+}
+
+resource "aws_ssm_parameter" "temp_migration_s3_bucket" {
+  name  = "/prod/MIGRATION_S3_BUCKET"
+  type  = "String"
+  value = module.cloned_s3_bucket.s3_bucket_id
+
+  tags = {
+    Purpose = "Ephemeral"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "migration_lambda_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.migration_task.function_name}"
+  retention_in_days = 1
+
+  tags = {
+    Purpose = "Ephemeral"
+  }
 }
