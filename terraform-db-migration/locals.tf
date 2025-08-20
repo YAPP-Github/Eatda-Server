@@ -2,6 +2,10 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
+  migration_lambda_function_name = "db-migration-task-temporary"
+}
+
+locals {
   iam_roles = {
     "db-migration-lambda-role" = {
       assume_role_services = ["lambda.amazonaws.com"]
@@ -135,14 +139,14 @@ locals {
 }
 
 locals {
-  cloned_s3_bucket_prefix   = "eatda-dev-clone"
+  cloned_s3_bucket_prefix   = "eatda-prod-clone"
   cloned_s3_environment     = "migration-test"
   cloned_s3_allowed_origins = ["https://*.example.com"]
 }
 
 locals {
   jump_host = {
-    key_name      = "eatda-dev-jump-key"
+    key_name      = "eatda-prod-jump-key"
     instance_type = "t3a.small"
     ami_id        = "ami-012ea6058806ff688"
   }

@@ -7,15 +7,6 @@ data "terraform_remote_state" "common_infra" {
   }
 }
 
-data "terraform_remote_state" "dev_infra" {
-  backend = "s3"
-  config = {
-    bucket = "eatda-tf-state"
-    key    = "dev/terraform.tfstate"
-    region = "ap-northeast-2"
-  }
-}
-
 data "terraform_remote_state" "prod_infra" {
   backend = "s3"
   config = {
@@ -92,7 +83,7 @@ resource "aws_vpc_endpoint" "ssm_interface" {
 }
 
 resource "aws_lambda_function" "migration_task" {
-  function_name = "db-migration-task-temporary"
+  function_name = local.migration_lambda_function_name
   handler       = "main.lambda_handler"
   runtime       = "python3.12"
   timeout       = 900
@@ -109,7 +100,7 @@ resource "aws_lambda_function" "migration_task" {
 
   environment {
     variables = {
-      TEST_ORIGIN_SOURCE_BUCKET = data.terraform_remote_state.dev_infra.outputs.s3_bucket_id
+      TEST_ORIGIN_SOURCE_BUCKET = data.terraform_remote_state.prod_infra.outputs.s3_bucket_id
       TEST_TARGET_BUCKET        = module.cloned_s3_bucket.s3_bucket_id
 
       SOURCE_DB_ENDPOINT = data.terraform_remote_state.prod_infra.outputs.rds_instance_address
@@ -119,8 +110,7 @@ resource "aws_lambda_function" "migration_task" {
 
   depends_on = [
     aws_vpc_endpoint.s3_gateway,
-    aws_vpc_endpoint.ssm_interface,
-    aws_cloudwatch_log_group.migration_lambda_log_group
+    aws_vpc_endpoint.ssm_interface
   ]
 
   tags = {
@@ -167,7 +157,7 @@ resource "aws_instance" "jump_host" {
   instance_type = local.jump_host.instance_type
   key_name      = local.jump_host.key_name
 
-  subnet_id = data.terraform_remote_state.common_infra.outputs.public_subnet_ids["dev"]
+  subnet_id = data.terraform_remote_state.common_infra.outputs.public_subnet_ids["prod"]
 
   vpc_security_group_ids      = [module.migration_sg.security_group_ids["jump-host"]]
   associate_public_ip_address = true
@@ -209,7 +199,7 @@ resource "aws_ssm_parameter" "temp_migration_s3_bucket" {
 }
 
 resource "aws_cloudwatch_log_group" "migration_lambda_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.migration_task.function_name}"
+  name              = "/aws/lambda/${local.migration_lambda_function_name}"
   retention_in_days = 1
 
   tags = {
