@@ -73,8 +73,9 @@ module "ecr" {
 
   for_each = var.ecr_repositories
 
-  repository_name      = each.key
-  scan_on_push         = each.value.scan_on_push
-  image_tag_mutability = each.value.image_tag_mutability
-  tags                 = each.value.tags
+  repository_name                     = each.key
+  scan_on_push                        = each.value.scan_on_push
+  image_tag_mutability                = each.value.image_tag_mutability
+  tags                                = each.value.tags
+  migration_test_ecr_lifecycle_policy = var.migration_test_ecr_lifecycle_policy
 }
