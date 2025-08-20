@@ -24,10 +24,10 @@ output "ec2_private_ip" {
   sensitive = true
 }
 
-output "s3_bucket_id" {
+output "dev_s3_bucket_id" {
   value = module.s3.s3_bucket_id
 }
 
-output "s3_bucket_arn" {
+output "dev_s3_bucket_arn" {
   value = module.s3.s3_bucket_arn
 }
