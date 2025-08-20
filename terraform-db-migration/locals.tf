@@ -17,10 +17,16 @@ locals {
             Statement = [
               {
                 Effect = "Allow",
-                Action = ["s3:GetObject", "s3:PutObject", "s3:CopyObject", "s3:HeadObject"],
+                Action = [
+                  "s3:GetObject",
+                  "s3:PutObject",
+                  "s3:CopyObject",
+                  "s3:DeleteObject",
+                  "s3:HeadObject"
+                ],
                 Resource = [
-                  // TODO 테스트 버킷으로 명시, 테스트 후 ssm에서 동적으로 가져오게 수정
-                  "arn:aws:s3:::test-bucket/*"
+                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.s3_bucket_id}/*",
+                  "${module.cloned_s3_bucket.s3_bucket_arn}/*"
                 ]
               },
               {
@@ -47,7 +53,7 @@ locals {
       name        = "eatda-lambda-migration-sg-temp"
       description = "Temporary SG for DB Migration Lambda"
       tags        = { Name = "eatda-lambda-migration-sg-temp", Purpose = "Ephemeral" }
-    },
+    }
     "cloned-rds" = {
       name        = "eatda-cloned-rds-sg-temp"
       description = "Temporary SG for Cloned RDS instance"
@@ -57,6 +63,11 @@ locals {
       name        = "eatda-jump-host-sg-temp"
       description = "Temporary SG for Jump Host EC2"
       tags        = { Name = "eatda-jump-host-sg-temp", Purpose = "Ephemeral" }
+    }
+    "ecs-task-migration" = {
+      name        = "eatda-ecs-task-migration-sg-temp"
+      description = "Temporary SG for Migration ECS Task"
+      tags        = { Name = "eatda-ecs-task-migration-sg-temp", Purpose = "Ephemeral" }
     }
   }
 
@@ -85,6 +96,14 @@ locals {
       cidr_blocks        = ["0.0.0.0/0"]
       description        = "Allow all outbound traffic from Jump Host"
     }
+    "ecs_task_allow_all_outbound" = {
+      security_group_key = "ecs-task-migration"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "Allow all outbound traffic from ECS Task"
+    }
   }
 
   cross_reference_rules = {
@@ -104,6 +123,14 @@ locals {
       protocol                  = "tcp"
       description               = "Allow MySQL from Jump Host to Cloned RDS"
     }
+    "cloned_rds_from_ecs_task" = {
+      source_security_group_key = "ecs-task-migration"
+      target_security_group_key = "cloned-rds"
+      from_port                 = 3306
+      to_port                   = 3306
+      protocol                  = "tcp"
+      description               = "Allow MySQL from Migration ECS Task to Cloned RDS"
+    }
   }
 }
 
@@ -116,7 +143,7 @@ locals {
 locals {
   jump_host = {
     key_name      = "eatda-dev-jump-key"
-    instance_type = "t2.nano"
+    instance_type = "t3a.small"
     ami_id        = "ami-012ea6058806ff688"
   }
 }
