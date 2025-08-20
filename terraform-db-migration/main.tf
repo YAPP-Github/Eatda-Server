@@ -100,7 +100,7 @@ resource "aws_lambda_function" "migration_task" {
 
   environment {
     variables = {
-      TEST_ORIGIN_SOURCE_BUCKET = data.terraform_remote_state.prod_infra.outputs.s3_bucket_id
+      TEST_ORIGIN_SOURCE_BUCKET = data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id
       TEST_TARGET_BUCKET        = module.cloned_s3_bucket.s3_bucket_id
 
       SOURCE_DB_ENDPOINT = data.terraform_remote_state.prod_infra.outputs.rds_instance_address

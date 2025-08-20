@@ -29,7 +29,7 @@ locals {
                   "s3:HeadObject"
                 ],
                 Resource = [
-                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.s3_bucket_id}/*",
+                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}/*",
                   "${module.cloned_s3_bucket.s3_bucket_arn}/*"
                 ]
               },
