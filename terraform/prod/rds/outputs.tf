@@ -16,3 +16,8 @@ output "rds_instance_identifier" {
 output "rds_instance_id" {
   value = aws_db_instance.prod.id
 }
+
+output "rds_instance_address" {
+  description = "The endpoint address of the production RDS instance."
+  value       = aws_db_instance.prod.address
+}

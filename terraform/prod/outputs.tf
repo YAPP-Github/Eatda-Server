@@ -35,3 +35,9 @@ output "rds_instance_id" {
   value     = module.rds.rds_instance_id
   sensitive = true
 }
+
+output "rds_instance_address" {
+  description = "The endpoint address of the production RDS instance."
+  value       = module.rds.rds_instance_address
+  sensitive   = true
+}
