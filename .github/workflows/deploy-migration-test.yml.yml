@@ -1,0 +1,188 @@
+name: 'Deploy Migration Test Environment'
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '테스트할 브랜치 이름'
+        required: true
+        default: 'dev'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-migration
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  build-lambda-handler:
+    name: Build Lambda Handler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies and create zip file
+        run: |
+          mkdir -p build/lambda-package
+          pip install -r ./lambda/requirements.txt -t ./build/lambda-package
+          cp ./lambda/main.py ./build/lambda-package/
+          cd ./build/lambda-package
+          zip -r ../migration_lambda.zip .
+
+      - name: Upload Lambda artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-build
+          path: ./build/migration_lambda.zip
+
+  terraform-apply-migration:
+    name: Terraform Apply MIGRATION
+    runs-on: ubuntu-latest
+    needs: build-lambda-handler
+    outputs:
+      tf_outputs_json: ${{ steps.get-outputs.outputs.data }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Download Lambda artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: lambda-build
+          path: ./build
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init (migration)
+        run: terraform init
+        working-directory: ./terraform-db-migration
+
+      - name: Terraform Apply MIGRATION
+        run: terraform apply -auto-approve
+        working-directory: ./terraform-db-migration
+
+      - name: Get Terraform Outputs
+        id: get-outputs
+        run: |
+          echo "data<<EOF" >> $GITHUB_OUTPUT
+          terraform output -json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        working-directory: ./terraform-db-migration
+
+  build-and-run-migration:
+    name: Build Image and Run Migration Sequence
+    runs-on: ubuntu-latest
+    needs: terraform-apply-migration
+    steps:
+      - name: Checkout specific branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Parse Terraform Outputs and Set Env
+        id: parse-tf
+        run: |
+          TF_OUTPUTS='${{ needs.terraform-apply-migration.outputs.tf_outputs_json }}'
+          echo "ECR_REPOSITORY=$(echo "$TF_OUTPUTS" | jq -r '.ecr_repository_name.value')" >> $GITHUB_ENV
+          echo "PROD_ECS_CLUSTER_NAME=$(echo "$TF_OUTPUTS" | jq -r '.prod_ecs_cluster_name.value')" >> $GITHUB_ENV
+          echo "PROD_ECS_SERVICE_NAME=$(echo "$TF_OUTPUTS" | jq -r '.prod_ecs_api_service_name.value')" >> $GITHUB_ENV
+          echo "LAMBDA_FUNCTION_NAME=$(echo "$TF_OUTPUTS" | jq -r '.migration_lambda_function_name.value')" >> $GITHUB_ENV
+          echo "VPC_SUBNET=$(echo "$TF_OUTPUTS" | jq -r '.private_subnet_id.value')" >> $GITHUB_ENV
+          echo "TASK_SECURITY_GROUP=$(echo "$TF_OUTPUTS" | jq -r '.task_security_group_id.value')" >> $GITHUB_ENV
+          echo "CLONED_RDS_ADDRESS=$(echo "$TF_OUTPUTS" | jq -r '.cloned_rds_address.value')" >> $GITHUB_ENV
+          echo "CLONED_S3_BUCKET_NAME=$(echo "$TF_OUTPUTS" | jq -r '.cloned_s3_bucket_name.value')" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          java-package: jdk
+          architecture: 'x64'
+          cache: 'gradle'
+
+      - name: Get TEST_JWT_SECRET_KEY from SSM
+        id: get-test-secret
+        run: |
+          SECRET_VALUE=$(aws ssm get-parameter --name "/common/TEST_JWT_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
+          echo "TEST_JWT_SECRET_KEY=$SECRET_VALUE" >> $GITHUB_ENV
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -Dspring.profiles.active=migration
+        env:
+          TEST_JWT_SECRET_KEY: ${{ env.TEST_JWT_SECRET_KEY }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_TAG="migration-test-$(date +'%Y%m%d-%H%M%S')"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Get Latest PROD Task Definition Info
+        id: get-prod-info
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.PROD_ECS_CLUSTER_NAME }}" --services "${{ env.PROD_ECS_SERVICE_NAME }}" --query "services[0].taskDefinition" --output text)
+          CONTAINER_NAME=$(aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition.containerDefinitions.name" --output text)
+          echo "::set-output name=task_definition_arn::$TASK_DEF_ARN"
+          echo "::set-output name=container_name::$CONTAINER_NAME"
+
+      - name: Invoke Pre-processing Lambda
+        run: |
+          aws lambda invoke --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --payload '{"task": "preprocess"}' response.json
+
+      - name: Run DB Migration ECS Task
+        id: ecs-run-task
+        run: |
+          MIGRATION_RDS_URL="jdbc:mysql://${{ env.CLONED_RDS_ADDRESS }}/eatda?useUnicode=true&characterEncoding=UTF-8"
+          TASK_ARN=$(aws ecs run-task \
+            --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} \
+            --task-definition ${{ steps.get-prod-info.outputs.task_definition_arn }} \
+            --launch-type EC2 \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ env.VPC_SUBNET }}],securityGroups=[${{ env.TASK_SECURITY_GROUP }}]}" \
+            --overrides '{ "containerOverrides": [ { "name": "${{ steps.get-prod-info.outputs.container_name }}", "image": "${{ steps.build-image.outputs.image_uri }}", "environment": [ { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" }, { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" }, { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" } ] } ] }' \
+            --query "tasks[0].taskArn" --output text)
+          echo "::set-output name=task_arn::$TASK_ARN"
+
+      - name: Wait for ECS Task to Complete
+        run: |
+          aws ecs wait tasks-stopped --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} --tasks ${{ steps.ecs-run-task.outputs.task_arn }}
+
+      - name: Invoke Post-processing Lambda
+        run: |
+          aws lambda invoke --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --payload '{"task": "postprocess"}' response.json
