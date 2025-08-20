@@ -1,4 +1,5 @@
 import boto3
+import json
 import logging
 import os
 import pymysql
@@ -7,96 +8,151 @@ import pymysql
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Boto3 클라이언트 초기화
+# Boto3 클라이언트
 s3_client = boto3.client('s3')
-ssm_client = boto3.client('ssm')
+secrets_manager_client = boto3.client('secretsmanager')
 
-# 환경 변수에서 설정값 가져오기
-TEST_ORIGIN_SOURCE_BUCKET = os.environ.get('TEST_ORIGIN_SOURCE_BUCKET')
-TEST_TARGET_BUCKET = os.environ.get('TEST_TARGET_BUCKET')
-SOURCE_DB_ENDPOINT = os.environ.get('SOURCE_DB_ENDPOINT')
-TARGET_DB_ENDPOINT = os.environ.get('TARGET_DB_ENDPOINT')  # 이 값은 복제 RDS에서 가져와야 함
-SSM_PARAMETER_PATH = os.environ.get('SSM_PARAMETER_PATH')
+# Terraform에서 주입하는 환경 변수
+SOURCE_BUCKET_FOR_CLONE = os.environ.get('TEST_ORIGIN_SOURCE_BUCKET')
+CLONED_BUCKET_FOR_TEST = os.environ.get('TEST_TARGET_BUCKET')
 
 
-def get_secret_from_ssm(parameter_name):
-    """SSM 파라미터 스토어에서 민감한 정보를 가져오는 함수"""
+def get_db_secret(secret_arn):
+    """Secrets Manager에서 DB 접속 정보를 가져오는 함수"""
     try:
-        parameter = ssm_client.get_parameter(
-            Name=f"{SSM_PARAMETER_PATH}{parameter_name}",
-            WithDecryption=True
-        )
-        return parameter['Parameter']['Value']
+        response = secrets_manager_client.get_secret_value(SecretId=secret_arn)
+        return json.loads(response['SecretString'])
     except Exception as e:
-        logger.error(f"Error getting parameter {parameter_name}: {e}")
-        raise e
+        logger.error(f"Error getting secret from Secrets Manager: {e}")
+        raise
 
 
-def clone_s3_to_test_bucket(event):
+def preprocess_clone_s3_for_test(event):
     """
-    작업 1: dev 버킷의 모든 객체를 임시 테스트 버킷으로 복제
+    [작업 1: 전처리] 테스트를 위해 원본 S3 버킷의 모든 객체를
+    임시 복제 버킷으로 복사합니다.
     """
-    logger.info(f"Starting S3 clone from {TEST_ORIGIN_SOURCE_BUCKET} to {TEST_TARGET_BUCKET}")
+    source = SOURCE_BUCKET_FOR_CLONE
+    target = CLONED_BUCKET_FOR_TEST
+    logger.info(f"Starting S3 clone from source bucket '{source}' to target bucket '{target}'")
 
-    # TODO: Paginator를 사용하여 원본 버킷의 모든 객체를 순회하고,
-    # s3_client.copy_object()를 사용하여 대상 버킷으로 복사하는 로직 구현
-    # 예시:
-    # paginator = s3_client.get_paginator('list_objects_v2')
-    # for page in paginator.paginate(Bucket=TEST_ORIGIN_SOURCE_BUCKET):
-    #     for obj in page.get('Contents', []):
-    #         copy_source = {'Bucket': TEST_ORIGIN_SOURCE_BUCKET, 'Key': obj['Key']}
-    #         s3_client.copy(copy_source, TEST_TARGET_BUCKET, obj['Key'])
+    if not source or not target:
+        raise ValueError("Environment variables for source or target bucket are not set.")
 
-    logger.info("S3 clone task completed.")
-    return {"status": "S3 clone successful"}
+    try:
+        paginator = s3_client.get_paginator('list_objects_v2')
+        for page in paginator.paginate(Bucket=source):
+            if 'Contents' not in page:
+                continue
+
+            for obj in page['Contents']:
+                copy_source = {'Bucket': source, 'Key': obj['Key']}
+                s3_client.copy_object(CopySource=copy_source, Bucket=target, Key=obj['Key'])
+
+        logger.info(f"Successfully cloned all objects from '{source}' to '{target}'.")
+        return {"status": "SUCCESS", "message": "Preprocessing (S3 Clone) completed."}
+
+    except Exception as e:
+        logger.error(f"An unexpected error occurred during S3 cloning: {e}")
+        raise
 
 
-def move_files_in_production_bucket(event):
+def move_s3_object(bucket, old_key, new_key):
+    """S3 객체를 복사하고 원본을 삭제하는 헬퍼 함수"""
+    try:
+        copy_source = {'Bucket': bucket, 'Key': old_key}
+        s3_client.copy_object(CopySource=copy_source, Bucket=bucket, Key=new_key)
+        s3_client.delete_object(Bucket=bucket, Key=old_key)
+        logger.info(f"Successfully moved '{old_key}' to '{new_key}' in bucket '{bucket}'.")
+        return True
+    except s3_client.exceptions.NoSuchKey:
+        logger.warning(f"Source object '{old_key}' not found in bucket '{bucket}'. Skipping.")
+        return False
+    except Exception as e:
+        logger.error(f"Failed to move object '{old_key}' to '{new_key}': {e}")
+        raise
+
+
+def postprocess_realign_data_from_db(event):
     """
-    작업 2: 실제 마이그레이션 후, 프로덕션 버킷 내부에서 파일 경로를 이동
+    [작업 2: 후처리] 마이그레이션된 DB를 직접 읽어 S3 객체를 재배치합니다.
     """
-    prod_bucket = event.get('prod_bucket')  # 이벤트 페이로드에서 받아야 함
-    source_prefix = event.get('source_prefix')  # 예: 'public/'
-    target_prefix = event.get('target_prefix')  # 예: 'archived/public/'
+    target_bucket = event.get('target_bucket_for_realignment')
+    db_endpoint = event.get('db_endpoint')
+    db_secret_arn = event.get('db_secret_arn')
 
-    logger.info(f"Starting file move in {prod_bucket} from {source_prefix} to {target_prefix}")
+    if not all([target_bucket, db_endpoint, db_secret_arn]):
+        raise ValueError("Payload must include target_bucket, db_endpoint, and db_secret_arn.")
 
-    # TODO: 원본 prefix의 객체를 순회하며, 새 prefix로 copy_object() 한 뒤,
-    # 원본 객체를 delete_object() 하는 로직 구현
+    logger.info(f"Starting data realignment for bucket '{target_bucket}' using DB at '{db_endpoint}'.")
 
-    logger.info("File move task completed.")
-    return {"status": "File move successful"}
+    db_credentials = get_db_secret(db_secret_arn)
+    connection = None
+    moved_count = 0
 
+    try:
+        connection = pymysql.connect(
+            host=db_endpoint,
+            user=db_credentials['username'],
+            password=db_credentials['password'],
+            database='eatda',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        logger.info("Successfully connected to the database.")
 
-def db_migrate(event):
-    """
-    작업 3: 실제 DB 마이그레이션 스크립트 실행
-    """
-    db_user = get_secret_from_ssm("USER")
-    db_password = get_secret_from_ssm("PASSWORD")
+        with connection.cursor() as cursor:
+            logger.info("Querying for 'cheer' image realignment tasks...")
+            sql_cheer = """
+                        SELECT c._deprecated_image_key as old_key, ci.image_key as new_key
+                        FROM cheer c
+                                 JOIN cheer_image ci ON c.id = ci.cheer_id
+                        WHERE c._deprecated_image_key IS NOT NULL
+                          AND c._deprecated_image_key != ''
+                        """
+            cursor.execute(sql_cheer)
+            cheer_tasks = cursor.fetchall()
+            logger.info(f"Found {len(cheer_tasks)} 'cheer' image(s) to move.")
+            for task in cheer_tasks:
+                if move_s3_object(target_bucket, task['old_key'], task['new_key']):
+                    moved_count += 1
 
-    logger.info(f"Starting DB migration from {SOURCE_DB_ENDPOINT} to {TARGET_DB_ENDPOINT}")
+            logger.info("Querying for 'story' image realignment tasks...")
+            sql_story = """
+                        SELECT s._deprecated_image_key as old_key, si.image_key as new_key
+                        FROM story s
+                                 JOIN story_image si ON s.id = si.story_id
+                        WHERE s._deprecated_image_key IS NOT NULL
+                          AND s._deprecated_image_key != ''
+                        """
+            cursor.execute(sql_story)
+            story_tasks = cursor.fetchall()
+            logger.info(f"Found {len(story_tasks)} 'story' image(s) to move.")
+            for task in story_tasks:
+                if move_s3_object(target_bucket, task['old_key'], task['new_key']):
+                    moved_count += 1
 
-    # TODO: 원본 DB와 대상 DB에 연결
-    # 데이터를 덤프하고 로드하는 등의 마이그레이션 로직 구현
+    finally:
+        if connection:
+            connection.close()
+            logger.info("Database connection closed.")
 
-    logger.info("DB migration task completed.")
-    return {"status": "DB migration successful"}
+    logger.info(f"Data realignment task completed. Total objects moved: {moved_count}.")
+    return {"status": "SUCCESS", "message": f"Moved {moved_count} objects."}
 
 
 def lambda_handler(event, context):
     """
-    메인 핸들러: 이벤트에 따라 적절한 작업을 호출
+    메인 핸들러: 워크플로우에서 전달된 'task' 값에 따라 적절한 작업을 호출합니다.
     """
     task = event.get('task')
-    logger.info(f"Received task: {task}")
+    logger.info(f"Received task: '{task}'")
 
-    if task == 'clone_s3':
-        return clone_s3_to_test_bucket(event)
-    elif task == 'move_files':
-        return move_files_in_production_bucket(event)
-    elif task == 'db_migrate':
-        return db_migrate(event)
+    if task == 'preprocess':
+        return preprocess_clone_s3_for_test(event)
+    elif task == 'postprocess':
+        # [수정 2] 정확한 함수 이름으로 수정합니다.
+        return postprocess_realign_data_from_db(event)
     else:
-        logger.error(f"Unknown task: {task}")
-        raise ValueError(f"Invalid task specified: {task}")
+        error_message = f"Unknown or invalid task specified: '{task}'. Must be 'preprocess' or 'postprocess'."
+        logger.error(error_message)
+        raise ValueError(error_message)
