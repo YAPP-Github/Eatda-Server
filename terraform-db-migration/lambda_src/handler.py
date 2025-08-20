@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import pymysql
+from botocore.exceptions import ClientError
 
 # 로깅 설정
 logger = logging.getLogger()
@@ -58,16 +59,24 @@ def preprocess_clone_s3_for_test(event):
 
 
 def move_s3_object(bucket, old_key, new_key):
-    """S3 객체를 복사하고 원본을 삭제하는 헬퍼 함수"""
+    """S3 객체를 복사하고 원본을 삭제하는 헬퍼 함수. 동일 키는 스킵."""
+    if old_key == new_key:
+        logger.info(f"Old key and new key are identical ('{old_key}'). Skipping move.")
+        return False
+
     try:
         copy_source = {'Bucket': bucket, 'Key': old_key}
         s3_client.copy_object(CopySource=copy_source, Bucket=bucket, Key=new_key)
         s3_client.delete_object(Bucket=bucket, Key=old_key)
         logger.info(f"Successfully moved '{old_key}' to '{new_key}' in bucket '{bucket}'.")
         return True
-    except s3_client.exceptions.NoSuchKey:
-        logger.warning(f"Source object '{old_key}' not found in bucket '{bucket}'. Skipping.")
-        return False
+    except ClientError as e:
+        error_code = e.response.get('Error', {}).get('Code')
+        if error_code in ('NoSuchKey', '404', 'NotFound'):
+            logger.warning(f"Source object '{old_key}' not found in bucket '{bucket}'. Skipping.")
+            return False
+        logger.error(f"Failed to move object '{old_key}' to '{new_key}': {e}")
+        raise
     except Exception as e:
         logger.error(f"Failed to move object '{old_key}' to '{new_key}': {e}")
         raise
