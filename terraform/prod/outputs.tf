@@ -46,3 +46,11 @@ output "rds_instance_address" {
   value       = module.rds.rds_instance_address
   sensitive   = true
 }
+
+output "prod_s3_bucket_id" {
+  value = module.s3.s3_bucket_id
+}
+
+output "prod_s3_bucket_arn" {
+  value = module.s3.s3_bucket_arn
+}
