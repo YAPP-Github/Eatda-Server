@@ -1,6 +1,6 @@
 output "ecr_repository_name" {
   description = "The name of the ECR repository."
-  value       = data.terraform_remote_state.common_infra.outputs.ecr_repository_name
+  value       = data.terraform_remote_state.bootstrap_infra.outputs.ecr_repo_urls["prod"]
 }
 
 output "prod_ecs_cluster_name" {

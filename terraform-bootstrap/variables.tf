@@ -5,7 +5,3 @@ variable "ecr_repositories" {
     tags                 = map(string)
   }))
 }
-
-variable "migration_test_ecr_lifecycle_policy" {
-  type = any
-}

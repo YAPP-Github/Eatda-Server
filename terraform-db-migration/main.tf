@@ -7,6 +7,15 @@ data "terraform_remote_state" "common_infra" {
   }
 }
 
+data "terraform_remote_state" "bootstrap_infra" {
+  backend = "s3"
+  config = {
+    bucket = "eatda-tf-state"
+    key    = "bootstrap/terraform.tfstate"
+    region = "ap-northeast-2"
+  }
+}
+
 data "terraform_remote_state" "prod_infra" {
   backend = "s3"
   config = {

@@ -77,5 +77,5 @@ module "ecr" {
   scan_on_push                        = each.value.scan_on_push
   image_tag_mutability                = each.value.image_tag_mutability
   tags                                = each.value.tags
-  migration_test_ecr_lifecycle_policy = var.migration_test_ecr_lifecycle_policy
+  migration_test_ecr_lifecycle_policy = local.default_ecr_lifecycle_policy
 }
