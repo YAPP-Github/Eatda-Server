@@ -64,7 +64,7 @@ module "cloned_s3_bucket" {
 resource "aws_vpc_endpoint" "s3_gateway" {
   vpc_id = data.terraform_remote_state.common_infra.outputs.vpc_id
 
-  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
+  service_name = "com.amazonaws.${data.aws_region.current.id}.s3"
 
   route_table_ids = data.terraform_remote_state.common_infra.outputs.private_route_table_ids
 
@@ -76,7 +76,7 @@ resource "aws_vpc_endpoint" "s3_gateway" {
 
 resource "aws_vpc_endpoint" "ssm_interface" {
   vpc_id            = data.terraform_remote_state.common_infra.outputs.vpc_id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.ssm"
+  service_name      = "com.amazonaws.${data.aws_region.current.id}.ssm"
   vpc_endpoint_type = "Interface"
 
   subnet_ids = values(data.terraform_remote_state.common_infra.outputs.private_subnet_ids)

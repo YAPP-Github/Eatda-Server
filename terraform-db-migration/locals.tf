@@ -27,7 +27,7 @@ locals {
                 Effect = "Allow",
                 Action = "ssm:GetParameter",
                 Resource = [
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/prod/MYSQL_*"
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/prod/MYSQL_*"
                 ]
               }
             ]
