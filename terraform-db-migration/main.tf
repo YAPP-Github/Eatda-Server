@@ -142,7 +142,7 @@ resource "aws_db_subnet_group" "migration_rds_subnet_group" {
 resource "aws_db_instance" "cloned_rds_for_migration" {
   identifier           = "eatda-rds-clone-for-migration"
   snapshot_identifier  = data.aws_db_snapshot.latest_prod_snapshot.id
-  instance_class       = "db.t3.medium"
+  instance_class       = "db.t3.micro"
   db_subnet_group_name = aws_db_subnet_group.migration_rds_subnet_group.name
 
   vpc_security_group_ids = [module.migration_sg.security_group_ids["cloned-rds"]]
