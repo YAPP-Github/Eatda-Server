@@ -22,6 +22,16 @@ locals {
               {
                 Effect = "Allow",
                 Action = [
+                  "s3:ListBucket"
+                ],
+                Resource = [
+                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}",
+                  module.cloned_s3_bucket.s3_bucket_arn
+                ]
+              },
+              {
+                Effect = "Allow",
+                Action = [
                   "s3:GetObject",
                   "s3:PutObject",
                   "s3:CopyObject",
@@ -72,6 +82,17 @@ locals {
       name        = "eatda-ecs-task-migration-sg-temp"
       description = "Temporary SG for Migration ECS Task"
       tags        = { Name = "eatda-ecs-task-migration-sg-temp", Purpose = "Ephemeral" }
+    }
+  }
+
+  ingress_rules = {
+    "allow_https_to_ssm_vpce_from_lambda" = {
+      security_group_key        = "lambda-migration"
+      from_port                 = 443
+      to_port                   = 443
+      protocol                  = "tcp"
+      source_security_group_key = "lambda-migration"
+      description               = "Allow HTTPS from Lambda ENI to SSM Interface VPC Endpoint ENI"
     }
   }
 

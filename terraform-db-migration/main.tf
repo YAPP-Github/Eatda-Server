@@ -50,7 +50,7 @@ module "migration_sg" {
   security_groups       = local.security_groups
   egress_rules          = local.egress_rules
   cross_reference_rules = local.cross_reference_rules
-  ingress_rules         = {}
+  ingress_rules         = local.ingress_rules
 }
 
 module "cloned_s3_bucket" {
