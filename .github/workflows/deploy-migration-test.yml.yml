@@ -35,8 +35,8 @@ jobs:
       - name: Install dependencies and create zip file
         run: |
           mkdir -p build/lambda-package
-          pip install -r ./lambda/requirements.txt -t ./build/lambda-package
-          cp ./lambda/main.py ./build/lambda-package/
+          pip install -r ./terraform-db-migration/lambda_src/requirements.txt -t ./build/lambda-package
+          cp ./terraform-db-migration/lambda_src/handler.py ./build/lambda-package/
           cd ./build/lambda-package
           zip -r ../migration_lambda.zip .
 
@@ -69,7 +69,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init (migration)
@@ -115,7 +115,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up JDK 21
@@ -152,15 +152,28 @@ jobs:
           IMAGE_TAG="migration-test-$(date +'%Y%m%d-%H%M%S')"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Get Latest PROD Task Definition Info
         id: get-prod-info
         run: |
           TASK_DEF_ARN=$(aws ecs describe-services --cluster "${{ env.PROD_ECS_CLUSTER_NAME }}" --services "${{ env.PROD_ECS_SERVICE_NAME }}" --query "services[0].taskDefinition" --output text)
-          CONTAINER_NAME=$(aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition.containerDefinitions.name" --output text)
-          echo "::set-output name=task_definition_arn::$TASK_DEF_ARN"
-          echo "::set-output name=container_name::$CONTAINER_NAME"
+          CONTAINER_NAME=$(aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query "taskDefinition.containerDefinitions[0].name" --output text)
+          echo "task_definition_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "container_name=$CONTAINER_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create New Task Definition with Updated Image
+        id: update-task-def
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition --task-definition "${{ steps.get-prod-info.outputs.task_definition_arn }}" --query "taskDefinition")
+          
+          NEW_TASK_DEF=$(echo $TASK_DEF | jq --arg IMAGE "${{ steps.build-image.outputs.image_uri }}" '
+            .containerDefinitions[0].image = $IMAGE |
+            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .placementConstraints, .compatibilities, .registeredAt, .registeredBy)
+          ')
+          
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_TASK_DEF" --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "new_task_definition_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
       - name: Invoke Pre-processing Lambda
         run: |
@@ -170,14 +183,14 @@ jobs:
         id: ecs-run-task
         run: |
           MIGRATION_RDS_URL="jdbc:mysql://${{ env.CLONED_RDS_ADDRESS }}/eatda?useUnicode=true&characterEncoding=UTF-8"
-          TASK_ARN=$(aws ecs run-task \
-            --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} \
-            --task-definition ${{ steps.get-prod-info.outputs.task_definition_arn }} \
-            --launch-type EC2 \
-            --network-configuration "awsvpcConfiguration={subnets=[${{ env.VPC_SUBNET }}],securityGroups=[${{ env.TASK_SECURITY_GROUP }}]}" \
-            --overrides '{ "containerOverrides": [ { "name": "${{ steps.get-prod-info.outputs.container_name }}", "image": "${{ steps.build-image.outputs.image_uri }}", "environment": [ { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" }, { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" }, { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" } ] } ] }' \
+          TASK_ARN=$(aws ecs run-task \\
+            --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} \\
+            --task-definition ${{ steps.update-task-def.outputs.new_task_definition_arn }} \\
+            --launch-type EC2 \\
+            --network-configuration "awsvpcConfiguration={subnets=[${{ env.VPC_SUBNET }}],securityGroups=[${{ env.TASK_SECURITY_GROUP }}]}" \\
+            --overrides '{ "containerOverrides": [ { "name": "${{ steps.get-prod-info.outputs.container_name }}", "environment": [ { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" }, { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" }, { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" } ] } ] }' \\
             --query "tasks[0].taskArn" --output text)
-          echo "::set-output name=task_arn::$TASK_ARN"
+          echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
 
       - name: Wait for ECS Task to Complete
         run: |
