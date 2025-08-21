@@ -170,6 +170,7 @@ resource "aws_instance" "jump_host" {
 
   vpc_security_group_ids      = [module.migration_sg.security_group_ids["jump-host"]]
   associate_public_ip_address = true
+  user_data                   = local.jump_host.user_data
 
   tags = {
     Name    = "eatda-jump-host-for-migration"

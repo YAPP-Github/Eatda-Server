@@ -175,5 +175,9 @@ locals {
     key_name      = "eatda-prod-jump-key"
     instance_type = "t3a.small"
     ami_id        = "ami-012ea6058806ff688"
+    user_data     = <<-EOT
+#!/bin/bash
+echo ECS_CLUSTER=prod-cluster >> /etc/ecs/ecs.config
+EOT
   }
 }
