@@ -97,8 +97,8 @@ resource "aws_lambda_function" "migration_task" {
   runtime       = "python3.12"
   timeout       = 900
 
-  filename         = "${path.root}/../build/migration_lambda.zip"
-  source_code_hash = filebase64sha256("${path.root}/../build/migration_lambda.zip")
+  filename         = "./build/migration_lambda.zip"
+  source_code_hash = filebase64sha256("./build/migration_lambda.zip")
 
   role = module.migration_iam_role["db-migration-lambda-role"].role_arn
 
