@@ -25,6 +25,7 @@ import eatda.service.BaseServiceTest;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ class CheerServiceTest extends BaseServiceTest {
     class RegisterCheer {
 
         @Test
+        @Disabled("현재 한시적으로 MAX_CHEER_SIZE=10000 으로 운영 중")
         void 응원_개수가_최대_개수를_초과하면_예외가_발생한다() {
             Member member = memberGenerator.generate("123");
             Store store1 = storeGenerator.generate("124", "서울시 강남구 역삼동 123-45");

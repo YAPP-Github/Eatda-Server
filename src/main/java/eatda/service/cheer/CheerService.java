@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CheerService {
 
-    private static final int MAX_CHEER_SIZE = 3;
+    private static final int MAX_CHEER_SIZE = 10_000;
 
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;

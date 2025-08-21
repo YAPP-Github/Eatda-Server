@@ -1,0 +1,46 @@
+name: 'Destroy Migration Test Environment'
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '리소스를 생성했던 브랜치 이름'
+        required: true
+        default: 'dev'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-migration-destroy
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  terraform-destroy-migration:
+    name: Terraform Destroy MIGRATION
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init (migration)
+        run: terraform init
+        working-directory: ./terraform-db-migration
+
+      - name: Terraform Destroy MIGRATION
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform-db-migration

@@ -8,3 +8,8 @@ resource "aws_ecr_repository" "common" {
 
   tags = var.tags
 }
+
+resource "aws_ecr_lifecycle_policy" "migration_test_image_cleanup" {
+  repository = aws_ecr_repository.common.name
+  policy     = var.migration_test_ecr_lifecycle_policy
+}
