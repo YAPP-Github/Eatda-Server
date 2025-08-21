@@ -88,28 +88,29 @@ def postprocess_realign_data_from_db(event):
     """
     target_bucket = event.get('target_bucket_for_realignment')
     db_endpoint = event.get('db_endpoint')
-    db_secret_arn = event.get('db_secret_arn')
+    db_username = event.get('db_username')
+    db_password = event.get('db_password')
 
-    if not all([target_bucket, db_endpoint, db_secret_arn]):
-        raise ValueError("Payload must include target_bucket, db_endpoint, and db_secret_arn.")
+    if not all([target_bucket, db_endpoint, db_username, db_password]):
+        raise ValueError("Payload must include target_bucket, db_endpoint, db_username, db_password.")
 
     logger.info(f"Starting data realignment for bucket '{target_bucket}' using DB at '{db_endpoint}'.")
 
-    db_credentials = get_db_secret(db_secret_arn)
     connection = None
     moved_count = 0
 
     try:
         connection = pymysql.connect(
             host=db_endpoint,
-            user=db_credentials['username'],
-            password=db_credentials['password'],
+            user=db_username,
+            password=db_password,
             database='eatda',
             cursorclass=pymysql.cursors.DictCursor
         )
         logger.info("Successfully connected to the database.")
 
         with connection.cursor() as cursor:
+            # Cheer 이미지 매핑
             logger.info("Querying for 'cheer' image realignment tasks...")
             sql_cheer = """
                         SELECT c._deprecated_image_key as old_key, ci.image_key as new_key
@@ -126,6 +127,7 @@ def postprocess_realign_data_from_db(event):
                 if move_s3_object(target_bucket, task['old_key'], task['new_key']):
                     moved_count += 1
 
+            # Story 이미지 매핑
             logger.info("Querying for 'story' image realignment tasks...")
             sql_story = """
                         SELECT s._deprecated_image_key as old_key, si.image_key as new_key
