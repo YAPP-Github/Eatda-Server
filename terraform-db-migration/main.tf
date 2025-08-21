@@ -93,7 +93,7 @@ resource "aws_vpc_endpoint" "ssm_interface" {
 
 resource "aws_lambda_function" "migration_task" {
   function_name = local.migration_lambda_function_name
-  handler       = "main.lambda_handler"
+  handler       = "handler.lambda_handler"
   runtime       = "python3.12"
   timeout       = 900
 
