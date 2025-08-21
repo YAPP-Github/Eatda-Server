@@ -176,7 +176,7 @@ locals {
     instance_type = "t3a.small"
     ami_id        = "ami-012ea6058806ff688"
     user_data = templatefile("./user-data.sh", {
-      ecs_cluster_name = "prod-cluster"
+      ecs_cluster_name = "migration-cluster"
     })
   }
 }
