@@ -6,7 +6,7 @@ on:
       branch:
         description: '리소스를 생성했던 브랜치 이름'
         required: true
-        default: 'dev'
+        default: 'develop'
 
 permissions:
   contents: read
