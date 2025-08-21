@@ -12,50 +12,53 @@ locals {
       policy_arns = [
         "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
       ]
-      custom_inline_policies = {
-        s3_ssm_access_for_migration = {
-          name        = "s3-ssm-access-for-migration-lambda"
-          description = "Allow S3 object and SSM parameter access for DB migration"
-          policy_document = {
-            Version = "2012-10-17"
-            Statement = [
-              {
-                Effect = "Allow",
-                Action = [
-                  "s3:ListBucket"
-                ],
-                Resource = [
-                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}",
-                  module.cloned_s3_bucket.s3_bucket_arn
-                ]
-              },
-              {
-                Effect = "Allow",
-                Action = [
-                  "s3:GetObject",
-                  "s3:PutObject",
-                  "s3:CopyObject",
-                  "s3:DeleteObject",
-                  "s3:HeadObject"
-                ],
-                Resource = [
-                  "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}/*",
-                  "${module.cloned_s3_bucket.s3_bucket_arn}/*"
-                ]
-              },
-              {
-                Effect = "Allow",
-                Action = "ssm:GetParameter",
-                Resource = [
-                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/prod/MYSQL_*"
-                ]
-              }
+    }
+  }
+  tags = {
+    Purpose = "DB Migration Lambda Execution"
+  }
+}
+
+locals {
+  custom_inline_policies = {
+    s3_ssm_access_for_migration = {
+      name        = "s3-ssm-access-for-migration-lambda"
+      description = "Allow S3 object and SSM parameter access for DB migration"
+      policy_document = {
+        Version = "2012-10-17"
+        Statement = [
+          {
+            Effect = "Allow",
+            Action = [
+              "s3:ListBucket"
+            ],
+            Resource = [
+              "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}",
+              module.cloned_s3_bucket.s3_bucket_arn
+            ]
+          },
+          {
+            Effect = "Allow",
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:CopyObject",
+              "s3:DeleteObject",
+              "s3:HeadObject"
+            ],
+            Resource = [
+              "arn:aws:s3:::${data.terraform_remote_state.prod_infra.outputs.prod_s3_bucket_id}/*",
+              "${module.cloned_s3_bucket.s3_bucket_arn}/*"
+            ]
+          },
+          {
+            Effect = "Allow",
+            Action = "ssm:GetParameter",
+            Resource = [
+              "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/prod/MYSQL_*"
             ]
           }
-        }
-      }
-      tags = {
-        Purpose = "DB Migration Lambda Execution"
+        ]
       }
     }
   }
@@ -91,6 +94,7 @@ locals {
       from_port                 = 443
       to_port                   = 443
       protocol                  = "tcp"
+      cidr_blocks               = []
       source_security_group_key = "lambda-migration"
       description               = "Allow HTTPS from Lambda ENI to SSM Interface VPC Endpoint ENI"
     }
