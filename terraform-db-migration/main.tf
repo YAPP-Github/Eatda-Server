@@ -212,3 +212,17 @@ resource "aws_ssm_parameter" "temp_migration_s3_bucket" {
     Purpose = "Ephemeral"
   }
 }
+
+resource "aws_ecs_cluster" "migration_cluster" {
+  name = "migration-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = {
+    Name    = "migration-cluster"
+    Purpose = "Ephemeral"
+  }
+}
