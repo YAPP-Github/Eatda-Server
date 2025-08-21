@@ -166,14 +166,24 @@ jobs:
       - name: Create New Task Definition with Updated Image
         id: update-task-def
         run: |
-          TASK_DEF=$(aws ecs describe-task-definition --task-definition "${{ steps.get-prod-info.outputs.task_definition_arn }}" --query "taskDefinition")
-          
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition "${{ steps.get-prod-info.outputs.task_definition_arn }}" \
+            --query "taskDefinition")
+
           NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "${{ steps.build-image.outputs.image_uri }}" '
+            .family = "api-migration" |
             .containerDefinitions[0].image = $IMAGE |
-            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .placementConstraints, .compatibilities, .registeredAt, .registeredBy)
+            (.containerDefinitions[0].command) |= map(
+              if test("prod$") then sub("prod$"; "migration") else . end
+            ) |
+            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .placementConstraints,
+                .compatibilities, .registeredAt, .registeredBy)
           ')
-          
-          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_TASK_DEF" --query "taskDefinition.taskDefinitionArn" --output text)
+
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query "taskDefinition.taskDefinitionArn" \
+            --output text)
           echo "new_task_definition_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
       - name: Invoke Pre-processing Lambda
@@ -191,10 +201,21 @@ jobs:
         run: |
           MIGRATION_RDS_URL="jdbc:mysql://${{ env.CLONED_RDS_ADDRESS }}/eatda?useUnicode=true&characterEncoding=UTF-8"
           TASK_ARN=$(aws ecs run-task \
-          --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} \
+          --cluster migration-cluster \
           --task-definition ${{ steps.update-task-def.outputs.new_task_definition_arn }} \
           --launch-type EC2 \
-          --overrides '{ "containerOverrides": [ { "name": "${{ steps.get-prod-info.outputs.container_name }}", "environment": [ { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" }, { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" }, { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" } ] } ] }' \
+          --overrides '{
+            "containerOverrides": [
+              {
+                "name": "${{ steps.get-prod-info.outputs.container_name }}",
+                "environment": [
+                  { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" },
+                  { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" },
+                  { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" }
+                ]
+              }
+            ]
+          }' \
           --query "tasks[0].taskArn" --output text)
           echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
           if [ -z "$TASK_ARN" ] || [ "$TASK_ARN" = "None" ]; then
@@ -203,11 +224,44 @@ jobs:
 
       - name: Wait for ECS Task to Complete
         run: |
-          aws ecs wait tasks-stopped --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} --tasks ${{ steps.ecs-run-task.outputs.task_arn }}
+          aws ecs wait tasks-stopped --cluster migration-cluster --tasks ${{ steps.ecs-run-task.outputs.task_arn }}
+
+      - name: Get DB Credentials from SSM
+        id: get-db-creds
+        run: |
+          DB_USER=$(aws ssm get-parameter --name "/prod/MYSQL_USER_NAME" --with-decryption --query "Parameter.Value" --output text)
+          DB_PASS=$(aws ssm get-parameter --name "/prod/MYSQL_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          
+          echo "::add-mask::$DB_USER"
+          echo "::add-mask::$DB_PASS"
+          
+          echo "DB_USER=$DB_USER" >> $GITHUB_ENV
+          echo "DB_PASS=$DB_PASS" >> $GITHUB_ENV
 
       - name: Invoke Post-processing Lambda
         run: |
-          aws lambda invoke --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --payload '{"task": "postprocess"}' response.json
+          PAYLOAD=$(jq -n \
+            --arg task "postprocess" \
+            --arg bucket "${{ env.CLONED_S3_BUCKET_NAME }}" \
+            --arg db_endpoint "${{ env.CLONED_RDS_ADDRESS }}" \
+            --arg db_username "${{ env.DB_USER }}" \
+            --arg db_password "${{ env.DB_PASS }}" \
+            '{
+              task: $task,
+              target_bucket_for_realignment: $bucket,
+              db_endpoint: $db_endpoint,
+              db_username: $db_username,
+              db_password: $db_password
+            }')
+
+          echo "Invoking Lambda with payload: $PAYLOAD"
+
+          aws lambda invoke \
+            --function-name "${{ env.LAMBDA_FUNCTION_NAME }}" \
+            --payload "$PAYLOAD" \
+            --cli-binary-format raw-in-base64-out \
+            response.json
+
 
 #  notify:
 #    name: Send Discord Notification (Migration)
