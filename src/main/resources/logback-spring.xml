@@ -71,4 +71,13 @@
         </root>
     </springProfile>
 
+    <springProfile name="migration">
+        <property name="LOG_NAME_PATTERN" value="${LOG_DIR}/eatda-%d{yyyy-MM-dd}.%i.log.gz"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_JSON"/>
+            <appender-ref ref="ROLLING_LOG_FILE"/>
+        </root>
+    </springProfile>
+
 </configuration>
