@@ -16,7 +16,7 @@ spring:
       max-request-size: 10MB
 
   config:
-    import: "aws-parameterstore:/prod/"
+    import: "optional:aws-parameterstore:/prod/"
 
   datasource:
     url: ${MIGRATION_RDS_URL}
