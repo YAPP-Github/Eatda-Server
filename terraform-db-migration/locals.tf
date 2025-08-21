@@ -168,6 +168,7 @@ locals {
   cloned_s3_bucket_prefix   = "eatda-prod-clone"
   cloned_s3_environment     = "migration-test"
   cloned_s3_allowed_origins = ["https://*.example.com"]
+  force_destroy             = true
 }
 
 locals {

@@ -18,10 +18,11 @@ data "terraform_remote_state" "common" {
 
 
 locals {
-  project_name = "eatda"
-  region       = "ap-northeast-2"
-  environment  = "prod"
-  name_prefix  = "eatda"
+  project_name  = "eatda"
+  region        = "ap-northeast-2"
+  environment   = "prod"
+  name_prefix   = "eatda"
+  force_destroy = false
 
   bucket_name_prefix = "eatda-storage"
   allowed_origins = [

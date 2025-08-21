@@ -63,6 +63,7 @@ module "cloned_s3_bucket" {
   bucket_name_prefix = local.cloned_s3_bucket_prefix
   environment        = local.cloned_s3_environment
   allowed_origins    = local.cloned_s3_allowed_origins
+  force_destroy      = local.force_destroy
 }
 
 resource "aws_vpc_endpoint" "s3_gateway" {

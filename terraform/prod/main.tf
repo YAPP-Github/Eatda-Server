@@ -53,4 +53,5 @@ module "s3" {
   bucket_name_prefix = local.bucket_name_prefix
   environment        = local.environment
   allowed_origins    = local.allowed_origins
+  force_destroy      = local.force_destroy
 }

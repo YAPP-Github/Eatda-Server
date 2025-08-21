@@ -9,3 +9,9 @@ variable "environment" {
 variable "allowed_origins" {
   type = list(string)
 }
+
+variable "force_destroy" {
+  type    = bool
+  default = false
+}
+
