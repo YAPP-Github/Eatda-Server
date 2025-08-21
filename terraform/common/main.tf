@@ -14,9 +14,9 @@ module "iam_role" {
   source   = "./iam-role"
   for_each = local.iam_roles
 
-  name                 = each.key
-  assume_role_services = each.value.assume_role_services
-  policy_arns          = each.value.policy_arns
+  name                   = each.key
+  assume_role_services   = each.value.assume_role_services
+  policy_arns            = each.value.policy_arns
   custom_inline_policies = try(each.value.custom_inline_policies, {})
 }
 
@@ -47,7 +47,7 @@ module "alb" {
     module.vpc.public_subnet_ids.dev,
     module.vpc.public_subnet_ids.prod
   ])
-  alb_security_group_id = [module.security_group.security_group_ids["alb"]]
+  alb_security_group_id           = [module.security_group.security_group_ids["alb"]]
   certificate_arn                 = module.route53.certificate_arn
   certificate_validation_complete = module.route53.certificate_validation_complete
 }

@@ -14,7 +14,15 @@ HOST=$(echo "$MYSQL_URL" | sed -E 's|jdbc:mysql://([^:/]+):([0-9]+)/([^?]+).*|\1
 PORT=$(echo "$MYSQL_URL" | sed -E 's|jdbc:mysql://([^:/]+):([0-9]+)/([^?]+).*|\2|')
 DB_NAME=$(echo "$MYSQL_URL" | sed -E 's|jdbc:mysql://([^:/]+):([0-9]+)/([^?]+).*|\3|')
 
-if mysqldump -h "$HOST" -P "$PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$DB_NAME" > "$ARCHIVE_PATH"; then
+retries=10
+count=0
+until mysqladmin ping -h "$HOST" -P "$PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent || [ $count -eq $retries ]; do
+  echo "[INFO] Waiting for MySQL to be ready... ($count/$retries)"
+  sleep 2
+  count=$((count+1))
+done
+
+if mysqldump --no-tablespaces -h "$HOST" -P "$PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$DB_NAME" > "$ARCHIVE_PATH"; then
   echo "[INFO] MySQL backup successful: $ARCHIVE_PATH"
 
   if aws s3 cp "$ARCHIVE_PATH" "$S3_BUCKET"; then

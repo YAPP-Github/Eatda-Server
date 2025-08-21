@@ -1,4 +1,4 @@
-package eatda.document.store;
+package eatda.document.cheer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -11,23 +11,25 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 
+import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
+import eatda.controller.store.SearchDistrict;
 import eatda.document.BaseDocumentTest;
 import eatda.document.RestDocsRequest;
 import eatda.document.RestDocsResponse;
 import eatda.document.Tag;
+import eatda.domain.cheer.CheerTagName;
+import eatda.domain.store.StoreCategory;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
 import io.restassured.http.ContentType;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,34 +42,22 @@ public class CheerDocumentTest extends BaseDocumentTest {
     @Nested
     class RegisterCheer {
 
-        private static final String REQUEST_DESCRIPTION_MARKDOWN = """
-                - 요청 형식 : multipart/form-data
-                - 요청 field
-                  - image : 응원 이미지 (선택, 최대 5MB, 허용 타입 : image/jpg, image/jpeg, image/png)
-                  - request : 응원 등록 요청 정보 (필수, 허용 타입 : application/json)
-                - request body 예시
-                    ```json
-                    {
-                        "storeKakaoId": "123", // 가게 카카오 ID (필수)
-                        "storeName": "농민백암순대 본점", // 가게 이름 (필수)
-                        "description": "너무 맛있어요! 준환님 추천 맛집!" // 응원 내용 (필수)
-                    }
-                    ```
-                """;
-
         RestDocsRequest requestDocument = request()
                 .tag(Tag.CHEER_API)
                 .summary("응원 등록")
-                .description(REQUEST_DESCRIPTION_MARKDOWN)
                 .requestHeader(
                         headerWithName("Authorization").description("인증 토큰")
-                ).multipartField(
-                        partWithName("image").description("응원 이미지 (선택)").optional(),
-                        partWithName("request").description("응원 등록 요청 정보")
-                ).requestBodyField("request",
+                )
+                .requestBodyField(
                         fieldWithPath("storeKakaoId").type(STRING).description("가게 카카오 ID"),
                         fieldWithPath("storeName").type(STRING).description("가게 이름"),
-                        fieldWithPath("description").type(STRING).description("응원 내용")
+                        fieldWithPath("description").type(STRING).description("응원 내용"),
+                        fieldWithPath("images").type(ARRAY).description("응원 이미지 리스트").optional(),
+                        fieldWithPath("images[].imageKey").type(STRING).description("이미지 key"),
+                        fieldWithPath("images[].orderIndex").type(NUMBER).description("이미지 순서 인덱스"),
+                        fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입"),
+                        fieldWithPath("images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)"),
+                        fieldWithPath("tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         RestDocsResponse responseDocument = response()
@@ -75,14 +65,41 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("storeId").type(NUMBER).description("가게 ID"),
                         fieldWithPath("cheerId").type(NUMBER).description("응원 ID"),
                         fieldWithPath("imageUrl").type(STRING).description("이미지 URL").optional(),
-                        fieldWithPath("cheerDescription").type(STRING).description("응원 내용")
+                        fieldWithPath("cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("images").type(ARRAY).description("응원 이미지 리스트").optional(),
+                        fieldWithPath("images[].imageKey").type(STRING).description("이미지 key").optional(),
+                        fieldWithPath("images[].orderIndex").type(NUMBER).description("이미지 순서 인덱스").optional(),
+                        fieldWithPath("images[].contentType").type(STRING).description("이미지 MIME 타입").optional(),
+                        fieldWithPath("images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)").optional(),
+                        fieldWithPath("images[].url").type(STRING).description("이미지 접근 URL").optional(),
+                        fieldWithPath("tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         @Test
         void 응원_등록_성공() {
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
-            CheerResponse response = new CheerResponse(1L, 1L, "https://example.img", "너무 맛있어요!");
-            doReturn(response).when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
+            CheerRegisterRequest request = new CheerRegisterRequest(
+                    "깜브레",
+                    "2085990843",
+                    "정말 맛있어요! 강추합니다!",
+                    List.of(
+                            new CheerRegisterRequest.UploadedImageDetail("temp/1.png", 0, "image/png", 12345),
+                            new CheerRegisterRequest.UploadedImageDetail("temp/2.png", 1, "image/png", 67890)
+                    ),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
+            );
+
+            CheerResponse response = new CheerResponse(
+                    1L,
+                    1L,
+                    List.of(
+                            new CheerImageResponse("temp/1.png", 0, "image/png", 12345L, "https://.../1.png"),
+                            new CheerImageResponse("temp/2.png", 1, "image/png", 67890L, "https://.../2.png")
+                    ),
+                    "정말 맛있어요! 강추합니다!",
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
+            );
+
+            doReturn(response).when(cheerService).registerCheer(eq(request), any(), anyLong(), any());
 
             var document = document("cheer/register", 201)
                     .request(requestDocument)
@@ -91,9 +108,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType(ContentType.JSON)
+                    .body(request)
                     .when().post("/api/cheer")
                     .then().statusCode(201);
         }
@@ -110,9 +126,18 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 "INVALID_CHEER_DESCRIPTION"})
         @ParameterizedTest
         void 응원_등록_실패(BusinessErrorCode errorCode) {
-            CheerRegisterRequest request = new CheerRegisterRequest("123", "농민백암순대 본점", "너무 맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(
+                    "농민백암순대 본점",
+                    "123",
+                    "너무 맛있어요!",
+                    List.of(
+                            new CheerRegisterRequest.UploadedImageDetail("temp/1.png", 0, "image/png", 12345)
+                    ),
+                    List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
+            );
+
             doThrow(new BusinessException(errorCode))
-                    .when(cheerService).registerCheer(eq(request), any(), any(), anyLong());
+                    .when(cheerService).registerCheer(eq(request), any(), anyLong(), any());
 
             var document = document("cheer/register", errorCode)
                     .request(requestDocument)
@@ -121,9 +146,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType(ContentType.MULTIPART)
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType(ContentType.JSON)
+                    .body(request)
                     .when().post("/api/cheer")
                     .then().statusCode(errorCode.getStatus().value());
         }
@@ -137,33 +161,46 @@ public class CheerDocumentTest extends BaseDocumentTest {
                 .summary("최신 응원 검색")
                 .queryParameter(
                         parameterWithName("page").description("조회 페이지 (기본값 0, 최소 0)").optional(),
-                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional()
+                        parameterWithName("size").description("조회 개수 (기본값 5, 최소 1, 최대 50)").optional(),
+                        parameterWithName("category").description("음식점 카테고리 0~1개(기본값: 전체) (ex. KOREAN)").optional(),
+                        parameterWithName("tag")
+                                .description("응원 태그 이름 0~N개(기본값: 전체) (ex. INSTAGRAMMABLE,ENERGETIC)").optional(),
+                        parameterWithName("location")
+                                .description("음식점 지역 0~N개(기본값: 전체) (ex. GANGNAM,KONDAE)").optional()
                 );
 
         RestDocsResponse responseDocument = response()
                 .responseBodyField(
                         fieldWithPath("cheers").type(ARRAY).description("응원 검색 결과"),
                         fieldWithPath("cheers[].storeId").type(NUMBER).description("가게 ID"),
-                        fieldWithPath("cheers[].imageUrl").type(STRING).description("이미지 URL").optional(),
+                        fieldWithPath("cheers[].images").type(ARRAY).description("응원 이미지 리스트").optional(),
+                        fieldWithPath("cheers[].images[].imageKey").type(STRING).description("이미지 key").optional(),
+                        fieldWithPath("cheers[].images[].orderIndex").type(NUMBER).description("이미지 순서 인덱스").optional(),
+                        fieldWithPath("cheers[].images[].contentType").type(STRING).description("이미지 MIME 타입")
+                                .optional(),
+                        fieldWithPath("cheers[].images[].fileSize").type(NUMBER).description("이미지 파일 크기 (byte 단위)")
+                                .optional(),
+                        fieldWithPath("cheers[].images[].url").type(STRING).description("이미지 접근 URL").optional(),
                         fieldWithPath("cheers[].storeName").type(STRING).description("가게 이름"),
                         fieldWithPath("cheers[].storeDistrict").type(STRING).description("가게 주소 (구)"),
                         fieldWithPath("cheers[].storeNeighborhood").type(STRING).description("가게 주소 (동)"),
                         fieldWithPath("cheers[].storeCategory").type(STRING).description("가게 카테고리"),
                         fieldWithPath("cheers[].cheerId").type(NUMBER).description("응원 ID"),
-                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용")
+                        fieldWithPath("cheers[].cheerDescription").type(STRING).description("응원 내용"),
+                        fieldWithPath("cheers[].tags").type(ARRAY).description("응원 태그 목록"),
+                        fieldWithPath("cheers[].memberId").type(NUMBER).description("응원 작성자 회원 ID"),
+                        fieldWithPath("cheers[].memberNickname").type(STRING).description("응원 작성자 닉네임")
                 );
 
         @Test
         void 음식점_검색_성공() {
-            int page = 0;
-            int size = 2;
             CheersResponse responses = new CheersResponse(List.of(
-                    new CheerPreviewResponse(2L, "https://example.image", "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
-                            "너무 맛있어요!"),
-                    new CheerPreviewResponse(1L, null, "석관동떡볶이", "성북구", "석관동", "기타", 1L,
-                            "너무 매워요! 하지만 맛있어요!")
+                    new CheerPreviewResponse(2L, Collections.emptyList(), "농민백암순대 본점", "강남구", "선릉구", "한식", 2L,
+                            "너무 맛있어요!", List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), 5L, "커찬"),
+                    new CheerPreviewResponse(1L, Collections.emptyList(), "석관동떡볶이", "성북구", "석관동", "기타", 1L,
+                            "너무 매워요! 하지만 맛있어요!", List.of(), 8L, "찬커")
             ));
-            doReturn(responses).when(cheerService).getCheers(page, size);
+            doReturn(responses).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", 200)
                     .request(requestDocument)
@@ -172,7 +209,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(200);
         }
@@ -180,9 +221,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
         @EnumSource(value = BusinessErrorCode.class, names = {"PRESIGNED_URL_GENERATION_FAILED"})
         @ParameterizedTest
         void 음식점_검색_실패(BusinessErrorCode errorCode) {
-            int page = 0;
-            int size = 2;
-            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(page, size);
+            doThrow(new BusinessException(errorCode)).when(cheerService).getCheers(any());
 
             var document = document("cheer/get-many", errorCode)
                     .request(requestDocument)
@@ -191,7 +230,11 @@ public class CheerDocumentTest extends BaseDocumentTest {
 
             given(document)
                     .contentType(ContentType.JSON)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM)
+                    .queryParam("location", SearchDistrict.GANGNAM, SearchDistrict.DAECHI)
                     .when().get("/api/cheer")
                     .then().statusCode(errorCode.getStatus().value());
         }
@@ -217,7 +260,8 @@ public class CheerDocumentTest extends BaseDocumentTest {
                         fieldWithPath("cheers[].id").type(NUMBER).description("응원 ID"),
                         fieldWithPath("cheers[].memberId").type(NUMBER).description("응원 작성자 회원 ID"),
                         fieldWithPath("cheers[].memberNickname").type(STRING).description("응원 작성자 닉네임"),
-                        fieldWithPath("cheers[].description").type(STRING).description("응원 내용")
+                        fieldWithPath("cheers[].description").type(STRING).description("응원 내용"),
+                        fieldWithPath("cheers[].tags").type(ARRAY).description("응원 태그 목록")
                 );
 
         @Test
@@ -226,8 +270,9 @@ public class CheerDocumentTest extends BaseDocumentTest {
             int page = 0;
             int size = 2;
             CheersInStoreResponse responses = new CheersInStoreResponse(List.of(
-                    new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!"),
-                    new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!")
+                    new CheerInStoreResponse(20L, 5L, "커찬", "너무 맛있어요!",
+                            List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM, CheerTagName.ENERGETIC)),
+                    new CheerInStoreResponse(10L, 3L, "찬커", "너무 매워요! 하지만 맛있어요!", List.of())
             ));
             doReturn(responses).when(cheerService).getCheersByStoreId(storeId, page, size);
 

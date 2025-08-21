@@ -22,10 +22,10 @@ resource "aws_route53_record" "cert_validation" {
     }
   }
 
-  zone_id = data.aws_route53_zone.common.zone_id  # 변경된 부분
-  name = each.value.name
-  type = each.value.type
-  ttl  = 60
+  zone_id = data.aws_route53_zone.common.zone_id # 변경된 부분
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = 60
   records = [each.value.value]
 }
 
@@ -58,6 +58,6 @@ resource "aws_route53_record" "frontend_subdomains" {
   name    = each.key == var.domain_name ? var.domain_name : "${each.key}.${var.domain_name}"
   type    = each.value.type
 
-  ttl = 300
+  ttl     = 300
   records = [each.value.value]
 }

@@ -159,59 +159,59 @@ locals {
     }
   }
 
-    ingress_rules = {
-      alb_http = {
-        security_group_key = "alb"
-        from_port          = 80
-        to_port            = 80
-        protocol           = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "HTTP"
-      }
-      alb_https = {
-        security_group_key = "alb"
-        from_port          = 443
-        to_port            = 443
-        protocol           = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "HTTPS"
-      }
-      ec2_ssh = {
-        security_group_key = "ec2"
-        from_port          = 22
-        to_port            = 22
-        protocol           = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "SSH"
-      }
+  ingress_rules = {
+    alb_http = {
+      security_group_key = "alb"
+      from_port          = 80
+      to_port            = 80
+      protocol           = "tcp"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "HTTP"
     }
+    alb_https = {
+      security_group_key = "alb"
+      from_port          = 443
+      to_port            = 443
+      protocol           = "tcp"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "HTTPS"
+    }
+    ec2_ssh = {
+      security_group_key = "ec2"
+      from_port          = 22
+      to_port            = 22
+      protocol           = "tcp"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "SSH"
+    }
+  }
 
-    egress_rules = {
-      alb_egress = {
-        security_group_key = "alb"
-        from_port          = 0
-        to_port            = 0
-        protocol           = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "Allow all"
-      }
-      ec2_egress = {
-        security_group_key = "ec2"
-        from_port          = 0
-        to_port            = 0
-        protocol           = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "Allow all"
-      }
-      rds_egress = {
-        security_group_key = "rds"
-        from_port          = 0
-        to_port            = 0
-        protocol           = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-        description        = "Allow all"
-      }
+  egress_rules = {
+    alb_egress = {
+      security_group_key = "alb"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "Allow all"
     }
+    ec2_egress = {
+      security_group_key = "ec2"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "Allow all"
+    }
+    rds_egress = {
+      security_group_key = "rds"
+      from_port          = 0
+      to_port            = 0
+      protocol           = "-1"
+      cidr_blocks        = ["0.0.0.0/0"]
+      description        = "Allow all"
+    }
+  }
 
   cross_reference_rules = {
     ec2_from_alb_http = {

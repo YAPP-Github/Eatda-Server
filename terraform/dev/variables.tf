@@ -10,14 +10,14 @@ variable "ecs_services" {
 
 variable "ecs_task_definitions_base" {
   type = map(object({
-    cpu          = number
-    memory       = number
-    network_mode = string
-    environment = map(string)
+    cpu                      = number
+    memory                   = number
+    network_mode             = string
+    environment              = map(string)
     requires_compatibilities = optional(list(string))
-    container_image = optional(string)
-    execution_role_arn = optional(string)
-    task_role_arn = optional(string)
+    container_image          = optional(string)
+    execution_role_arn       = optional(string)
+    task_role_arn            = optional(string)
     port_mappings = optional(list(object({
       container_port = number
       host_port      = number
