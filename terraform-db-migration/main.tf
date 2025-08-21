@@ -31,6 +31,10 @@ data "aws_db_snapshot" "latest_prod_snapshot" {
   snapshot_type          = "automated"
 }
 
+data "aws_iam_instance_profile" "ec2_to_ecs" {
+  name = "ec2-to-ecs"
+}
+
 module "migration_iam_role" {
   source = "../terraform/common/iam-role"
 
@@ -162,9 +166,10 @@ resource "aws_db_instance" "cloned_rds_for_migration" {
 }
 
 resource "aws_instance" "jump_host" {
-  ami           = local.jump_host.ami_id
-  instance_type = local.jump_host.instance_type
-  key_name      = local.jump_host.key_name
+  ami                  = local.jump_host.ami_id
+  instance_type        = local.jump_host.instance_type
+  key_name             = local.jump_host.key_name
+  iam_instance_profile = data.aws_iam_instance_profile.ec2_to_ecs.name
 
   subnet_id = data.terraform_remote_state.common_infra.outputs.public_subnet_ids["prod"]
 
