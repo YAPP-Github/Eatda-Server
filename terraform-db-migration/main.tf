@@ -50,7 +50,7 @@ module "migration_sg" {
   security_groups       = local.security_groups
   egress_rules          = local.egress_rules
   cross_reference_rules = local.cross_reference_rules
-  ingress_rules         = local.ingress_rules
+  ingress_rules         = {}
 }
 
 module "cloned_s3_bucket" {
@@ -201,15 +201,6 @@ resource "aws_ssm_parameter" "temp_migration_s3_bucket" {
   name  = "/prod/MIGRATION_S3_BUCKET"
   type  = "String"
   value = module.cloned_s3_bucket.s3_bucket_id
-
-  tags = {
-    Purpose = "Ephemeral"
-  }
-}
-
-resource "aws_cloudwatch_log_group" "migration_lambda_log_group" {
-  name              = "/aws/lambda/${local.migration_lambda_function_name}"
-  retention_in_days = 1
 
   tags = {
     Purpose = "Ephemeral"

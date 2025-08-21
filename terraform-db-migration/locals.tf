@@ -86,17 +86,10 @@ locals {
       description = "Temporary SG for Migration ECS Task"
       tags        = { Name = "eatda-ecs-task-migration-sg-temp", Purpose = "Ephemeral" }
     }
-  }
-
-  ingress_rules = {
-    "allow_https_to_ssm_vpce_from_lambda" = {
-      security_group_key        = "lambda-migration"
-      from_port                 = 443
-      to_port                   = 443
-      protocol                  = "tcp"
-      cidr_blocks               = []
-      source_security_group_key = "lambda-migration"
-      description               = "Allow HTTPS from Lambda ENI to SSM Interface VPC Endpoint ENI"
+    "ssm-vpce" = {
+      name        = "eatda-ssm-vpce-sg-temp"
+      description = "Temporary SG for SSM VPC Endpoint"
+      tags        = { Name = "eatda-ssm-vpce-sg-temp", Purpose = "Ephemeral" }
     }
   }
 
@@ -136,6 +129,14 @@ locals {
   }
 
   cross_reference_rules = {
+    "allow_https_to_ssm_vpce_from_lambda" = {
+      source_security_group_key = "lambda-migration"
+      target_security_group_key = "ssm-vpce"
+      from_port                 = 443
+      to_port                   = 443
+      protocol                  = "tcp"
+      description               = "Allow HTTPS from Lambda ENI to SSM Interface VPC Endpoint ENI"
+    }
     "cloned_rds_from_lambda" = {
       source_security_group_key = "lambda-migration"
       target_security_group_key = "cloned-rds"
