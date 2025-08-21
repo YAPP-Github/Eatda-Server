@@ -194,7 +194,6 @@ jobs:
           --cluster ${{ env.PROD_ECS_CLUSTER_NAME }} \
           --task-definition ${{ steps.update-task-def.outputs.new_task_definition_arn }} \
           --launch-type EC2 \
-          --network-configuration "awsvpcConfiguration={subnets=[${{ env.VPC_SUBNET }}],securityGroups=[${{ env.TASK_SECURITY_GROUP }}]}" \
           --overrides '{ "containerOverrides": [ { "name": "${{ steps.get-prod-info.outputs.container_name }}", "environment": [ { "name": "SPRING_PROFILES_ACTIVE", "value": "migration" }, { "name": "MIGRATION_RDS_URL", "value": "'"${MIGRATION_RDS_URL}"'" }, { "name": "MIGRATION_S3_BUCKET", "value": "${{ env.CLONED_S3_BUCKET_NAME }}" } ] } ] }' \
           --query "tasks[0].taskArn" --output text)
           echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
