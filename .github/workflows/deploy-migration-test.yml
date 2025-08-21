@@ -226,6 +226,22 @@ jobs:
         run: |
           aws ecs wait tasks-stopped --cluster migration-cluster --tasks ${{ steps.ecs-run-task.outputs.task_arn }}
 
+      - name: Check ECS Task Exit Code
+        run: |
+          TASK_ARN=${{ steps.ecs-run-task.outputs.task_arn }}
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster migration-cluster \
+            --tasks $TASK_ARN \
+            --query "tasks[0].containers[0].exitCode" \
+            --output text)
+          
+          echo "ECS Task Exit Code: $EXIT_CODE"
+          
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "Migration task failed with exit code $EXIT_CODE"
+            exit 1
+          fi
+
       - name: Get DB Credentials from SSM
         id: get-db-creds
         run: |
@@ -261,7 +277,6 @@ jobs:
             --payload "$PAYLOAD" \
             --cli-binary-format raw-in-base64-out \
             response.json
-
 
 #  notify:
 #    name: Send Discord Notification (Migration)
