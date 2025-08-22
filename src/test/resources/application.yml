@@ -29,6 +29,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
     hibernate:
       ddl-auto: create-drop
     open-in-view: false
@@ -56,3 +60,6 @@ oauth:
 
 kakao:
   api-key: ablselfsgbwrlgrwrlhknwnkefknkwelfk
+
+cdn:
+  base-url: "http://localhost:8080"

@@ -7,18 +7,16 @@ public record StoriesDetailResponse(List<StoryDetailResponse> stories) {
 
     public record StoryDetailResponse(
             long storyId,
-            String imageUrl,
+            List<StoryImageResponse> images,
             long memberId,
             String memberNickname
     ) {
-
-        public StoryDetailResponse(Story story, String imageUrl) {
+        public StoryDetailResponse(Story story, List<StoryImageResponse> images) {
             this(
                     story.getId(),
-                    imageUrl,
+                    images,
                     story.getMember().getId(),
-                    story.getMember().getNickname()
-            );
+                    story.getMember().getNickname());
         }
     }
 }

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import eatda.domain.ImageKey;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
@@ -38,17 +37,21 @@ class CheerTest {
         @ParameterizedTest
         @NullAndEmptySource
         void 설명이_비어있으면_안된다(String description) {
-            ImageKey imageKey = new ImageKey("imageKey");
-
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, description, imageKey));
+                    () -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, description));
 
             assertThat(exception.getErrorCode()).isEqualTo(BusinessErrorCode.INVALID_CHEER_DESCRIPTION);
         }
 
         @Test
-        void 이미지_키는_null이_가능하다() {
-            assertThatCode(() -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", null))
+        void 기본_생성자는_예외를_던지지_않는다() {
+            assertThatCode(() -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!"))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        void isAdmin_파라미터와_함께_생성할_수_있다() {
+            assertThatCode(() -> new Cheer(DEFAULT_MEMBER, DEFAULT_STORE, "Great store!", true))
                     .doesNotThrowAnyException();
         }
     }

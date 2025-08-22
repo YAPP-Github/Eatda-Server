@@ -13,3 +13,7 @@ variable "image_tag_mutability" {
 variable "tags" {
   type = map(string)
 }
+
+variable "migration_test_ecr_lifecycle_policy" {
+  type = any
+}

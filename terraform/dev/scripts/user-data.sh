@@ -21,6 +21,10 @@ until systemctl is-active --quiet crond; do
   sleep 1
 done
 
+sudo chown -R ec2-user:ec2-user /home/ec2-user/mysql
+
+sudo dnf install -y mariadb105
+
 (
   sudo crontab -u ec2-user -l 2>/dev/null || true
   echo "0 0 * * 0 /home/ec2-user/scripts/app-backup-dev-logs.sh >> /home/ec2-user/logs/backup/app-backup.log 2>&1"

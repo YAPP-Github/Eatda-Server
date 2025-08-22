@@ -4,13 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import eatda.controller.BaseControllerTest;
+import eatda.controller.store.SearchDistrict;
 import eatda.domain.cheer.Cheer;
+import eatda.domain.cheer.CheerTagName;
 import eatda.domain.member.Member;
 import eatda.domain.store.District;
 import eatda.domain.store.Store;
-import eatda.util.ImageUtils;
-import eatda.util.MappingUtils;
+import eatda.domain.store.StoreCategory;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -23,38 +26,47 @@ class CheerControllerTest extends BaseControllerTest {
         @Test
         void 응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!",
+                    new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
-                    .multiPart("image", ImageUtils.getTestImage(), "image/png")
+                    .contentType("application/json")
+                    .body(request)
                     .when()
                     .post("/api/cheer")
                     .then()
                     .statusCode(201)
                     .extract().as(CheerResponse.class);
 
-            assertThat(response.storeId()).isEqualTo(store.getId());
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(store.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
+            );
         }
 
         @Test
         void 이미지가_비어있을_경우에도_응원을_등록한다() {
             Store store = storeGenerator.generate("123", "서울시 노원구 월계3동 123-45", District.NOWON);
-            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!");
+            CheerRegisterRequest request = new CheerRegisterRequest(store.getKakaoId(), store.getName(), "맛있어요!",
+                    new ArrayList<>(), List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
 
             CheerResponse response = given()
                     .header(HttpHeaders.AUTHORIZATION, accessToken())
-                    .contentType("multipart/form-data")
-                    .multiPart("request", "request.json", MappingUtils.toJsonBytes(request), "application/json")
+                    .contentType("application/json")
+                    .body(request)
                     .when()
                     .post("/api/cheer")
                     .then()
                     .statusCode(201)
                     .extract().as(CheerResponse.class);
 
-            assertThat(response.storeId()).isEqualTo(store.getId());
+            assertAll(
+                    () -> assertThat(response.storeId()).isEqualTo(store.getId()),
+                    () -> assertThat(response.cheerDescription()).isEqualTo(request.description()),
+                    () -> assertThat(response.tags()).containsExactlyInAnyOrderElementsOf(request.tags())
+            );
         }
     }
 
@@ -70,13 +82,11 @@ class CheerControllerTest extends BaseControllerTest {
             Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
             Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
             Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
-            int page = 0;
-            int size = 2;
 
             CheersResponse response = given()
                     .when()
-                    .queryParam("page", page)
-                    .queryParam("size", size)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
                     .get("/api/cheer")
                     .then()
                     .statusCode(200)
@@ -88,7 +98,43 @@ class CheerControllerTest extends BaseControllerTest {
                     () -> assertThat(firstResponse.storeId()).isEqualTo(store2.getId()),
                     () -> assertThat(firstResponse.storeDistrict()).isEqualTo("성북구"),
                     () -> assertThat(firstResponse.storeNeighborhood()).isEqualTo("석관동"),
-                    () -> assertThat(firstResponse.cheerId()).isEqualTo(cheer3.getId())
+                    () -> assertThat(firstResponse.cheerId()).isEqualTo(cheer3.getId()),
+                    () -> assertThat(firstResponse.tags()).isEmpty()
+            );
+        }
+
+        @Test
+        void 필터링을_통해_응원을_조회한다() {
+            Member member = memberGenerator.generateRegisteredMember("nickname", "ac@kakao.com", "123", "01011111111");
+            Store store1 = storeGenerator.generate("111", "서울시 노원구 월계3동 123-45", District.NOWON,
+                    StoreCategory.KOREAN);
+            Store store2 = storeGenerator.generate("222", "서울시 노원구 월계3동 123-46", District.NOWON,
+                    StoreCategory.KOREAN);
+            LocalDateTime startAt = LocalDateTime.of(2025, 7, 26, 1, 0, 0);
+            Cheer cheer1 = cheerGenerator.generateAdmin(member, store1, startAt);
+            Cheer cheer2 = cheerGenerator.generateAdmin(member, store1, startAt.plusHours(1));
+            Cheer cheer3 = cheerGenerator.generateAdmin(member, store2, startAt.plusHours(2));
+            cheerTagGenerator.generate(cheer1, List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM));
+            cheerTagGenerator.generate(cheer2, List.of(CheerTagName.INSTAGRAMMABLE));
+            cheerTagGenerator.generate(cheer3, List.of(CheerTagName.CLEAN_RESTROOM));
+
+            CheersResponse response = given()
+                    .when()
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("category", StoreCategory.KOREAN)
+                    .queryParam("tag", CheerTagName.INSTAGRAMMABLE)
+                    .queryParam("location", SearchDistrict.GEUMCHEON, SearchDistrict.MYEONGDONG)
+                    .get("/api/cheer")
+                    .then()
+                    .statusCode(200)
+                    .extract().as(CheersResponse.class);
+
+            CheerPreviewResponse firstResponse = response.cheers().get(0);
+            assertAll(
+                    () -> assertThat(response.cheers()).hasSize(2),
+                    () -> assertThat(response.cheers().get(0).cheerId()).isEqualTo(cheer2.getId()),
+                    () -> assertThat(response.cheers().get(1).cheerId()).isEqualTo(cheer1.getId())
             );
         }
 

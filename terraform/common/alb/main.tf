@@ -21,7 +21,7 @@ module "https" {
   alb_arn        = aws_alb.common.arn
   https_listener = local.https_listener
   listener_rules = local.listener_rules
-  depends_on = [var.certificate_validation_complete]
+  depends_on     = [var.certificate_validation_complete]
 }
 
 module "target_groups" {

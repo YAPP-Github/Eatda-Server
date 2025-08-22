@@ -29,24 +29,24 @@ variable "enable_network_address_usage_metrics" {
 
 variable "public_subnet_cidrs" {
   description = "CIDR blocks for public subnets"
-  type = list(string)
-  default = ["10.0.0.0/20", "10.0.16.0/20"]
+  type        = list(string)
+  default     = ["10.0.0.0/20", "10.0.16.0/20"]
 }
 
 variable "private_subnet_cidrs" {
   description = "CIDR blocks for private subnets"
-  type = list(string)
-  default = ["10.0.128.0/20", "10.0.144.0/20"]
+  type        = list(string)
+  default     = ["10.0.128.0/20", "10.0.144.0/20"]
 }
 
 variable "availability_zones" {
   description = "Availability zones for subnets"
-  type = list(string)
-  default = ["ap-northeast-2a", "ap-northeast-2c"]
+  type        = list(string)
+  default     = ["ap-northeast-2a", "ap-northeast-2c"]
 }
 
 variable "tags" {
   description = "Tags to apply to resources"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

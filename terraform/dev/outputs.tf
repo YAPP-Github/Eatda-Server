@@ -23,3 +23,16 @@ output "ec2_private_ip" {
   value     = module.ec2.private_ip
   sensitive = true
 }
+
+output "cloudfront_domain_name" {
+  value     = module.s3.cloudfront_domain_name
+  sensitive = true
+}
+
+output "s3_bucket_id" {
+  value = module.s3.s3_bucket_id
+}
+
+output "s3_bucket_arn" {
+  value = module.s3.s3_bucket_arn
+}
