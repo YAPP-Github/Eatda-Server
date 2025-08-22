@@ -59,22 +59,35 @@ def preprocess_clone_s3_for_test(event):
 
 
 def move_s3_object(bucket, old_key, new_key):
-    """S3 객체를 복사하고 원본을 삭제하는 헬퍼 함수. 동일 키는 스킵."""
+    """S3 객체를 복사/삭제하고 ContentType, FileSize 반환"""
     if old_key == new_key:
         logger.info(f"Old key and new key are identical ('{old_key}'). Skipping move.")
-        return False
+        return None
 
     try:
+        # S3 객체 메타데이터 조회
+        head = s3_client.head_object(Bucket=bucket, Key=old_key)
+        content_type = head['ContentType']
+        file_size = head['ContentLength']
+
         copy_source = {'Bucket': bucket, 'Key': old_key}
-        s3_client.copy_object(CopySource=copy_source, Bucket=bucket, Key=new_key)
+        s3_client.copy_object(
+            CopySource=copy_source,
+            Bucket=bucket,
+            Key=new_key,
+            MetadataDirective='COPY'
+        )
         s3_client.delete_object(Bucket=bucket, Key=old_key)
-        logger.info(f"Successfully moved '{old_key}' to '{new_key}' in bucket '{bucket}'.")
-        return True
+
+        logger.info(
+            f"Moved '{old_key}' -> '{new_key}', ContentType={content_type}, Size={file_size} bytes"
+        )
+        return {"content_type": content_type, "file_size": file_size}
     except ClientError as e:
         error_code = e.response.get('Error', {}).get('Code')
         if error_code in ('NoSuchKey', '404', 'NotFound'):
             logger.warning(f"Source object '{old_key}' not found in bucket '{bucket}'. Skipping.")
-            return False
+            return None
         logger.error(f"Failed to move object '{old_key}' to '{new_key}': {e}")
         raise
     except Exception as e:
@@ -84,7 +97,8 @@ def move_s3_object(bucket, old_key, new_key):
 
 def postprocess_realign_data_from_db(event):
     """
-    [작업 2: 후처리] 마이그레이션된 DB를 직접 읽어 S3 객체를 재배치합니다.
+    [작업 2: 후처리] 마이그레이션된 DB를 직접 읽어 S3 객체를 재배치하고,
+    ContentType, FileSize를 DB에 업데이트합니다.
     """
     target_bucket = event.get('target_bucket_for_realignment')
     db_endpoint = event.get('db_endpoint')
@@ -113,7 +127,7 @@ def postprocess_realign_data_from_db(event):
             # Cheer 이미지 매핑
             logger.info("Querying for 'cheer' image realignment tasks...")
             sql_cheer = """
-                        SELECT c._deprecated_image_key as old_key, ci.image_key as new_key
+                        SELECT c._deprecated_image_key as old_key, ci.image_key as new_key, ci.id as image_id
                         FROM cheer c
                                  JOIN cheer_image ci ON c.id = ci.cheer_id
                         WHERE c._deprecated_image_key IS NOT NULL
@@ -124,13 +138,24 @@ def postprocess_realign_data_from_db(event):
             cheer_tasks = cursor.fetchall()
             logger.info(f"Found {len(cheer_tasks)} 'cheer' image(s) to move.")
             for task in cheer_tasks:
-                if move_s3_object(target_bucket, task['old_key'], task['new_key']):
+                meta = move_s3_object(target_bucket, task['old_key'], task['new_key'])
+                if meta:
+                    cursor.execute(
+                        """
+                        UPDATE cheer_image
+                        SET content_type=%s,
+                            file_size=%s
+                        WHERE id = %s
+                        """,
+                        (meta['content_type'], meta['file_size'], task['image_id'])
+                    )
                     moved_count += 1
+            connection.commit()
 
             # Story 이미지 매핑
             logger.info("Querying for 'story' image realignment tasks...")
             sql_story = """
-                        SELECT s._deprecated_image_key as old_key, si.image_key as new_key
+                        SELECT s._deprecated_image_key as old_key, si.image_key as new_key, si.id as image_id
                         FROM story s
                                  JOIN story_image si ON s.id = si.story_id
                         WHERE s._deprecated_image_key IS NOT NULL
@@ -141,8 +166,19 @@ def postprocess_realign_data_from_db(event):
             story_tasks = cursor.fetchall()
             logger.info(f"Found {len(story_tasks)} 'story' image(s) to move.")
             for task in story_tasks:
-                if move_s3_object(target_bucket, task['old_key'], task['new_key']):
+                meta = move_s3_object(target_bucket, task['old_key'], task['new_key'])
+                if meta:
+                    cursor.execute(
+                        """
+                        UPDATE story_image
+                        SET content_type=%s,
+                            file_size=%s
+                        WHERE id = %s
+                        """,
+                        (meta['content_type'], meta['file_size'], task['image_id'])
+                    )
                     moved_count += 1
+            connection.commit()
 
     finally:
         if connection:
