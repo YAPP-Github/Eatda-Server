@@ -28,7 +28,6 @@ data "terraform_remote_state" "prod_infra" {
 data "aws_db_snapshot" "latest_prod_snapshot" {
   db_instance_identifier = data.terraform_remote_state.prod_infra.outputs.rds_instance_identifier
   most_recent            = true
-  snapshot_type          = "automated"
 }
 
 data "aws_iam_instance_profile" "ec2_to_ecs" {
