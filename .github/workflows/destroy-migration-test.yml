@@ -37,6 +37,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Prepare dummy lambda zip
+        run: |
+          mkdir -p ./terraform-db-migration/build
+          echo "dummy" > ./terraform-db-migration/build/migration_lambda.zip
+          zip ./terraform-db-migration/build/migration_lambda.zip ./terraform-db-migration/build/migration_lambda.zip || true
+
       - name: Terraform Init (migration)
         run: terraform init
         working-directory: ./terraform-db-migration
