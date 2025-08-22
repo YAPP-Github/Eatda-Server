@@ -163,7 +163,6 @@ def lambda_handler(event, context):
     if task == 'preprocess':
         return preprocess_clone_s3_for_test(event)
     elif task == 'postprocess':
-        # [수정 2] 정확한 함수 이름으로 수정합니다.
         return postprocess_realign_data_from_db(event)
     else:
         error_message = f"Unknown or invalid task specified: '{task}'. Must be 'preprocess' or 'postprocess'."

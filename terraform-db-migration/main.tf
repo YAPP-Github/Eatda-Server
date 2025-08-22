@@ -79,23 +79,6 @@ resource "aws_vpc_endpoint" "s3_gateway" {
   }
 }
 
-resource "aws_vpc_endpoint" "ssm_interface" {
-  vpc_id            = data.terraform_remote_state.common_infra.outputs.vpc_id
-  service_name      = "com.amazonaws.${data.aws_region.current.id}.ssm"
-  vpc_endpoint_type = "Interface"
-
-  subnet_ids = values(data.terraform_remote_state.common_infra.outputs.private_subnet_ids)
-
-  security_group_ids = [module.migration_sg.security_group_ids["lambda-migration"]]
-
-  private_dns_enabled = true
-
-  tags = {
-    Name    = "vpce-ssm-interface-for-migration"
-    Purpose = "Ephemeral"
-  }
-}
-
 resource "aws_lambda_function" "migration_task" {
   function_name = local.migration_lambda_function_name
   handler       = "handler.lambda_handler"
