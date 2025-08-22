@@ -107,7 +107,6 @@ resource "aws_lambda_function" "migration_task" {
 
   depends_on = [
     aws_vpc_endpoint.s3_gateway,
-    aws_vpc_endpoint.ssm_interface
   ]
 
   tags = {
