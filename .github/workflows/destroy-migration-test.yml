@@ -34,7 +34,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init (migration)
@@ -44,3 +44,39 @@ jobs:
       - name: Terraform Destroy MIGRATION
         run: terraform destroy -auto-approve
         working-directory: ./terraform-db-migration
+
+  notify:
+    name: Send Discord Notification (Migration Destroy)
+    runs-on: ubuntu-latest
+    needs: terraform-destroy-migration
+    if: always()
+    steps:
+      - name: Prepare Notification Info
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Discord Notify (Success)
+        if: needs.terraform-destroy-migration.result == 'success'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "✅ Migration Test 리소스 삭제 성공!"
+          embed-color: 65280
+          embed-description: |
+            마이그레이션 테스트 환경 리소스가 성공적으로 삭제되었습니다.
+            **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **실행자**: ${{ github.actor }}
+          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Discord Notify (Failure)
+        if: needs.terraform-destroy-migration.result != 'success'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "❌ Migration Test 리소스 삭제 실패!"
+          embed-color: 16711680
+          embed-description: |
+            마이그레이션 테스트 환경 리소스 삭제 중 오류가 발생했습니다.
+            **커밋**: [${{ steps.vars.outputs.sha_short }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **실행자**: ${{ github.actor }}
+          embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
