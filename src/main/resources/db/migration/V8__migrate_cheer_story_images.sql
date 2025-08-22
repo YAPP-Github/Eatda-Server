@@ -1,6 +1,6 @@
 INSERT INTO cheer_image (cheer_id, image_key, order_index, created_at)
 SELECT c.id,
-       CONCAT('cheer/', c.id, '/', c.image_key),
+       CONCAT('cheer/', c.id, '/', REGEXP_REPLACE(c.image_key, '.*\/', '')),
        1,
        c.created_at
 FROM cheer c
@@ -13,7 +13,7 @@ WHERE c.image_key IS NOT NULL
 
 INSERT INTO story_image (story_id, image_key, order_index, created_at)
 SELECT s.id,
-       CONCAT('story/', s.id, '/', s.image_key),
+       CONCAT('story/', s.id, '/', REGEXP_REPLACE(s.image_key, '.*\/', '')),
        1,
        s.created_at
 FROM story s
