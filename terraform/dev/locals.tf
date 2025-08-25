@@ -42,7 +42,7 @@ locals {
 
   dev_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t3a.small"
+    instance_type        = "t2.micro"
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
