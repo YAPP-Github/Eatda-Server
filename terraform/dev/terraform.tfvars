@@ -20,8 +20,8 @@ ecs_services = {
 
 ecs_task_definitions_base = {
   api-dev = {
-    cpu                      = 1500
-    memory                   = 1024
+    cpu                      = 500
+    memory                   = 256
     network_mode             = "host"
     requires_compatibilities = ["EC2"]
 
@@ -47,7 +47,7 @@ ecs_task_definitions_base = {
   mysql-dev = {
     cpu                      = 256
     memoryReservation        = 128
-    memory                   = 512
+    memory                   = 256
     network_mode             = "host"
     requires_compatibilities = ["EC2"]
     container_image          = "mysql:8"

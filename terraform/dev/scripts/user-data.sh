@@ -1,6 +1,12 @@
 #!/bin/bash
 echo ECS_CLUSTER=${ecs_cluster_name} >> /etc/ecs/ecs.config
 
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
 mkdir -p /home/ec2-user/logs/backup
 mkdir -p /home/ec2-user/mysql
 mkdir -p /home/ec2-user/scripts

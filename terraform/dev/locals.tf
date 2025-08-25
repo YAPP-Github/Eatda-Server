@@ -42,7 +42,7 @@ locals {
 
   dev_instance_definitions = {
     ami                  = "ami-012ea6058806ff688"
-    instance_type        = "t3a.small"
+    instance_type        = "t2.micro"
     role                 = "dev"
     iam_instance_profile = data.terraform_remote_state.common.outputs.instance_profile_name["ec2-to-ecs"]
     key_name             = "eatda-ec2-dev-key"
@@ -75,13 +75,6 @@ locals {
           "java",
           "-Xlog:gc*:stdout:time,uptime,level,tags",
           "-Xlog:gc*:file=/logs/gc.log:time,uptime,level,tags",
-          "-XX:+UseG1GC",
-          "-XX:InitialRAMPercentage=30",
-          "-XX:MaxRAMPercentage=70",
-          "-XX:ParallelGCThreads=2",
-          "-XX:ConcGCThreads=1",
-          "-XX:MaxDirectMemorySize=128m",
-          "-Xlog:ergo=trace",
           "-javaagent:/dd-java-agent.jar",
           "-Ddd.logs.injection=true",
           "-Ddd.runtime-metrics.enabled=true",
