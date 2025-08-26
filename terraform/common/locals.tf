@@ -42,9 +42,9 @@ locals {
                 Effect = "Allow"
                 Action = ["ssm:GetParameter", "ssm:GetParametersByPath"]
                 Resource = [
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_URL",
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_USER_NAME",
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_PASSWORD"
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_URL",
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_USER_NAME",
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/dev/MYSQL_PASSWORD"
                 ]
               }
             ]
@@ -87,14 +87,14 @@ locals {
                 Effect = "Allow",
                 Action = ["ssm:GetParametersByPath", "ssm:GetParameter"],
                 Resource = [
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/dev/*",
-                  "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/prod/*"
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/dev/*",
+                  "arn:aws:ssm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:parameter/prod/*"
                 ]
               },
               {
                 Effect   = "Allow",
                 Action   = "kms:Decrypt",
-                Resource = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
+                Resource = "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
               }
             ]
           }
