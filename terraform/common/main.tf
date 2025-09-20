@@ -63,3 +63,15 @@ resource "aws_wafv2_web_acl_association" "this" {
   resource_arn = module.alb.alb_arn
   web_acl_arn  = module.waf.web_acl_arn
 }
+
+resource "aws_cloudwatch_log_group" "waf_logs" {
+  name              = "aws-waf-logs-${local.project_name}"
+  retention_in_days = 7
+
+  tags = local.common_tags
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "this" {
+  log_destination_configs = [trimsuffix(aws_cloudwatch_log_group.waf_logs.arn, ":*")]
+  resource_arn            = module.waf.web_acl_arn
+}
