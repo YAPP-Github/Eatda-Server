@@ -51,3 +51,15 @@ module "alb" {
   certificate_arn                 = module.route53.certificate_arn
   certificate_validation_complete = module.route53.certificate_validation_complete
 }
+
+module "waf" {
+  source            = "./waf"
+  project_name      = local.project_name
+  request_threshold = local.request_threshold
+  tags              = local.common_tags
+}
+
+resource "aws_wafv2_web_acl_association" "this" {
+  resource_arn = module.alb.alb_arn
+  web_acl_arn  = module.waf.web_acl_arn
+}
