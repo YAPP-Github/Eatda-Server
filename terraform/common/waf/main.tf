@@ -90,18 +90,75 @@ resource "aws_wafv2_web_acl" "this" {
   rule {
     name     = "AWS-Managed-Bot-Control-Rule-Set"
     priority = 40
+
     override_action {
       none {}
     }
+
     statement {
       managed_rule_group_statement {
         vendor_name = "AWS"
         name        = "AWSManagedRulesBotControlRuleSet"
+
+        rule_action_override {
+          name = "SignalNonBrowserUserAgent"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
+
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "aws-managed-bot-control"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # 임시 조치로 ua가 node일 경우만 통과시킴
+  rule {
+    name     = "Block-Non-Node-User-Agents"
+    priority = 41
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          label_match_statement {
+            scope = "LABEL"
+            key   = "awswaf:managed:aws:bot-control:signal:non_browser_user_agent"
+          }
+        }
+
+        statement {
+          not_statement {
+            statement {
+              byte_match_statement {
+                search_string = "node"
+                field_to_match {
+                  single_header {
+                    name = "user-agent"
+                  }
+                }
+                positional_constraint = "CONTAINS"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "block-non-node-uas"
       sampled_requests_enabled   = true
     }
   }
