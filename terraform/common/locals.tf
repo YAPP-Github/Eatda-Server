@@ -4,7 +4,6 @@ data "aws_region" "current" {}
 locals {
   group_name   = "power"
   project_name = "eatda"
-  admin_email  = "yappweb1server@gmail.com"
 
   policy_arns = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
