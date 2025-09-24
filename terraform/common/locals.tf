@@ -251,5 +251,5 @@ locals {
 }
 
 locals {
-  request_threshold = 200
+  request_threshold = 2000
 }

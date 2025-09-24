@@ -19,17 +19,36 @@ resource "aws_wafv2_web_acl" "this" {
     statement {
       and_statement {
         statement {
-          byte_match_statement {
-            field_to_match {
-              single_header {
-                name = "user-agent"
+          or_statement {
+            statement {
+              byte_match_statement {
+                field_to_match {
+                  single_header {
+                    name = "user-agent"
+                  }
+                }
+                search_string         = "node"
+                positional_constraint = "CONTAINS"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
               }
             }
-            search_string         = "node"
-            positional_constraint = "CONTAINS"
-            text_transformation {
-              priority = 0
-              type     = "NONE"
+            statement {
+              byte_match_statement {
+                field_to_match {
+                  single_header {
+                    name = "user-agent"
+                  }
+                }
+                search_string         = "Vercel"
+                positional_constraint = "CONTAINS"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
             }
           }
         }
