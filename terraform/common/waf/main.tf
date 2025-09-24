@@ -1,15 +1,131 @@
+data "aws_ssm_parameter" "x_origin_verify" {
+  name = "/common/CLIENT_HEADER_SECRET"
+}
+
 resource "aws_wafv2_web_acl" "this" {
   name  = "${var.project_name}-web-acl"
   scope = "REGIONAL"
 
   default_action {
-    allow {}
+    block {}
   }
 
-  # Rate-based Rule (HTTP Flood)
+  rule {
+    name     = "Allow-Verified-Server-Requests"
+    priority = 5
+    action {
+      allow {}
+    }
+    statement {
+      and_statement {
+        statement {
+          or_statement {
+            statement {
+              byte_match_statement {
+                field_to_match {
+                  single_header {
+                    name = "user-agent"
+                  }
+                }
+                search_string         = "node"
+                positional_constraint = "CONTAINS"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statement {
+              byte_match_statement {
+                field_to_match {
+                  single_header {
+                    name = "user-agent"
+                  }
+                }
+                search_string         = "Vercel"
+                positional_constraint = "CONTAINS"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+          }
+        }
+        statement {
+          byte_match_statement {
+            field_to_match {
+              single_header {
+                name = "x-origin-verify"
+              }
+            }
+            search_string         = data.aws_ssm_parameter.x_origin_verify.value
+            positional_constraint = "EXACTLY"
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-verified-server-requests"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "Allow-Browser-Requests"
+    priority = 10
+    action {
+      allow {}
+    }
+    statement {
+      or_statement {
+        statement {
+          size_constraint_statement {
+            field_to_match {
+              single_header {
+                name = "origin"
+              }
+            }
+            comparison_operator = "GT"
+            size                = 0
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+        statement {
+          size_constraint_statement {
+            field_to_match {
+              single_header {
+                name = "referer"
+              }
+            }
+            comparison_operator = "GT"
+            size                = 0
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-browser-requests"
+      sampled_requests_enabled   = true
+    }
+  }
+
   rule {
     name     = "Rate-Limit-Rule"
-    priority = 1
+    priority = 20
     action {
       block {}
     }
@@ -29,7 +145,7 @@ resource "aws_wafv2_web_acl" "this" {
   # AWS Managed Core Rule Set
   rule {
     name     = "AWS-Managed-Core-Rule-Set"
-    priority = 10
+    priority = 30
     override_action {
       none {}
     }
@@ -49,7 +165,7 @@ resource "aws_wafv2_web_acl" "this" {
   # Scanners & Probes Protection
   rule {
     name     = "AWS-Managed-Known-Bad-Inputs-Rule-Set"
-    priority = 20
+    priority = 40
     override_action {
       none {}
     }
@@ -69,7 +185,7 @@ resource "aws_wafv2_web_acl" "this" {
   # Reputation Lists Protection
   rule {
     name     = "AWS-Managed-Amazon-IP-Reputation-List"
-    priority = 30
+    priority = 50
     override_action {
       none {}
     }
@@ -89,26 +205,16 @@ resource "aws_wafv2_web_acl" "this" {
   # Bad Bot Protection
   rule {
     name     = "AWS-Managed-Bot-Control-Rule-Set"
-    priority = 40
-
+    priority = 60
     override_action {
       none {}
     }
-
     statement {
       managed_rule_group_statement {
         vendor_name = "AWS"
         name        = "AWSManagedRulesBotControlRuleSet"
-
-        rule_action_override {
-          name = "SignalNonBrowserUserAgent"
-          action_to_use {
-            count {}
-          }
-        }
       }
     }
-
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "aws-managed-bot-control"
@@ -116,57 +222,10 @@ resource "aws_wafv2_web_acl" "this" {
     }
   }
 
-  # 임시 조치로 ua가 node일 경우만 통과시킴
-  rule {
-    name     = "Block-Non-Node-User-Agents"
-    priority = 41
-
-    action {
-      block {}
-    }
-
-    statement {
-      and_statement {
-        statement {
-          label_match_statement {
-            scope = "LABEL"
-            key   = "awswaf:managed:aws:bot-control:signal:non_browser_user_agent"
-          }
-        }
-
-        statement {
-          not_statement {
-            statement {
-              byte_match_statement {
-                search_string = "node"
-                field_to_match {
-                  single_header {
-                    name = "user-agent"
-                  }
-                }
-                positional_constraint = "CONTAINS"
-                text_transformation {
-                  priority = 0
-                  type     = "NONE"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "block-non-node-uas"
-      sampled_requests_enabled   = true
-    }
-  }
-
   # Anonymous IP list
   rule {
     name     = "AWS-Managed-Anonymous-IP-List"
-    priority = 50
+    priority = 70
     override_action {
       none {}
     }
@@ -186,7 +245,7 @@ resource "aws_wafv2_web_acl" "this" {
   # SQL database
   rule {
     name     = "AWS-Managed-SQLi-Rule-Set"
-    priority = 60
+    priority = 80
     override_action {
       none {}
     }
