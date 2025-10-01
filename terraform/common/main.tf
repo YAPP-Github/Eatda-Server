@@ -74,4 +74,9 @@ resource "aws_cloudwatch_log_group" "waf_logs" {
 resource "aws_wafv2_web_acl_logging_configuration" "this" {
   log_destination_configs = [trimsuffix(aws_cloudwatch_log_group.waf_logs.arn, ":*")]
   resource_arn            = module.waf.web_acl_arn
+  redacted_fields {
+    single_header {
+      name = "x-origin-verify"
+    }
+  }
 }
