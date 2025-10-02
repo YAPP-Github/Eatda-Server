@@ -41,6 +41,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         return findAll(spec, pageable);
     }
 
+    // Querydsl등을 이용하여 EntityGraph와 Limit 분리 필요
     @EntityGraph(attributePaths = {"cheers"})
     List<Store> findAll(Specification<Store> spec, Pageable pageable);
 
