@@ -8,19 +8,18 @@ import eatda.domain.store.Store;
 import eatda.domain.store.StoreCategory;
 import jakarta.persistence.criteria.JoinType;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.Nullable;
 
 public interface CheerRepository extends JpaRepository<Cheer, Long> {
 
-    @EntityGraph(attributePaths = {"member", "cheerTags.values"})
-    List<Cheer> findAllByStoreOrderByCreatedAtDesc(Store store, PageRequest pageRequest);
+    Page<Cheer> findAllByStoreOrderByCreatedAtDesc(Store store, PageRequest pageRequest);
 
-    default List<Cheer> findAllByConditions(@Nullable StoreCategory category,
+    default Page<Cheer> findAllByConditions(@Nullable StoreCategory category,
                                             List<CheerTagName> cheerTagNames,
                                             List<District> districts, Pageable pageable) {
         Specification<Cheer> spec = createSpecification(category, cheerTagNames, districts);
@@ -36,7 +35,9 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
         }
         if (!cheerTagNames.isEmpty()) {
             spec = spec.and(((root, query, cb) -> {
-                query.distinct(true);
+                if (query != null) {
+                    query.distinct(true);
+                }
                 return root.join("cheerTags").join("values", JoinType.LEFT)
                         .get("name").in(cheerTagNames);
             }));
@@ -47,8 +48,7 @@ public interface CheerRepository extends JpaRepository<Cheer, Long> {
         return spec;
     }
 
-    @EntityGraph(attributePaths = {"store", "member", "cheerTags.values"})
-    List<Cheer> findAll(Specification<Cheer> specification, Pageable pageable);
+    Page<Cheer> findAll(Specification<Cheer> specification, Pageable pageable);
 
     int countByMember(Member member);
 

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 class CheerRepositoryTest extends BaseRepositoryTest {
@@ -64,7 +65,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             Cheer cheer2_2 = cheerGenerator.generateCommon(member2, store2);
             Cheer cheer3_2 = cheerGenerator.generateCommon(member2, store3);
 
-            List<Cheer> actual = cheerRepository.findAllByConditions(
+            Page<Cheer> actual = cheerRepository.findAllByConditions(
                     StoreCategory.KOREAN, List.of(), List.of(), Pageable.unpaged());
 
             assertThat(actual).map(Cheer::getId)
@@ -90,7 +91,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer2_2, List.of(CheerTagName.CLEAN_RESTROOM));
             cheerTagGenerator.generate(cheer3_1, List.of(CheerTagName.ENERGETIC, CheerTagName.QUIET));
 
-            List<Cheer> actual = cheerRepository.findAllByConditions(null,
+            Page<Cheer> actual = cheerRepository.findAllByConditions(null,
                     List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), List.of(), Pageable.unpaged());
 
             assertThat(actual)
@@ -110,7 +111,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             Cheer cheer2_2 = cheerGenerator.generateCommon(member2, store2);
             Cheer cheer3_2 = cheerGenerator.generateCommon(member2, store3);
 
-            List<Cheer> actual = cheerRepository.findAllByConditions(
+            Page<Cheer> actual = cheerRepository.findAllByConditions(
                     null, List.of(), List.of(District.GANGNAM), Pageable.unpaged());
 
             assertThat(actual)
@@ -145,7 +146,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer4_2, List.of(CheerTagName.INSTAGRAMMABLE));
             cheerTagGenerator.generate(cheer5_2, List.of(CheerTagName.CLEAN_RESTROOM, CheerTagName.ENERGETIC));
 
-            List<Cheer> actual = cheerRepository.findAllByConditions(StoreCategory.KOREAN,
+            Page<Cheer> actual = cheerRepository.findAllByConditions(StoreCategory.KOREAN,
                     List.of(CheerTagName.CLEAN_RESTROOM), List.of(District.GANGNAM), Pageable.unpaged());
 
             assertThat(actual)
@@ -169,7 +170,7 @@ class CheerRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer2_1, List.of(CheerTagName.CLEAN_RESTROOM));
             cheerTagGenerator.generate(cheer2_2, List.of(CheerTagName.CLEAN_RESTROOM));
 
-            List<Cheer> actual = cheerRepository.findAllByConditions(null, List.of(), List.of(), Pageable.unpaged());
+            Page<Cheer> actual = cheerRepository.findAllByConditions(null, List.of(), List.of(), Pageable.unpaged());
 
             assertThat(actual)
                     .map(Cheer::getId)
