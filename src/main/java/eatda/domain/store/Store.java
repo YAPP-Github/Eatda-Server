@@ -57,6 +57,12 @@ public class Store extends AuditingEntity {
     @Embedded
     private Coordinates coordinates;
 
+    /*
+    현재는 가게당 평균 응원 수가 5개 이하이므로 BatchSize=10이 적절함.
+    IN 쿼리 한 번당 최대 10개 Store의 Cheer를 로딩하도록 설정.
+    향후 응원 수가 증가하거나 Store 리스트 조회 규모가 커질 경우
+    성능 모니터링 후 BatchSize 조정 및 Fetch 전략 재검토 필요.
+    */
     @OneToMany(mappedBy = "store")
     private List<Cheer> cheers = new ArrayList<>();
 

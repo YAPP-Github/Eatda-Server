@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 @Table(name = "story")
 @Entity
@@ -36,7 +35,6 @@ public class Story extends AuditingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @BatchSize(size = 10)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -60,7 +58,6 @@ public class Story extends AuditingEntity {
     @Column(name = "description")
     private String description;
 
-    @BatchSize(size = 10)
     @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StoryImage> images = new ArrayList<>();
 
