@@ -262,26 +262,6 @@ resource "aws_wafv2_web_acl" "this" {
     }
   }
 
-  # Bad Bot Protection
-  rule {
-    name     = "AWS-Managed-Bot-Control-Rule-Set"
-    priority = 60
-    override_action {
-      none {}
-    }
-    statement {
-      managed_rule_group_statement {
-        vendor_name = "AWS"
-        name        = "AWSManagedRulesBotControlRuleSet"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "aws-managed-bot-control"
-      sampled_requests_enabled   = true
-    }
-  }
-
   # Anonymous IP list
   rule {
     name     = "AWS-Managed-Anonymous-IP-List"
