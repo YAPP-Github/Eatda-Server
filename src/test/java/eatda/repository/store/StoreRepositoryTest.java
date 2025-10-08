@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 class StoreRepositoryTest extends BaseRepositoryTest {
@@ -61,7 +62,7 @@ class StoreRepositoryTest extends BaseRepositoryTest {
             Store store2 = storeGenerator.generate("1236", "서울시 강남구 역삼동 123-45", StoreCategory.WESTERN, startAt);
             Store store3 = storeGenerator.generate("1237", "서울시 강남구 역삼동 123-45", StoreCategory.KOREAN, startAt);
 
-            List<Store> actual = storeRepository.findAllByConditions(
+            Page<Store> actual = storeRepository.findAllByConditions(
                     StoreCategory.KOREAN, List.of(), List.of(), Pageable.unpaged());
 
             assertThat(actual).map(Store::getId)
@@ -87,7 +88,7 @@ class StoreRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer2_2, List.of(CheerTagName.CLEAN_RESTROOM));
             cheerTagGenerator.generate(cheer3_1, List.of(CheerTagName.ENERGETIC, CheerTagName.QUIET));
 
-            List<Store> actual = storeRepository.findAllByConditions(null,
+            Page<Store> actual = storeRepository.findAllByConditions(null,
                     List.of(CheerTagName.INSTAGRAMMABLE, CheerTagName.CLEAN_RESTROOM), List.of(), Pageable.unpaged());
 
             assertThat(actual).map(Store::getId)
@@ -100,7 +101,7 @@ class StoreRepositoryTest extends BaseRepositoryTest {
             Store store2 = storeGenerator.generate("1236", "서울시 강남구 역삼동 123-45", District.GANGNAM);
             Store store3 = storeGenerator.generate("1237", "서울시 성북구 석관동 123-45", District.SEONGBUK);
 
-            List<Store> actual = storeRepository.findAllByConditions(
+            Page<Store> actual = storeRepository.findAllByConditions(
                     null, List.of(), List.of(District.GANGNAM), Pageable.unpaged());
 
             assertThat(actual).map(Store::getId)
@@ -134,7 +135,7 @@ class StoreRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer4_2, List.of(CheerTagName.INSTAGRAMMABLE));
             cheerTagGenerator.generate(cheer5_2, List.of(CheerTagName.CLEAN_RESTROOM, CheerTagName.ENERGETIC));
 
-            List<Store> actual = storeRepository.findAllByConditions(StoreCategory.KOREAN,
+            Page<Store> actual = storeRepository.findAllByConditions(StoreCategory.KOREAN,
                     List.of(CheerTagName.CLEAN_RESTROOM), List.of(District.GANGNAM), Pageable.unpaged());
 
             assertThat(actual).map(Store::getId)
@@ -157,7 +158,7 @@ class StoreRepositoryTest extends BaseRepositoryTest {
             cheerTagGenerator.generate(cheer2_1, List.of(CheerTagName.CLEAN_RESTROOM));
             cheerTagGenerator.generate(cheer2_2, List.of(CheerTagName.CLEAN_RESTROOM));
 
-            List<Store> actual = storeRepository.findAllByConditions(null, List.of(), List.of(), Pageable.unpaged());
+            Page<Store> actual = storeRepository.findAllByConditions(null, List.of(), List.of(), Pageable.unpaged());
 
             assertThat(actual).map(Store::getId)
                     .containsExactlyInAnyOrder(store1.getId(), store2.getId(), store3.getId());
