@@ -8,9 +8,9 @@ import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
@@ -33,7 +33,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             """)
     List<Store> findAllByCheeredMemberId(long memberId);
 
-    default List<Store> findAllByConditions(@Nullable StoreCategory category,
+    default Page<Store> findAllByConditions(@Nullable StoreCategory category,
                                             List<CheerTagName> cheerTagNames,
                                             List<District> districts,
                                             Pageable pageable) {
@@ -41,8 +41,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         return findAll(spec, pageable);
     }
 
-    @EntityGraph(attributePaths = {"cheers"})
-    List<Store> findAll(Specification<Store> spec, Pageable pageable);
+    Page<Store> findAll(Specification<Store> spec, Pageable pageable);
 
     private Specification<Store> createSpecification(@Nullable StoreCategory category,
                                                      List<CheerTagName> cheerTagNames,
@@ -52,8 +51,12 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("category"), category));
         }
         if (!cheerTagNames.isEmpty()) {
-            spec = spec.and(((root, query, cb) ->
-                    root.join("cheers").join("cheerTags").join("values").get("name").in(cheerTagNames)));
+            spec = spec.and(((root, query, cb) -> {
+                if (query != null) {
+                    query.distinct(true);
+                }
+                return root.join("cheers").join("cheerTags").join("values").get("name").in(cheerTagNames);
+            }));
         }
         if (!districts.isEmpty()) {
             spec = spec.and((root, query, cb) -> root.get("district").in(districts));

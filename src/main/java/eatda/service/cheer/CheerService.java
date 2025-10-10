@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -115,12 +116,15 @@ public class CheerService {
 
     @Transactional(readOnly = true)
     public CheersResponse getCheers(CheerSearchParameters parameters) {
-        List<Cheer> cheers = cheerRepository.findAllByConditions(
+        Page<Cheer> cheerPage = cheerRepository.findAllByConditions(
                 parameters.getCategory(),
                 parameters.getCheerTagNames(),
                 parameters.getDistricts(),
-                PageRequest.of(parameters.getPage(), parameters.getSize(), Sort.by(Direction.DESC, "createdAt"))
+                PageRequest.of(parameters.getPage(), parameters.getSize(),
+                        Sort.by(Direction.DESC, "createdAt"))
         );
+
+        List<Cheer> cheers = cheerPage.getContent();
         return toCheersResponse(cheers);
     }
 
@@ -140,11 +144,12 @@ public class CheerService {
     @Transactional(readOnly = true)
     public CheersInStoreResponse getCheersByStoreId(Long storeId, int page, int size) {
         Store store = storeRepository.getById(storeId);
-        List<Cheer> cheers = cheerRepository.findAllByStoreOrderByCreatedAtDesc(store, PageRequest.of(page, size));
+        Page<Cheer> cheersPage = cheerRepository.findAllByStoreOrderByCreatedAtDesc(store, PageRequest.of(page, size));
 
-        List<CheerInStoreResponse> cheersResponse = cheers.stream()
+        List<CheerInStoreResponse> cheersResponse = cheersPage.getContent().stream()
                 .map(CheerInStoreResponse::new)
-                .toList(); // TODO N+1 문제 해결
+                .toList();
+
         return new CheersInStoreResponse(cheersResponse);
     }
 }

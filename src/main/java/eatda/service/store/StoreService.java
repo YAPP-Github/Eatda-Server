@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -45,7 +46,7 @@ public class StoreService {
     // TODO : N+1 문제 해결
     @Transactional(readOnly = true)
     public StoresResponse getStores(StoreSearchParameters parameters) {
-        List<Store> stores = storeRepository.findAllByConditions(
+        Page<Store> stores = storeRepository.findAllByConditions(
                 parameters.getCategory(),
                 parameters.getCheerTagNames(),
                 parameters.getDistricts(),

@@ -49,6 +49,12 @@ public class Cheer extends AuditingEntity {
     @OneToMany(mappedBy = "cheer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CheerImage> images = new HashSet<>();
 
+    /*
+    CheerTags가 Embedded이기 때문에 BatchSize를 그대로 적용하지 못함.
+    성능을 위해서는 Embedded 제거 후 직접 @OneToMany로 매핑 필요함.
+    현재 데이터가 많지 않음으로 현상 유지하며 모니터링.
+    추후 재설계 필요
+     */
     @Embedded
     private CheerTags cheerTags;
 
