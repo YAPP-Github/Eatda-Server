@@ -97,7 +97,6 @@ def get_aws_waf_stats(start_iso, end_iso):
                 Dimensions=[
                     {'Name': 'WebACL', 'Value': WAF_WEB_ACL_NAME},
                     {'Name': 'Region', 'Value': AWS_REGION},
-                    {'Name': 'Rule', 'Value': 'ALL'}
                 ],
                 StartTime=start_iso,
                 EndTime=end_iso,
