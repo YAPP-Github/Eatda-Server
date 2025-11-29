@@ -51,7 +51,7 @@ def normalize_slo_value(value):
 
 def get_datadog_metrics(start_ts, end_ts):
     configuration = Configuration()
-    configuration.server_variables["site"] = "us5"
+    configuration.host = "https://api.us5.datadoghq.com"
     configuration.api_key["apiKeyAuth"] = DD_API_KEY
     configuration.api_key["appKeyAuth"] = DD_APP_KEY
 
