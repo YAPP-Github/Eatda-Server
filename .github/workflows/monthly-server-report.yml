@@ -1,9 +1,6 @@
 name: monthly-server-report.yml
 
 on:
-  push:
-    branches:
-      - feat/PRODUCT-281
   schedule:
     - cron: '30 0 1 * *'
   workflow_dispatch:
