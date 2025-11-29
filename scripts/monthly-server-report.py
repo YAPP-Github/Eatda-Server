@@ -93,19 +93,20 @@ def get_aws_waf_stats(start_dt, end_dt):
     client = boto3.client('cloudwatch', region_name=AWS_REGION)
 
     def get_metric(metric_name):
+        response = client.get_metric_statistics(
+            Namespace='AWS/WAFV2',
+            MetricName=metric_name,
+            Dimensions=[
+                {'Name': 'WebACL', 'Value': WAF_WEB_ACL_NAME},
+                {'Name': 'Rule', 'Value': 'ALL'},
+                {'Name': 'Region', 'Value': AWS_REGION},
+            ],
+            StartTime=start_dt,
+            EndTime=end_dt,
+            Period=86400,
+            Statistics=['Sum']
+        )
         try:
-            response = client.get_metric_statistics(
-                Namespace='AWS/WAFV2',
-                MetricName=metric_name,
-                Dimensions=[
-                    {'Name': 'WebACL', 'Value': WAF_WEB_ACL_NAME},
-                    {'Name': 'Region', 'Value': AWS_REGION},
-                ],
-                StartTime=start_dt,
-                EndTime=end_dt,
-                Period=86400,
-                Statistics=['Sum']
-            )
             if response['Datapoints']:
                 return int(sum([dp['Sum'] for dp in response['Datapoints']]))
 
