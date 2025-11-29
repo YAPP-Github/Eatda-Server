@@ -89,7 +89,7 @@ def get_datadog_metrics(start_ts, end_ts):
     return data
 
 
-def get_aws_waf_stats(start_iso, end_iso):
+def get_aws_waf_stats(start_dt, end_dt):
     client = boto3.client('cloudwatch', region_name=AWS_REGION)
 
     def get_metric(metric_name):
@@ -101,13 +101,14 @@ def get_aws_waf_stats(start_iso, end_iso):
                     {'Name': 'WebACL', 'Value': WAF_WEB_ACL_NAME},
                     {'Name': 'Region', 'Value': AWS_REGION},
                 ],
-                StartTime=start_iso,
-                EndTime=end_iso,
-                Period=2592000,
+                StartTime=start_dt,
+                EndTime=end_dt,
+                Period=86400,
                 Statistics=['Sum']
             )
             if response['Datapoints']:
-                return int(response['Datapoints'][0]['Sum'])
+                return int(sum([dp['Sum'] for dp in response['Datapoints']]))
+
             print(f"⚠️ No datapoints for WAF metric: {metric_name}")
             return 0
         except Exception as e:
@@ -141,7 +142,8 @@ def send_discord_report():
     current_period, prev_period = get_date_ranges()
 
     dd_data = get_datadog_metrics(current_period['start_ts'], current_period['end_ts'])
-    waf_data = get_aws_waf_stats(current_period['start_iso'], current_period['end_iso'])
+
+    waf_data = get_aws_waf_stats(current_period['start_dt'], current_period['end_dt'])
 
     curr_cost = get_total_cost(current_period['start_iso'], current_period['end_iso'])
     prev_cost = get_total_cost(prev_period['start_iso'], prev_period['end_iso'])
