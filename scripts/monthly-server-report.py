@@ -26,6 +26,8 @@ def get_date_ranges():
     report_period = {
         'start_ts': int(last_month_start.timestamp()),
         'end_ts': int(this_month_start.timestamp()),
+        'start_dt': last_month_start,
+        'end_dt': this_month_start,
         'start_iso': last_month_start.strftime('%Y-%m-%d'),
         'end_iso': this_month_start.strftime('%Y-%m-%d'),
         'month_str': last_month_start.strftime("%Y년 %m월")
@@ -49,6 +51,7 @@ def normalize_slo_value(value):
 
 def get_datadog_metrics(start_ts, end_ts):
     configuration = Configuration()
+    configuration.server_variables["site"] = "us5"
     configuration.api_key["apiKeyAuth"] = DD_API_KEY
     configuration.api_key["appKeyAuth"] = DD_APP_KEY
 
