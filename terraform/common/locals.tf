@@ -248,3 +248,7 @@ locals {
     }
   }
 }
+
+locals {
+  request_threshold = 2000
+}

@@ -5,8 +5,13 @@ resource "aws_alb_listener" "https" {
   certificate_arn   = var.https_listener.certificate_arn
 
   default_action {
-    type             = var.https_listener.type
-    target_group_arn = var.https_listener.default_target_group_arn
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied: Invalid Host"
+      status_code  = "403"
+    }
   }
 }
 

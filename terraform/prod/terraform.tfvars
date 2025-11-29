@@ -11,7 +11,7 @@ ecs_services = {
   datadog = {
     task_definition     = "datadog"
     launch_type         = "EC2"
-    scheduling_strategy = "REPLICA"
+    scheduling_strategy = "DAEMON"
   }
 }
 
@@ -49,6 +49,9 @@ ecs_task_definitions_base = {
       DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL = "true"
       DD_APM_RECEIVER_PORT                 = "8126"
       DD_APM_NON_LOCAL_TRAFFIC             = "true"
+      DD_EC2_USE_IMDSV2                    = "true"
+      DD_COLLECT_EC2_TAGS                  = "true"
+      DD_COLLECT_EC2_METADATA              = "true"
       DD_SERVICE                           = "eatda-api-prod"
       DD_ENV                               = "prod"
       DD_VERSION                           = "v1"
