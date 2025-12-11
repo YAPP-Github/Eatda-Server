@@ -28,6 +28,7 @@ public enum BusinessErrorCode {
     INVALID_CHEER_IMAGE_KEY("CHE002", "응원 이미지 키가 비어 있습니다.", HttpStatus.BAD_REQUEST),
     FULL_CHEER_SIZE_PER_MEMBER("CHE003", "회원당 응원 한도가 넘었습니다."),
     ALREADY_CHEERED("CHE004", "이미 응원한 가게입니다."),
+    CHEER_NOT_FOUND("CHE005", "응원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     // CheerTag
     CHEER_TAGS_DUPLICATED("CHE_TAG001", "응원 태그는 중복될 수 없습니다."),

@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class FileClient {
 
     private static final int THREAD_POOL_SIZE = 5; // TODO 비동기 병렬처리 개선
+    private static final String PATH_DELIMITER = "/";
     private final S3Client s3Client;
     private final String bucket;
     private final S3Presigner s3Presigner;
@@ -55,7 +56,7 @@ public class FileClient {
         List<CompletableFuture<String>> futures = tempImageKeys.stream()
                 .map(tempImageKey -> CompletableFuture.supplyAsync(() -> {
                     String fileName = extractFileName(tempImageKey);
-                    String newPermanentKey = domainName + "/" + domainId + "/" + fileName;
+                    String newPermanentKey = domainName + PATH_DELIMITER + domainId + PATH_DELIMITER + fileName;
                     try {
                         copyObject(tempImageKey, newPermanentKey);
                         deleteObject(tempImageKey);
@@ -72,7 +73,7 @@ public class FileClient {
     }
 
     private String extractFileName(String fullKey) {
-        int index = fullKey.lastIndexOf('/');
+        int index = fullKey.lastIndexOf(PATH_DELIMITER);
         return index == -1 ? fullKey : fullKey.substring(index + 1);
     }
 

@@ -57,7 +57,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            assertThatThrownBy(() -> cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER))
+            assertThatThrownBy(() -> cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining(BusinessErrorCode.FULL_CHEER_SIZE_PER_MEMBER.getMessage());
         }
@@ -76,7 +76,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            assertThatThrownBy(() -> cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER))
+            assertThatThrownBy(() -> cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining(BusinessErrorCode.ALREADY_CHEERED.getMessage());
         }
@@ -93,7 +93,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            CheerResponse response = cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER);
+            CheerResponse response = cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER);
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
@@ -117,7 +117,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            CheerResponse response = cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER);
+            CheerResponse response = cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER);
 
             assertAll(
                     () -> assertThat(response.storeId()).isEqualTo(store.getId()),
@@ -140,7 +140,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            CheerResponse response = cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER);
+            CheerResponse response = cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER);
 
             assertAll(
                     () -> assertThat(response.cheerDescription()).isEqualTo("맛있어요!"),
@@ -158,7 +158,7 @@ class CheerServiceTest extends BaseServiceTest {
                     "123", StoreCategory.KOREAN, "02-755-5232", "농민백암순대 본점", "http://place.map.kakao.com/123",
                     "서울시 강남구 역삼동 123-45", "서울시 강남구 역삼동 123-45", District.GANGNAM, 37.5665, 126.9780);
 
-            CheerResponse response = cheerService.registerCheer(request, result, member.getId(), ImageDomain.CHEER);
+            CheerResponse response = cheerService.createCheer(request, result, member.getId(), ImageDomain.CHEER);
 
             Store foundStore = storeRepository.findByKakaoId("123").orElseThrow();
             assertAll(
