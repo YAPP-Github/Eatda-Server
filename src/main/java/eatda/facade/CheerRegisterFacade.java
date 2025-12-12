@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.core.exception.SdkException;
 
 @Component
 @RequiredArgsConstructor
@@ -34,9 +35,9 @@ public class CheerRegisterFacade {
             List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
             List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
             cheer = cheerService.saveCheerImages(cheer.getId(), sortedImages, permanentKeys);
-        } catch (Exception e) {
+        } catch (SdkException sdkException) {
             cheerService.deleteCheer(cheer.getId());
-            throw e;
+            throw sdkException;
         }
 
         return new CheerResponse(cheer, creationResult.store(), cdnBaseUrl);
