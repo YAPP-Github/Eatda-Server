@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import software.amazon.awssdk.core.exception.SdkException;
 
 class CheerRegisterFacadeTest extends BaseFacadeTest {
@@ -35,18 +36,7 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
         void 응원을_등록하면_이미지를_이동하고_최종_응답을_반환한다() {
             var member = memberGenerator.generate("member-1");
 
-            CheerRegisterRequest.UploadedImageDetail image1 =
-                    new CheerRegisterRequest.UploadedImageDetail("temp/key1.jpg", 1L, "image/jpeg", 1000L);
-            CheerRegisterRequest.UploadedImageDetail image2 =
-                    new CheerRegisterRequest.UploadedImageDetail("temp/key2.jpg", 2L, "image/jpeg", 2000L);
-
-            CheerRegisterRequest request = new CheerRegisterRequest(
-                    "kakao-1",
-                    "농민백암순대",
-                    "맛있어요",
-                    List.of(image1, image2),
-                    List.of(CheerTagName.GOOD_FOR_DATING)
-            );
+            CheerRegisterRequest request = getRegisterRequest();
 
             StoreSearchResult storeResult = new StoreSearchResult(
                     "kakao-1",
@@ -124,7 +114,7 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                     anyLong(),
                     anyList()
             )).willThrow(
-                    software.amazon.awssdk.core.exception.SdkException.builder().build()
+                    SdkException.builder().build()
             );
 
             try {
@@ -138,6 +128,48 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
             }
 
             assertThat(cheerRepository.count()).isZero();
+        }
+
+        @Test
+        void 이미지_이동이_부분적으로_성공한_후_실패하면_응원을_삭제한다() {
+            var member = memberGenerator.generate("member-1");
+
+            CheerRegisterRequest request = getCheerRegisterRequest();
+
+            StoreSearchResult storeResult = new StoreSearchResult(
+                    "kakao-1",
+                    StoreCategory.KOREAN,
+                    "02-000-0000",
+                    "농민백암순대",
+                    "http://place.map.kakao.com/1",
+                    "서울시 강남구",
+                    "서울시 강남구",
+                    District.GANGNAM,
+                    37.715132,
+                    127.269310
+            );
+
+            given(fileClient.moveTempFilesToPermanent(
+                    eq(ImageDomain.CHEER.getName()),
+                    anyLong(),
+                    anyList()
+            )).willAnswer(invocation -> {
+                throw SdkException.builder().build();
+            });
+
+            try {
+                cheerRegisterFacade.registerCheer(
+                        request,
+                        storeResult,
+                        member.getId(),
+                        ImageDomain.CHEER
+                );
+            } catch (Exception ignored) {
+            }
+
+            assertThat(cheerRepository.count())
+                    .as("부분 성공 후 실패 시 Cheer는 삭제되어야 한다")
+                    .isZero();
         }
 
         @Test
@@ -179,10 +211,24 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                     .moveTempFilesToPermanent(anyString(), anyLong(), anyList());
         }
 
-        @Test
-        void 이미지_이동이_부분적으로_성공한_후_실패하면_응원을_삭제한다() {
-            var member = memberGenerator.generate("member-1");
+        @NonNull
+        private CheerRegisterRequest getRegisterRequest() {
+            CheerRegisterRequest.UploadedImageDetail image1 =
+                    new CheerRegisterRequest.UploadedImageDetail("temp/key1.jpg", 1L, "image/jpeg", 1000L);
+            CheerRegisterRequest.UploadedImageDetail image2 =
+                    new CheerRegisterRequest.UploadedImageDetail("temp/key2.jpg", 2L, "image/jpeg", 2000L);
 
+            return new CheerRegisterRequest(
+                    "kakao-1",
+                    "농민백암순대",
+                    "맛있어요",
+                    List.of(image1, image2),
+                    List.of(CheerTagName.GOOD_FOR_DATING)
+            );
+        }
+
+        @NonNull
+        private CheerRegisterRequest getCheerRegisterRequest() {
             CheerRegisterRequest.UploadedImageDetail image1 =
                     new CheerRegisterRequest.UploadedImageDetail(
                             "temp/key1.jpg", 1L, "image/jpeg", 1000L
@@ -196,48 +242,13 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                             "temp/key3.jpg", 3L, "image/jpeg", 1000L
                     );
 
-            CheerRegisterRequest request = new CheerRegisterRequest(
+            return new CheerRegisterRequest(
                     "kakao-1",
                     "농민백암순대",
                     "부분 성공 테스트",
                     List.of(image1, image2, image3),
                     List.of(CheerTagName.GOOD_FOR_DATING)
             );
-
-            StoreSearchResult storeResult = new StoreSearchResult(
-                    "kakao-1",
-                    StoreCategory.KOREAN,
-                    "02-000-0000",
-                    "농민백암순대",
-                    "http://place.map.kakao.com/1",
-                    "서울시 강남구",
-                    "서울시 강남구",
-                    District.GANGNAM,
-                    37.715132,
-                    127.269310
-            );
-
-            given(fileClient.moveTempFilesToPermanent(
-                    eq(ImageDomain.CHEER.getName()),
-                    anyLong(),
-                    anyList()
-            )).willAnswer(invocation -> {
-                throw SdkException.builder().build();
-            });
-
-            try {
-                cheerRegisterFacade.registerCheer(
-                        request,
-                        storeResult,
-                        member.getId(),
-                        ImageDomain.CHEER
-                );
-            } catch (Exception ignored) {
-            }
-
-            assertThat(cheerRepository.count())
-                    .as("부분 성공 후 실패 시 Cheer는 삭제되어야 한다")
-                    .isZero();
         }
     }
 }
