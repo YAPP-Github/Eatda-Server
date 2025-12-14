@@ -7,12 +7,14 @@ import eatda.domain.ImageDomain;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.store.StoreSearchResult;
 import eatda.service.cheer.CheerService;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.core.exception.SdkException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CheerRegisterFacade {
@@ -32,13 +34,21 @@ public class CheerRegisterFacade {
             return cheerService.getCheerResponse(cheer.getId());
         }
 
+        List<String> permanentKeys = Collections.emptyList();
         try {
             List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
-            List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
+            permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
             cheerService.saveCheerImages(cheer.getId(), sortedImages, permanentKeys);
-        } catch (SdkException sdkException) {
+
+        } catch (Exception e) {
+            log.error("응원 등록 프로세스 실패. 롤백 수행. cheerId={}", cheer.getId(), e);
+
             cheerService.deleteCheer(cheer.getId());
-            throw sdkException;
+
+            if (!permanentKeys.isEmpty()) {
+                fileClient.deleteFiles(permanentKeys);
+            }
+            throw e;
         }
 
         return cheerService.getCheerResponse(cheer.getId());

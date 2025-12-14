@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import eatda.controller.cheer.CheerRegisterRequest;
 import eatda.controller.cheer.CheerResponse;
@@ -71,7 +72,7 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
             assertThat(response.tags()).containsExactly(CheerTagName.GOOD_FOR_DATING);
             assertThat(response.images()).hasSize(2);
 
-            Mockito.verify(fileClient)
+            verify(fileClient)
                     .moveTempFilesToPermanent(
                             eq(ImageDomain.CHEER.getName()),
                             anyLong(),
@@ -168,8 +169,50 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
             }
 
             assertThat(cheerRepository.count())
-                    .as("부분 성공 후 실패 시 Cheer는 삭제되어야 한다")
+                    .as("부분 성공 후 실패 시 Cheer는 삭제되어야 한다.")
                     .isZero();
+        }
+
+        @Test
+        void 이미지_이동은_성공했으나_DB_저장에_실패하면_파일과_응원_모두_삭제한다() {
+            var member = memberGenerator.generate("member-1");
+            String tooLongContentType = "a".repeat(300);
+
+            CheerRegisterRequest request = new CheerRegisterRequest(
+                    "kakao-1", "농민백암순대", "맛있어요",
+                    List.of(new CheerRegisterRequest.UploadedImageDetail(
+                            "temp/key1.jpg",
+                            1L,
+                            tooLongContentType,
+                            1000L
+                    )),
+                    List.of(CheerTagName.GOOD_FOR_DATING)
+            );
+
+            StoreSearchResult storeResult = new StoreSearchResult(
+                    "kakao-1", StoreCategory.KOREAN, "02-000-0000", "농민백암순대",
+                    "http://place.map.kakao.com/1", "서울시 강남구", "서울시 강남구",
+                    District.GANGNAM, 37.715132, 127.269310
+            );
+
+            List<String> movedKeys = List.of("cheer/1/key1.jpg");
+            given(fileClient.moveTempFilesToPermanent(anyString(), anyLong(), anyList()))
+                    .willReturn(movedKeys);
+
+            try {
+                cheerRegisterFacade.registerCheer(
+                        request,
+                        storeResult,
+                        member.getId(),
+                        ImageDomain.CHEER
+                );
+            } catch (Exception ignored) {
+                assertThat(cheerRepository.count())
+                        .as("DB 에러(컬럼 길이 초과) 발생 시 응원글은 삭제되어야 한다.")
+                        .isZero();
+
+                verify(fileClient).deleteFiles(movedKeys);
+            }
         }
 
         @Test
@@ -207,7 +250,7 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
             assertThat(response.images()).isEmpty();
             assertThat(cheerRepository.count()).isEqualTo(1);
 
-            Mockito.verify(fileClient, Mockito.never())
+            verify(fileClient, Mockito.never())
                     .moveTempFilesToPermanent(anyString(), anyLong(), anyList());
         }
 
