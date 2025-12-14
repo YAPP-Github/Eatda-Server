@@ -99,7 +99,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
                     List.of(CheerTagName.GOOD_FOR_DATING, CheerTagName.CLEAN_RESTROOM)
             );
 
-            doReturn(response).when(cheerService).registerCheer(eq(request), any(), anyLong(), any());
+            doReturn(response).when(cheerService).createCheer(eq(request), any(), anyLong());
 
             var document = document("cheer/register", 201)
                     .request(requestDocument)
@@ -137,7 +137,7 @@ public class CheerDocumentTest extends BaseDocumentTest {
             );
 
             doThrow(new BusinessException(errorCode))
-                    .when(cheerService).registerCheer(eq(request), any(), anyLong(), any());
+                    .when(cheerService).createCheer(eq(request), any(), anyLong());
 
             var document = document("cheer/register", errorCode)
                     .request(requestDocument)
