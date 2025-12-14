@@ -207,12 +207,13 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                         ImageDomain.CHEER
                 );
             } catch (Exception ignored) {
-                assertThat(cheerRepository.count())
-                        .as("DB 에러(컬럼 길이 초과) 발생 시 응원글은 삭제되어야 한다.")
-                        .isZero();
-
-                verify(fileClient).deleteFiles(movedKeys);
             }
+
+            assertThat(cheerRepository.count())
+                    .as("DB 에러(컬럼 길이 초과) 발생 시 응원글은 삭제되어야 한다.")
+                    .isZero();
+
+            verify(fileClient).deleteFiles(movedKeys);
         }
 
         @Test
