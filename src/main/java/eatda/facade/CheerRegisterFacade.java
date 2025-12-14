@@ -10,7 +10,6 @@ import eatda.service.cheer.CheerService;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.exception.SdkException;
 
@@ -18,8 +17,6 @@ import software.amazon.awssdk.core.exception.SdkException;
 @RequiredArgsConstructor
 public class CheerRegisterFacade {
 
-    @Value("${cdn.base-url}")
-    private String cdnBaseUrl;
     private final CheerService cheerService;
     private final FileClient fileClient;
 
@@ -31,16 +28,20 @@ public class CheerRegisterFacade {
         CheerCreationResult creationResult = cheerService.createCheer(request, result, memberId);
         Cheer cheer = creationResult.cheer();
 
+        if (request.images() == null || request.images().isEmpty()) {
+            return cheerService.getCheerResponse(cheer.getId());
+        }
+
         try {
             List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
             List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
-            cheer = cheerService.saveCheerImages(cheer.getId(), sortedImages, permanentKeys);
+            cheerService.saveCheerImages(cheer.getId(), sortedImages, permanentKeys);
         } catch (SdkException sdkException) {
             cheerService.deleteCheer(cheer.getId());
             throw sdkException;
         }
 
-        return new CheerResponse(cheer, creationResult.store(), cdnBaseUrl);
+        return cheerService.getCheerResponse(cheer.getId());
     }
 
     private List<CheerRegisterRequest.UploadedImageDetail> sortImages(
@@ -53,6 +54,10 @@ public class CheerRegisterFacade {
     private List<String> moveImages(ImageDomain domain,
                                     long cheerId,
                                     List<CheerRegisterRequest.UploadedImageDetail> sortedImages) {
+        if (sortedImages.isEmpty()) {
+            return List.of();
+        }
+
         List<String> tempKeys = sortedImages.stream()
                 .map(CheerRegisterRequest.UploadedImageDetail::imageKey)
                 .toList();
