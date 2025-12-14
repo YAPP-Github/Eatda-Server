@@ -1,6 +1,7 @@
 package eatda.facade.cheer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -118,15 +119,14 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                     SdkException.builder().build()
             );
 
-            try {
-                cheerRegisterFacade.registerCheer(
-                        request,
-                        storeResult,
-                        member.getId(),
-                        ImageDomain.CHEER
-                );
-            } catch (Exception ignored) {
-            }
+            assertThrows(SdkException.class, () ->
+                    cheerRegisterFacade.registerCheer(
+                            request,
+                            storeResult,
+                            member.getId(),
+                            ImageDomain.CHEER
+                    )
+            );
 
             assertThat(cheerRepository.count()).isZero();
         }
@@ -158,15 +158,14 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
                 throw SdkException.builder().build();
             });
 
-            try {
-                cheerRegisterFacade.registerCheer(
-                        request,
-                        storeResult,
-                        member.getId(),
-                        ImageDomain.CHEER
-                );
-            } catch (Exception ignored) {
-            }
+            assertThrows(SdkException.class, () ->
+                    cheerRegisterFacade.registerCheer(
+                            request,
+                            storeResult,
+                            member.getId(),
+                            ImageDomain.CHEER
+                    )
+            );
 
             assertThat(cheerRepository.count())
                     .as("부분 성공 후 실패 시 Cheer는 삭제되어야 한다.")
@@ -199,21 +198,21 @@ class CheerRegisterFacadeTest extends BaseFacadeTest {
             given(fileClient.moveTempFilesToPermanent(anyString(), anyLong(), anyList()))
                     .willReturn(movedKeys);
 
-            try {
-                cheerRegisterFacade.registerCheer(
-                        request,
-                        storeResult,
-                        member.getId(),
-                        ImageDomain.CHEER
-                );
-            } catch (Exception ignored) {
-            }
+            assertThrows(Exception.class, () ->
+                    cheerRegisterFacade.registerCheer(
+                            request,
+                            storeResult,
+                            member.getId(),
+                            ImageDomain.CHEER
+                    )
+            );
 
             assertThat(cheerRepository.count())
                     .as("DB 에러(컬럼 길이 초과) 발생 시 응원글은 삭제되어야 한다.")
                     .isZero();
 
             verify(fileClient).deleteFiles(movedKeys);
+
         }
 
         @Test
