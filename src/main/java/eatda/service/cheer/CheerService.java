@@ -4,6 +4,7 @@ import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
 import eatda.controller.cheer.CheerRegisterRequest;
+import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheerSearchParameters;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
@@ -68,27 +69,25 @@ public class CheerService {
     }
 
     @Transactional
-    public Cheer saveCheerImages(Long cheerId,
-                                 List<CheerRegisterRequest.UploadedImageDetail> sortedImages,
-                                 List<String> permanentKeys) {
+    public void saveCheerImages(Long cheerId,
+                                List<CheerRegisterRequest.UploadedImageDetail> sortedImages,
+                                List<String> permanentKeys) {
 
-        Cheer persistentCheer = cheerRepository.findById(cheerId)
+        Cheer cheer = cheerRepository.findById(cheerId)
                 .orElseThrow(() -> new BusinessException(BusinessErrorCode.CHEER_NOT_FOUND));
 
         IntStream.range(0, sortedImages.size())
                 .forEach(i -> {
                     var detail = sortedImages.get(i);
                     CheerImage cheerImage = new CheerImage(
-                            persistentCheer,
+                            cheer,
                             permanentKeys.get(i),
                             detail.orderIndex(),
                             detail.contentType(),
                             detail.fileSize()
                     );
-                    persistentCheer.addImage(cheerImage);
+                    cheer.addImage(cheerImage);
                 });
-
-        return persistentCheer;
     }
 
     @Transactional(readOnly = true)
@@ -107,14 +106,11 @@ public class CheerService {
 
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
-                .map(cheer -> {
-                    Store store = cheer.getStore();
-                    return new CheerPreviewResponse(cheer,
-                            cheer.getImages().stream()
-                                    .map(img -> new CheerImageResponse(img, cdnBaseUrl))
-                                    .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
-                                    .toList());
-                })
+                .map(cheer -> new CheerPreviewResponse(cheer,
+                        cheer.getImages().stream()
+                                .map(img -> new CheerImageResponse(img, cdnBaseUrl))
+                                .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
+                                .toList()))
                 .toList());
     }
 
@@ -133,5 +129,13 @@ public class CheerService {
     @Transactional
     public void deleteCheer(Long cheerId) {
         cheerRepository.deleteById(cheerId);
+    }
+
+    @Transactional(readOnly = true)
+    public CheerResponse getCheerResponse(Long cheerId) {
+        Cheer cheer = cheerRepository.findById(cheerId)
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.CHEER_NOT_FOUND));
+
+        return new CheerResponse(cheer, cdnBaseUrl);
     }
 }
