@@ -6,6 +6,7 @@ import eatda.domain.ImageDomain;
 import eatda.domain.cheer.CheerTagName;
 import eatda.domain.store.StoreCategory;
 import eatda.domain.store.StoreSearchResult;
+import eatda.facade.CheerRegisterFacade;
 import eatda.service.cheer.CheerService;
 import eatda.service.store.StoreSearchService;
 import jakarta.validation.constraints.Max;
@@ -29,13 +30,14 @@ public class CheerController {
 
     private final CheerService cheerService;
     private final StoreSearchService storeSearchService;
+    private final CheerRegisterFacade cheerRegisterFacade;
 
     @PostMapping("/api/cheer")
     public ResponseEntity<CheerResponse> registerCheer(@RequestBody CheerRegisterRequest request,
                                                        LoginMember member) {
         StoreSearchResult searchResult = storeSearchService.searchStoreByKakaoId(
                 request.storeName(), request.storeKakaoId());
-        CheerResponse response = cheerService.registerCheer(request, searchResult, member.id(), ImageDomain.CHEER);
+        CheerResponse response = cheerRegisterFacade.registerCheer(request, searchResult, member.id(), ImageDomain.CHEER);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
