@@ -1,6 +1,5 @@
 package eatda.service.cheer;
 
-import eatda.client.file.FileClient;
 import eatda.controller.cheer.CheerImageResponse;
 import eatda.controller.cheer.CheerInStoreResponse;
 import eatda.controller.cheer.CheerPreviewResponse;
@@ -9,7 +8,6 @@ import eatda.controller.cheer.CheerResponse;
 import eatda.controller.cheer.CheerSearchParameters;
 import eatda.controller.cheer.CheersInStoreResponse;
 import eatda.controller.cheer.CheersResponse;
-import eatda.domain.ImageDomain;
 import eatda.domain.cheer.Cheer;
 import eatda.domain.cheer.CheerImage;
 import eatda.domain.member.Member;
@@ -17,6 +15,7 @@ import eatda.domain.store.Store;
 import eatda.domain.store.StoreSearchResult;
 import eatda.exception.BusinessErrorCode;
 import eatda.exception.BusinessException;
+import eatda.facade.CheerCreationResult;
 import eatda.repository.cheer.CheerRepository;
 import eatda.repository.member.MemberRepository;
 import eatda.repository.store.StoreRepository;
@@ -37,20 +36,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheerService {
 
     private static final int MAX_CHEER_SIZE = 10_000;
-
+    private static final String SORTED_PROPERTIES = "createdAt";
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final CheerRepository cheerRepository;
-    private final FileClient fileClient;
 
     @Value("${cdn.base-url}")
     private String cdnBaseUrl;
 
     @Transactional
-    public CheerResponse registerCheer(CheerRegisterRequest request,
-                                       StoreSearchResult result,
-                                       long memberId,
-                                       ImageDomain domain
+    public CheerCreationResult createCheer(CheerRegisterRequest request,
+                                           StoreSearchResult result,
+                                           long memberId
     ) {
         Member member = memberRepository.getById(memberId);
         validateRegisterCheer(member, request.storeKakaoId());
@@ -59,15 +56,7 @@ public class CheerService {
                 .orElseGet(() -> storeRepository.save(result.toStore())); // TODO 상점 조회/저장 동시성 이슈 해결
         Cheer cheer = new Cheer(member, store, request.description());
         cheer.setCheerTags(request.tags());
-        Cheer savedCheer = cheerRepository.save(cheer);
-
-        // TODO 트랜잭션 범위 축소
-        List<CheerRegisterRequest.UploadedImageDetail> sortedImages = sortImages(request.images());
-        List<String> permanentKeys = moveImages(domain, cheer.getId(), sortedImages);
-
-        saveCheerImages(cheer, sortedImages, permanentKeys);
-
-        return new CheerResponse(savedCheer, store, cdnBaseUrl);
+        return new CheerCreationResult(cheerRepository.save(cheer), store);
     }
 
     private void validateRegisterCheer(Member member, String storeKakaoId) {
@@ -79,25 +68,14 @@ public class CheerService {
         }
     }
 
-    private List<CheerRegisterRequest.UploadedImageDetail> sortImages(
-            List<CheerRegisterRequest.UploadedImageDetail> images) {
-        return images.stream()
-                .sorted(Comparator.comparingLong(CheerRegisterRequest.UploadedImageDetail::orderIndex))
-                .toList();
-    }
+    @Transactional
+    public void saveCheerImages(Long cheerId,
+                                List<CheerRegisterRequest.UploadedImageDetail> sortedImages,
+                                List<String> permanentKeys) {
 
-    private List<String> moveImages(ImageDomain domain,
-                                    long cheerId,
-                                    List<CheerRegisterRequest.UploadedImageDetail> sortedImages) {
-        List<String> tempKeys = sortedImages.stream()
-                .map(CheerRegisterRequest.UploadedImageDetail::imageKey)
-                .toList();
-        return fileClient.moveTempFilesToPermanent(domain.getName(), cheerId, tempKeys);
-    }
+        Cheer cheer = cheerRepository.findById(cheerId)
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.CHEER_NOT_FOUND));
 
-    private void saveCheerImages(Cheer cheer,
-                                 List<CheerRegisterRequest.UploadedImageDetail> sortedImages,
-                                 List<String> permanentKeys) {
         IntStream.range(0, sortedImages.size())
                 .forEach(i -> {
                     var detail = sortedImages.get(i);
@@ -108,10 +86,8 @@ public class CheerService {
                             detail.contentType(),
                             detail.fileSize()
                     );
-                    cheer.addImage(cheerImage); // 여기서 양방향 동기화
+                    cheer.addImage(cheerImage);
                 });
-
-        cheerRepository.save(cheer);
     }
 
     @Transactional(readOnly = true)
@@ -121,7 +97,7 @@ public class CheerService {
                 parameters.getCheerTagNames(),
                 parameters.getDistricts(),
                 PageRequest.of(parameters.getPage(), parameters.getSize(),
-                        Sort.by(Direction.DESC, "createdAt"))
+                        Sort.by(Direction.DESC, SORTED_PROPERTIES))
         );
 
         List<Cheer> cheers = cheerPage.getContent();
@@ -130,14 +106,11 @@ public class CheerService {
 
     private CheersResponse toCheersResponse(List<Cheer> cheers) {
         return new CheersResponse(cheers.stream()
-                .map(cheer -> {
-                    Store store = cheer.getStore();
-                    return new CheerPreviewResponse(cheer,
-                            cheer.getImages().stream()
-                                    .map(img -> new CheerImageResponse(img, cdnBaseUrl))
-                                    .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
-                                    .toList());
-                })
+                .map(cheer -> new CheerPreviewResponse(cheer,
+                        cheer.getImages().stream()
+                                .map(img -> new CheerImageResponse(img, cdnBaseUrl))
+                                .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
+                                .toList()))
                 .toList());
     }
 
@@ -151,5 +124,18 @@ public class CheerService {
                 .toList();
 
         return new CheersInStoreResponse(cheersResponse);
+    }
+
+    @Transactional
+    public void deleteCheer(Long cheerId) {
+        cheerRepository.deleteById(cheerId);
+    }
+
+    @Transactional(readOnly = true)
+    public CheerResponse getCheerResponse(Long cheerId) {
+        Cheer cheer = cheerRepository.findById(cheerId)
+                .orElseThrow(() -> new BusinessException(BusinessErrorCode.CHEER_NOT_FOUND));
+
+        return new CheerResponse(cheer, cdnBaseUrl);
     }
 }

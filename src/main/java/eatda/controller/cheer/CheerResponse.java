@@ -2,7 +2,6 @@ package eatda.controller.cheer;
 
 import eatda.domain.cheer.Cheer;
 import eatda.domain.cheer.CheerTagName;
-import eatda.domain.store.Store;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,12 +14,12 @@ public record CheerResponse(
         List<CheerTagName> tags
 ) {
 
-    public CheerResponse(Cheer cheer, Store store, String cdnBaseUrl) {
+    public CheerResponse(Cheer cheer, String cdnBaseUrl) {
         this(
-                store.getId(),
+                cheer.getStore().getId(),
                 cheer.getId(),
                 cheer.getImages().stream()
-                        .map(img -> new CheerImageResponse(img, cdnBaseUrl)) // ✅ CDN 붙여줌
+                        .map(img -> new CheerImageResponse(img, cdnBaseUrl))
                         .sorted(Comparator.comparingLong(CheerImageResponse::orderIndex))
                         .collect(Collectors.toList()),
                 cheer.getDescription(),
